@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VARO — 지금, 바로 당신의 스타일. 2026 남성 패션 커뮤니티 쇼핑몰.">
+  <meta name="theme-color" content="#FFFFFF">
+  <title>VARO — 지금, 바로 당신의 스타일</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="./styles/reset.css">
+  <link rel="stylesheet" href="./styles/variables.css">
+  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/header.css">
+  <link rel="stylesheet" href="./styles/mega-menu.css">
+  <link rel="stylesheet" href="./styles/index.css">
+</head>
+
+<body data-page="home">
+
+  <!-- ══════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════ -->
+  <div class="header-top">
+    <div class="header-top__inner">
+      <p class="header-top__notice">무료배송 50,000원 이상 · 당일발송 가능 · 7일 무료반품 · <strong style="color:#D96B3C">1+1 이벤트 진행 중
+          D-6</strong></p>
+      <nav class="header-top__util">
+        <a href="./signup.html">회원가입</a><span class="header-top__sep"></span>
+        <a href="./login.html">로그인</a><span class="header-top__sep"></span>
+        <a href="./mypage.html">주문조회</a><span class="header-top__sep"></span>
+        <a href="./mypage.html">마이페이지</a>
+      </nav>
+    </div>
+  </div>
+
+  <header class="site-header" id="siteHeader">
+    <div class="header-main">
+      <div class="header-main__inner">
+        <a href="./index.html" class="site-header__logo" aria-label="VARO 홈">V<span>A</span>RO</a>
+        <div class="header-main__actions">
+          <button class="icon-btn" id="searchToggle" aria-label="검색">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+          </button>
+          <a href="#" class="icon-btn" aria-label="위시리스트">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+          </a>
+          <a href="./cart.html" class="icon-btn cart-icon-btn" aria-label="장바구니">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
+            <span class="cart-badge" id="cartBadge" aria-live="polite"></span>
+          </a>
+          <a href="./login.html" class="icon-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </a>
+          <button class="member-badge-btn" onclick="location.href='./mypage.html'">GOLD</button>
+          <button class="icon-btn hamburger" id="mobileMenuToggle" aria-expanded="false" aria-controls="mobileNav">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="category-nav" aria-label="카테고리 메뉴">
+      <ul class="category-nav__list">
+        <li class="category-nav__item"><a href="./shop.html?filter=best">BEST</a></li>
+        <li class="category-nav__item category-nav__item--special"><a href="./shop.html">자체제작</a></li>
+        <li class="category-nav__item category-nav__item--new"><a href="./shop.html?filter=new">NEW 5%</a></li>
+        <li class="category-nav__item"><a href="./shop.html">COLLECTION</a></li>
+        <li class="category-nav__divider"></li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=outer">OUTER</a></li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=shirt">SHIRT</a></li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=top">TOP</a></li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=knit">KNIT</a></li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=bottom">BOTTOM</a></li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=setup">SET-UP</a></li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=shoes">SHOES</a></li>
+        <li class="category-nav__item"><a href="./shop.html?category=acc">ACC</a></li>
+        <li class="category-nav__divider"></li>
+        <li class="category-nav__item category-nav__item--event"><a href="./event.html">1+1 EVENT</a></li>
+        <li class="category-nav__item category-nav__item--fast"><a href="./shop.html?filter=fast">당일발송</a></li>
+        <li class="category-nav__item category-nav__item--sale"><a href="./shop.html?filter=sale">TIME SALE 10%</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <nav class="mobile-nav" id="mobileNav" aria-hidden="true">
+    <div class="mobile-nav__header">
+      <span class="site-header__logo">V<span>A</span>RO</span>
+      <button class="icon-btn mobile-nav__close" id="mobileNavClose"><svg width="22" height="22" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg></button>
+    </div>
+    <ul class="mobile-nav__list">
+      <li><a href="./shop.html?filter=best" class="mobile-nav__link">BEST</a></li>
+      <li><a href="./shop.html?filter=new" class="mobile-nav__link" style="color:#D96B3C">NEW 5%</a></li>
+      <li><a href="./shop.html?category=outer" class="mobile-nav__link">아우터</a></li>
+      <li><a href="./shop.html?category=shirt" class="mobile-nav__link">셔츠</a></li>
+      <li><a href="./shop.html?category=top" class="mobile-nav__link">상의</a></li>
+      <li><a href="./shop.html?category=knit" class="mobile-nav__link">니트</a></li>
+      <li><a href="./shop.html?category=bottom" class="mobile-nav__link">하의</a></li>
+      <li><a href="./shop.html?category=setup" class="mobile-nav__link">세트업</a></li>
+      <li><a href="./shop.html?category=shoes" class="mobile-nav__link">슈즈</a></li>
+      <li><a href="./event.html" class="mobile-nav__link" style="color:#D96B3C;font-weight:700">1+1 이벤트</a></li>
+      <li><a href="./shop.html?filter=sale" class="mobile-nav__link" style="color:#E02020;font-weight:800">SALE</a></li>
+      <li><a href="./community.html" class="mobile-nav__link">커뮤니티</a></li>
+    </ul>
+    <div class="mobile-nav__footer">
+      <a href="./login.html" class="btn btn--outline btn--full">로그인</a>
+      <a href="./signup.html" class="btn btn--accent btn--full">회원가입</a>
+    </div>
+  </nav>
+  <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+
+  <div class="search-overlay" id="searchOverlay" role="dialog" aria-hidden="true">
+    <div class="search-overlay__inner">
+      <form class="search-form" onsubmit="return false;">
+        <input type="search" class="search-input" id="searchInput" placeholder="브랜드, 상품, 카테고리 검색..." autocomplete="off"
+          maxlength="100">
+        <button type="button" class="icon-btn search-submit"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.8">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg></button>
+      </form>
+      <button class="search-close" id="searchClose">ESC 닫기</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════ -->
+  <main id="main-content">
+
+    <!-- ① 단일 대형 화보 슬라이더 -->
+    <section class="main-slider" aria-label="메인 슬라이더">
+      <div class="main-slider__slide">
+        <a href="./shop.html" class="main-slider__panel">
+          <img src="./assets/trendy/hero_shirt.png" alt="VARO 2026 SS Collection" loading="eager" fetchpriority="high">
+          <div class="main-slider__panel-overlay">
+            <h2 class="main-slider__title">the era of minimal</h2>
+            <a href="./shop.html" class="btn btn--outline" style="color:#fff;border-color:#fff">explore collection</a>
+          </div>
+        </a>
+      </div>
+      <!-- 계절별 네비게이션 (01-12) -->
+      <div class="slider-months">
+        <span class="month-item">01</span>
+        <span class="month-item">02</span>
+        <span class="month-item">03</span>
+        <span class="month-item">04</span>
+        <span class="month-item">05</span>
+        <span class="month-item">06</span>
+        <span class="month-item">07</span>
+        <span class="month-item">08</span>
+        <span class="month-item">09</span>
+        <span class="month-item">10</span>
+        <span class="month-item">11</span>
+        <span class="month-item month-item--active">12</span>
+      </div>
+    </section>
+
+    <!-- ② NEW IN (3열 그리드) -->
+    <section class="home-section">
+      <div class="container">
+        <div class="home-section__head"
+          style="flex-direction:column; align-items:center; text-align:center; margin-bottom:60px">
+          <h2 class="home-section__title"
+            style="font-family:var(--font-serif); font-size:40px; text-transform:lowercase; margin-bottom:12px">new
+            arrivals</h2>
+          <p class="home-section__sub">시즌의 정취를 담은 새로운 컬렉션</p>
+        </div>
+        <div class="product-grid" id="newInGrid">
+          <!-- JS 렌더 -->
+        </div>
+        <div style="text-align:center; margin-top:60px">
+          <a href="./shop.html?filter=new" class="home-section__more" style="display:inline-flex">view all arrivals</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ② 마퀴 배너 -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee__track" id="marqueeTrack">
+        <span class="marquee__item">FREE SHIPPING OVER <b>50,000 KRW</b></span>
+        <span class="marquee__item">2026 SS — <b>NEW ARRIVALS</b></span>
+        <span class="marquee__item">상의 전품목 <b>1+1 EVENT</b></span>
+        <span class="marquee__item">FLASH DEAL — <b>TIME SALE 10%</b></span>
+        <span class="marquee__item">GOLD 멤버 <b>무료배송</b></span>
+        <span class="marquee__item">7일 <b>무료반품</b> 보장</span>
+        <span class="marquee__item">FREE SHIPPING OVER <b>50,000 KRW</b></span>
+        <span class="marquee__item">2026 SS — <b>NEW ARRIVALS</b></span>
+        <span class="marquee__item">상의 전품목 <b>1+1 EVENT</b></span>
+        <span class="marquee__item">FLASH DEAL — <b>TIME SALE 10%</b></span>
+        <span class="marquee__item">GOLD 멤버 <b>무료배송</b></span>
+        <span class="marquee__item">7일 <b>무료반품</b> 보장</span>
+      </div>
+    </div>
+
+    <!-- ③ NEW IN -->
+    <section class="home-section">
+      <div class="container">
+        <div class="home-section__head">
+          <div>
+            <h2 class="home-section__title">NEW IN</h2>
+            <p class="home-section__sub">2026 SS 최신 입고 상품</p>
+          </div>
+          <a href="./shop.html?filter=new" class="home-section__more">전체보기 <span>→</span></a>
+        </div>
+        <div class="product-grid" id="newInGrid">
+          <!-- JS 렌더 -->
+        </div>
+      </div>
+    </section>
+
+    <section class="home-banner-row container">
+      <a href="./event.html" class="home-banner home-banner--accent">
+        <div class="home-banner__img">
+          <img src="./assets/trendy/banner_event_1.png" alt="상의 1+1 이벤트 화보" loading="lazy" width="700" height="300">
+        </div>
+        <div class="home-banner__content">
+          <span class="home-banner__tag">EVENT</span>
+          <p class="home-banner__title">상의 전품목<br><strong>1+1 이벤트</strong></p>
+          <p class="home-banner__period">~ 04.25 · D-6</p>
+        </div>
+      </a>
+      <a href="./shop.html?filter=sale" class="home-banner home-banner--dark">
+        <div class="home-banner__img">
+          <img src="./assets/trendy/korean_leather_jacket_black_1776533955223.png" alt="타임세일 가죽 자켓" loading="lazy"
+            width="700" height="300">
+        </div>
+        <div class="home-banner__content">
+          <span class="home-banner__tag">TIME SALE</span>
+          <p class="home-banner__title">오늘만<br><strong>최대 -10%</strong></p>
+          <p class="home-banner__period">자정 종료</p>
+        </div>
+      </a>
+    </section>
+
+    <!-- ③ BEST 상품 -->
+    <section class="home-section home-section--gray">
+      <div class="container">
+        <div class="home-section__head"
+          style="flex-direction:column; align-items:center; text-align:center; margin-bottom:60px">
+          <h2 class="home-section__title"
+            style="font-family:var(--font-serif); font-size:40px; text-transform:lowercase; margin-bottom:12px">weekly
+            best</h2>
+          <p class="home-section__sub">이번 주 가장 사랑받은 피스</p>
+        </div>
+        <div class="product-grid" id="bestGrid"></div>
+      </div>
+    </section>
+
+    <!-- ④ 카테고리 (심플 3열) -->
+    <section class="home-section">
+      <div class="container">
+        <div class="home-section__head"
+          style="flex-direction:column; align-items:center; text-align:center; margin-bottom:60px">
+          <h2 class="home-section__title"
+            style="font-family:var(--font-serif); font-size:40px; text-transform:lowercase; margin-bottom:12px">shop by
+            category</h2>
+        </div>
+        <div class="cat-banner-grid">
+          <a href="./shop.html?category=outer" class="cat-banner">
+            <img src="./hero_autumn_style_coat_1776618420_1776616914355.png" alt="아우터">
+            <div class="cat-banner__info">
+              <p class="cat-banner__name">outer</p>
+            </div>
+          </a>
+          <a href="./shop.html?category=top" class="cat-banner">
+            <img src="./korean_oversized_stripe_shirt_1776533534047.png" alt="상의">
+            <div class="cat-banner__info">
+              <p class="cat-banner__name">tops</p>
+            </div>
+          </a>
+          <a href="./shop.html?category=bottom" class="cat-banner">
+            <img src="./korean_wide_selvedge_denim_1776533548638.png" alt="하의">
+            <div class="cat-banner__info">
+              <p class="cat-banner__name">bottoms</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ⑤ 에디터 픽 -->
+    <section class="editor-pick-section">
+      <div class="container">
+        <div class="editor-pick-inner">
+          <div class="editor-pick-text">
+            <p class="editor-pick-text__eyebrow">director's pick</p>
+            <h2 class="editor-pick-text__title" style="font-family:var(--font-serif); font-weight:400">the minimal
+              <br>essentials
+            </h2>
+            <p class="editor-pick-text__body">세월이 흘러도 변치 않는 가치, 미니멀한 실루엣과 최상의 소재로 완성된 이번 시즌의 정수입니다.</p>
+            <a href="./product.html?id=P003" class="editor-pick-text__link">view details →</a>
+          </div>
+          <a href="./product.html?id=P003" class="editor-pick-img">
+            <img src="./korean_minimal_balmacaan_coat_1776533515652.png" alt="에디터 픽">
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ══════════════════════════════════════════
+   FOOTER (룩플 3단 개편)
+══════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="site-footer__inner container">
+      <!-- 1단: 고객센터 -->
+      <div class="footer-column">
+        <h3 class="footer-title">c/s center</h3>
+        <p class="footer-info"><strong>1588-0000</strong></p>
+        <p class="footer-sub">AM 10:00 - PM 05:30 <br>LUNCH PM 01:00 - PM 02:00 <br>SAT, SUN, HOLIDAY OFF</p>
+      </div>
+
+      <!-- 2단: 브랜드 정보 -->
+      <div class="footer-column footer-column--center">
+        <p class="footer-logo"
+          style="font-family:var(--font-serif); font-size:32px; text-transform:lowercase; margin-bottom:20px">varo</p>
+        <p class="footer-sub">상호: 바로패션(주) | 대표: 홍길동 <br>사업자등록번호: 000-00-00000 <br>통신판매업신고: 제0000-서울-0000호</p>
+        <p class="footer-copy">© varo all rights reserved.</p>
+      </div>
+
+      <!-- 3단: 링크/SNS -->
+      <div class="footer-column">
+        <h3 class="footer-title">account</h3>
+        <ul class="footer-links" style="list-style:none; padding:0">
+          <li> 우리은행 000-000-000000 (예금주: 바로패션)</li>
+          <li><a href="#" style="text-decoration:none; color:inherit">instagram: @varo_official</a></li>
+          <li><a href="#" style="text-decoration:none; color:inherit">kakao talk: @varo_cs</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script src="./js/data.js"></script>
+  <script src="./js/utils.js"></script>
+  <script src="./js/main.js"></script>
+  <script src="./js/mega-menu.js"></script>
+  <script src="./js/index.js"></script>
+</body>
+
+</html>

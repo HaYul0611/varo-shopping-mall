@@ -1,0 +1,113 @@
+/* 경로: styles/variables.css */
+/* VARO 2026 디자인 토큰 — 이 파일 한 곳에서만 색상·타이포·간격을 수정하세요 */
+
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+
+:root {
+  /* ── 브랜드 컬러 ─────────────────────────────────── */
+  --color-bg: #FFFFFF;
+  /* 미니멀 순백색 */
+  --color-black: #000000;
+  /* 완전 블랙 */
+  --color-accent: #2C2C2C;
+  /* 톤다운된 블랙/차콜 */
+  --color-accent-light: #F8F8F8;
+  /* 매우 연한 회색 배경 */
+  --color-accent-dark: #111111;
+  /* 딥 블랙 */
+  --color-blue: #3A4B5A;
+  /* 차분한 네이비 */
+  --color-white: #FFFFFF;
+  --color-gray: #999999;
+  /* 뉴트럴 그레이 */
+  --color-light: #F2F2F2;
+  /* 밝은 회색 */
+  --color-border: #EEEEEE;
+
+  /* ── 멤버십 등급 컬러 (개성 있게 재조정) ────────────────── */
+  --color-bronze: #A0785A;
+  --color-silver: #A9A9A9;
+  --color-gold: #C5A059;
+  --color-vip: #000000;
+
+  /* ── 타이포그래피 (개성을 살린 폰트 조합) ────────────────── */
+  /* 로고 및 헤드라인용 세리프 */
+  --font-serif: "Fraunces", "Playfair Display", serif;
+  /* 본문 및 네비게이션용 산세리프 */
+  --font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+  --font-size-xs: 0.6875rem;
+  /* 11px */
+  --font-size-sm: 0.75rem;
+  /* 12px */
+  --font-size-base: 0.8125rem;
+  /* 13px */
+  --font-size-md: 0.875rem;
+  /* 14px */
+  --font-size-lg: 1rem;
+  /* 16px */
+  --font-size-xl: 1.25rem;
+  /* 20px */
+  --font-size-2xl: 1.5rem;
+  /* 24px */
+  --font-size-3xl: 2rem;
+  /* 32px */
+  --font-size-4xl: 2.5rem;
+  /* 40px */
+
+  --letter-spacing-tight: -0.04em;
+  --letter-spacing-normal: -0.02em;
+  --letter-spacing-wide: 0.06em;
+  --letter-spacing-wider: 0.12em;
+  --letter-spacing-widest: 0.2em;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --font-weight-black: 800;
+
+  --line-height-tight: 1.2;
+  --line-height-base: 1.5;
+  --line-height-loose: 1.75;
+
+  /* ── 간격 ───────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── 레이아웃 ──────────────────────────────────── */
+  --container-max: 1440px;
+  --container-pad: clamp(16px, 4vw, 48px);
+  --header-height: 56px;
+  --grid-gap: 16px;
+  --grid-gap-sm: 10px;
+
+  /* ── 반경 ───────────────────────────────────────── */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* ── 그림자 ─────────────────────────────────────── */
+  --shadow-sm: 0 1px 3px rgba(28, 26, 22, 0.08);
+  --shadow-md: 0 4px 12px rgba(28, 26, 22, 0.10);
+  --shadow-lg: 0 8px 24px rgba(28, 26, 22, 0.12);
+
+  /* ── 전환 ───────────────────────────────────────── */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+  --transition-slow: 0.4s ease;
+
+  /* ── z-index ────────────────────────────────────── */
+  --z-header: 100;
+  --z-overlay: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+}

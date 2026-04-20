@@ -1,0 +1,111 @@
+/* 경로: styles/shop.css */
+/* VARO 2026 — 쇼핑 목록 페이지 */
+
+/* ── 쇼핑 헤더 ──────────────────────────────────────── */
+.shop-header { padding: 20px 0 0; }
+.shop-header__top { margin-bottom: 16px; }
+.shop-header__title { font-size: clamp(22px, 3vw, 32px); font-weight: var(--font-weight-black); letter-spacing: var(--letter-spacing-tight); margin: 6px 0 4px; }
+.shop-header__count { font-size: var(--font-size-xs); color: var(--color-gray); }
+
+/* ── 필터 탭 ─────────────────────────────────────────── */
+.filter-tabs { display: flex; gap: 6px; padding: 12px 0 16px; overflow-x: auto; scrollbar-width: none; }
+.filter-tabs::-webkit-scrollbar { display: none; }
+.filter-tab {
+  padding: 7px 16px;
+  border: 0.5px solid rgba(28,26,22,.2);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  white-space: nowrap;
+  background: transparent;
+  transition: all var(--transition-fast);
+  letter-spacing: -0.01em;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+}
+.filter-tab.is-active { background: var(--color-black); color: var(--color-white); border-color: var(--color-black); }
+.filter-tab:hover:not(.is-active) { border-color: var(--color-black); }
+.filter-tab--event { color: var(--color-accent); border-color: var(--color-accent); }
+.filter-tab--event.is-active { background: var(--color-accent); border-color: var(--color-accent); color: white; }
+
+/* ── 정렬 + 뷰 토글 ────────────────────────────────── */
+.shop-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.sort-wrap { position: relative; }
+.sort-select {
+  border: 0.5px solid rgba(28,26,22,.18);
+  background: transparent;
+  font-size: var(--font-size-xs);
+  padding: 7px 10px;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  border-radius: var(--radius-sm);
+}
+.view-toggle { display: flex; gap: 4px; }
+.view-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.5px solid var(--color-border);
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-gray);
+  transition: all var(--transition-fast);
+  border-radius: var(--radius-sm);
+  padding: 0;
+}
+.view-btn.is-active { background: var(--color-black); color: var(--color-white); border-color: var(--color-black); }
+.view-btn svg { width: 14px; height: 14px; fill: currentColor; }
+
+/* ── 쇼핑 바디 레이아웃 ─────────────────────────────── */
+.shop-body { display: grid; grid-template-columns: 1fr; gap: 24px; padding-bottom: var(--space-16); }
+@media (min-width: 1024px) { .shop-body { grid-template-columns: 200px 1fr; } }
+
+/* ── 사이드 필터 (데스크탑) ─────────────────────────── */
+.side-filter { display: none; }
+@media (min-width: 1024px) { .side-filter { display: block; } }
+.side-filter__section { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 0.5px solid var(--color-border); }
+.side-filter__section:last-child { border-bottom: none; }
+.side-filter__title { font-size: 10px; font-weight: var(--font-weight-black); letter-spacing: var(--letter-spacing-widest); text-transform: uppercase; margin-bottom: 12px; }
+.side-filter__list { display: flex; flex-direction: column; gap: 10px; }
+.side-filter__list label { display: flex; align-items: center; gap: 8px; font-size: var(--font-size-xs); cursor: pointer; }
+.side-filter__list input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--color-accent); }
+.side-filter__sizes { display: flex; gap: 5px; flex-wrap: wrap; }
+.size-chip {
+  padding: 5px 10px;
+  border: 0.5px solid rgba(28,26,22,.2);
+  background: transparent;
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+  border-radius: var(--radius-sm);
+}
+.size-chip.is-active { background: var(--color-black); color: var(--color-white); border-color: var(--color-black); }
+
+/* ── 빈 상태 ──────────────────────────────────────── */
+.shop-empty { text-align: center; padding: 60px 0; }
+.shop-empty svg { width: 48px; height: 48px; stroke: var(--color-gray); fill: none; stroke-width: 1.2; margin: 0 auto 16px; }
+.shop-empty p { font-size: var(--font-size-base); color: var(--color-gray); margin-bottom: 20px; }
+
+/* ── 페이지네이션 ─────────────────────────────────── */
+.pagination { display: flex; justify-content: center; align-items: center; gap: 4px; padding: var(--space-10) 0 0; }
+.pagination__btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.5px solid var(--color-border);
+  background: var(--color-white);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+  border-radius: var(--radius-sm);
+}
+.pagination__btn:hover { border-color: var(--color-black); }
+.pagination__btn--active { background: var(--color-black); color: var(--color-white); border-color: var(--color-black); cursor: default; }
+.pagination__btn--nav svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }

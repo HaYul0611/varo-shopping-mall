@@ -1,0 +1,537 @@
+/* 경로: styles/header.css */
+/* VARO 2026 — 헤더 전면 재설계 */
+/* 참조: 룩플(Lookple) / 오텀(Autumn) 스타일 */
+/* 적용 방법: 모든 HTML <head>에 main.css 다음에 추가 */
+/* <link rel="stylesheet" href="./styles/header.css"> */
+
+/* ══════════════════════════════════════════════════════
+   기존 site-header 다크 스타일 전부 초기화
+══════════════════════════════════════════════════════ */
+.site-header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  background: transparent !important;
+  height: auto !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.site-header__inner {
+  display: none !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   1. 상단 유틸리티 바
+══════════════════════════════════════════════════════ */
+.header-top {
+  background: #F5F5F5;
+  border-bottom: 1px solid #E8E8E8;
+  height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.header-top__inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.header-top__notice {
+  font-size: 11px;
+  color: #999;
+  letter-spacing: 0.04em;
+}
+
+.header-top__util {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.header-top__util a {
+  font-size: 11px;
+  color: #666;
+  text-decoration: none;
+  padding: 0 10px;
+  transition: color 0.15s;
+  letter-spacing: -0.01em;
+}
+
+.header-top__util a:hover {
+  color: #D96B3C;
+}
+
+.header-top__sep {
+  width: 1px;
+  height: 10px;
+  background: #DDD;
+  display: inline-block;
+}
+
+/* ══════════════════════════════════════════════════════
+   2. 메인 헤더 (로고 + 검색/장바구니)
+══════════════════════════════════════════════════════ */
+.header-main {
+  background: #FFFFFF;
+  border-bottom: 1px solid #EBEBEB;
+  height: 58px;
+  display: flex;
+  align-items: center;
+}
+
+.header-main__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* 로고 — Fraunces 세리프 적용 */
+.header-main .site-header__logo,
+.header-main__logo {
+  font-family: var(--font-serif);
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--color-black) !important;
+  text-decoration: none;
+  user-select: none;
+  text-transform: lowercase;
+  /* 트렌디한 소문자 로고 스타일 */
+}
+
+.header-main .site-header__logo span,
+.header-main__logo span {
+  color: var(--color-black) !important;
+  /* 오렌지색 제거 */
+}
+
+/* 우측 액션 버튼 그룹 */
+.header-main__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header-main__actions .icon-btn {
+  width: 36px !important;
+  height: 36px !important;
+  color: #1C1A16 !important;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+.header-main__actions .icon-btn:hover {
+  color: #D96B3C !important;
+}
+
+.header-main__actions .icon-btn svg {
+  width: 19px;
+  height: 19px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+}
+
+.header-main__actions .cart-badge {
+  background: #D96B3C !important;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  min-width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  padding: 0 3px;
+  pointer-events: none;
+}
+
+.header-main__actions .cart-icon-btn {
+  position: relative;
+}
+
+.header-main__actions .cart-badge:empty {
+  display: none;
+}
+
+/* 멤버십 등급 버튼 */
+.header-main__actions .member-badge-btn {
+  background: #1C1A16;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  margin-left: 4px;
+}
+
+.header-main__actions .member-badge-btn:hover {
+  background: #D96B3C;
+}
+
+/* 햄버거 (모바일) */
+.header-main__actions .hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.header-main__actions .hamburger span {
+  display: block;
+  width: 20px;
+  height: 1.5px;
+  background: #1C1A16 !important;
+  border-radius: 2px;
+  transition: transform 0.25s, opacity 0.25s;
+}
+
+.header-main__actions .hamburger.is-open span:nth-child(1) {
+  transform: translateY(6.5px) rotate(45deg);
+}
+
+.header-main__actions .hamburger.is-open span:nth-child(2) {
+  opacity: 0;
+}
+
+.header-main__actions .hamburger.is-open span:nth-child(3) {
+  transform: translateY(-6.5px) rotate(-45deg);
+}
+
+/* ══════════════════════════════════════════════════════
+   3. 카테고리 탭 네비게이션 바
+══════════════════════════════════════════════════════ */
+.category-nav {
+  background: #FFFFFF;
+  border-bottom: 2px solid #1C1A16;
+  position: relative;
+  z-index: 50;
+}
+
+.category-nav__list {
+  display: flex;
+  align-items: center;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  gap: 0;
+  list-style: none;
+}
+
+.category-nav__list::-webkit-scrollbar {
+  display: none;
+}
+
+.category-nav__item {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.category-nav__item>a {
+  display: block;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1C1A16;
+  white-space: nowrap;
+  transition: color 0.15s;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  font-family: 'Pretendard Variable', Pretendard, sans-serif;
+}
+
+.category-nav__item:hover>a {
+  color: #D96B3C;
+}
+
+.category-nav__item.is-active>a {
+  color: #D96B3C;
+  border-bottom: 2px solid #D96B3C;
+  margin-bottom: -2px;
+}
+
+/* 특수 카테고리 컬러 */
+.category-nav__item--new>a {
+  color: #D96B3C;
+  font-weight: 700;
+}
+
+.category-nav__item--event>a {
+  color: #D96B3C;
+  font-weight: 700;
+}
+
+.category-nav__item--sale>a {
+  color: #E02020;
+  font-weight: 800;
+}
+
+.category-nav__item--fast>a {
+  color: #4A7FA5;
+  font-weight: 700;
+}
+
+.category-nav__item--special>a {
+  color: #4A7FA5;
+}
+
+/* 구분선 아이템 */
+.category-nav__divider {
+  width: 1px;
+  height: 14px;
+  background: #E0E0E0;
+  margin: 0 4px;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* ══════════════════════════════════════════════════════
+   4. 하위 카테고리 드롭다운
+══════════════════════════════════════════════════════ */
+.sub-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 130px;
+  background: #FFFFFF;
+  border: 1px solid #E8E8E8;
+  border-top: 2px solid #D96B3C;
+  z-index: 300;
+  padding: 8px 0;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  list-style: none;
+}
+
+.category-nav__item.has-sub:hover .sub-menu {
+  display: block;
+}
+
+.sub-menu li {
+  display: block;
+}
+
+.sub-menu li a {
+  display: block;
+  padding: 8px 18px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #555;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color 0.12s, background 0.12s, padding-left 0.12s;
+  letter-spacing: -0.01em;
+}
+
+.sub-menu li a:hover {
+  color: #D96B3C;
+  background: #FEF0E8;
+  padding-left: 22px;
+}
+
+/* ══════════════════════════════════════════════════════
+   5. 검색 오버레이 재정의 (흰 배경에 맞게)
+══════════════════════════════════════════════════════ */
+.search-overlay {
+  background: rgba(28, 26, 22, 0.88) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   6. 모바일 드로어 재정의
+══════════════════════════════════════════════════════ */
+.mobile-nav__header {
+  background: #1C1A16 !important;
+}
+
+.mobile-nav__header .site-header__logo {
+  color: #fff !important;
+  font-size: 16px !important;
+}
+
+.mobile-nav__header .site-header__logo span {
+  color: #D96B3C !important;
+}
+
+.mobile-nav__close svg {
+  stroke: rgba(255, 255, 255, .8) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   7. 반응형
+══════════════════════════════════════════════════════ */
+@media (max-width: 1023px) {
+  .category-nav {
+    display: none;
+  }
+
+  .header-main__actions .hamburger {
+    display: flex !important;
+  }
+
+  .header-top {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .header-main__actions .hamburger {
+    display: none !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   8. 스크롤 시 그림자 효과
+══════════════════════════════════════════════════════ */
+.site-header--scrolled .header-main {
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+}
+
+/* ══════════════════════════════════════════════════════
+  pointer-events: none;
+  z-index: 200;
+}
+
+.mega-panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.mega-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #FFFFFF;
+  border-bottom: 1px solid #EBEBEB;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+
+.mega-panel--open {
+  max-height: 500px;
+}
+
+.mega-panel--open~.mega-panel-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mega-panel__inner {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  padding: 50px 24px;
+  gap: 80px;
+}
+
+.mega-panel__links {
+  display: flex;
+  flex-direction: column;
+}
+
+.mega-panel__title {
+  font-family: 'EB Garamond', serif;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  margin-bottom: 30px;
+  color: #1C1A16;
+}
+
+.mega-panel__links ul {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px 40px;
+  list-style: none;
+}
+
+.mega-panel__links a {
+  font-size: 14px;
+  color: #666;
+  text-decoration: none;
+  transition: color 0.2s, transform 0.2s;
+  display: inline-block;
+}
+
+.mega-panel__links a:hover {
+  color: #D96B3C;
+  transform: translateX(4px);
+}
+
+.mega-panel__visual {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.mega-panel__visual img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.mega-panel__visual span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #D96B3C;
+  text-transform: uppercase;
+}
+
+/* 활성 탭 표시 */
+.category-nav__item.is-panel-active>a {
+  color: #D96B3C !important;
+}
+
+.category-nav__item.is-panel-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #D96B3C;
+}
+
+/* ══════════════════════════════════════════════════════
+   9. 페이지별 active 상태
+   각 HTML body에 data-page 속성으로 자동 활성화
+══════════════════════════════════════════════════════ */
+body[data-page="shop"] .category-nav__item--shop>a,
+body[data-page="community"] .category-nav__item--community>a,
+body[data-page="event"] .category-nav__item--event>a {
+  color: #D96B3C;
+}

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VARO 쇼핑 — 최신 남성 패션 컬렉션을 만나보세요.">
+  <meta name="theme-color" content="#0D0D0D">
+  <title>SHOP — VARO</title>
+
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+
+  <link rel="stylesheet" href="./styles/reset.css">
+  <link rel="stylesheet" href="./styles/variables.css">
+  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/header.css">
+  <link rel="stylesheet" href="./styles/mega-menu.css">
+  <link rel="stylesheet" href="./styles/shop.css">
+</head>
+
+<body>
+
+  <!-- ── 상단 유틸리티 바 ────────────────────────────── -->
+  <div class="header-top">
+    <div class="header-top__inner">
+      <p class="header-top__notice">무료배송 50,000원 이상 · 당일발송 가능 · 7일 무료반품</p>
+      <nav class="header-top__util" aria-label="유틸리티 메뉴">
+        <a href="./signup.html">회원가입</a>
+        <span class="header-top__sep" aria-hidden="true"></span>
+        <a href="./login.html">로그인</a>
+        <span class="header-top__sep" aria-hidden="true"></span>
+        <a href="#">주문조회</a>
+        <span class="header-top__sep" aria-hidden="true"></span>
+        <a href="./mypage.html">마이페이지</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ── 메인 헤더 ──────────────────────────────────── -->
+  <header class="site-header" id="siteHeader">
+
+    <div class="header-main">
+      <div class="header-main__inner">
+
+        <a href="./index.html" class="site-header__logo" aria-label="VARO 홈">V<span>A</span>RO</a>
+
+        <div class="header-main__actions">
+          <button class="icon-btn" id="searchToggle" aria-label="검색">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+          </button>
+          <a href="#" class="icon-btn" aria-label="위시리스트">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              aria-hidden="true">
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+          </a>
+          <a href="./cart.html" class="icon-btn cart-icon-btn" aria-label="장바구니">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              aria-hidden="true">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
+            <span class="cart-badge" id="cartBadge" aria-live="polite"></span>
+          </a>
+          <a href="./login.html" class="icon-btn" aria-label="로그인/마이페이지">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              aria-hidden="true">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </a>
+          <button class="member-badge-btn" onclick="location.href='./mypage.html'" aria-label="GOLD 멤버십">GOLD</button>
+          <button class="icon-btn hamburger" id="mobileMenuToggle" aria-label="메뉴 열기" aria-expanded="false"
+            aria-controls="mobileNav">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── 카테고리 탭 바 ─────────────────────────────── -->
+    <nav class="category-nav" aria-label="카테고리 메뉴">
+      <ul class="category-nav__list">
+
+        <li class="category-nav__item"><a href="./shop.html?filter=best">BEST</a></li>
+        <li class="category-nav__item category-nav__item--special"><a href="./shop.html">자체제작</a></li>
+        <li class="category-nav__item category-nav__item--new"><a href="./shop.html?filter=new">NEW 5%</a></li>
+        <li class="category-nav__item"><a href="./shop.html">COLLECTION</a></li>
+
+        <li class="category-nav__divider" aria-hidden="true"></li>
+
+        <li class="category-nav__item has-sub">
+          <a href="./shop.html?category=outer">아우터</a>
+          <ul class="sub-menu" aria-label="아우터 서브메뉴">
+            <li><a href="./shop.html?sub=jacket">자켓</a></li>
+            <li><a href="./shop.html?sub=coat">코트</a></li>
+            <li><a href="./shop.html?sub=padding">패딩</a></li>
+            <li><a href="./shop.html?sub=jumper">점퍼</a></li>
+            <li><a href="./shop.html?sub=leather">레더</a></li>
+          </ul>
+        </li>
+
+        <li class="category-nav__item has-sub">
+          <a href="./shop.html?category=shirt">셔츠</a>
+          <ul class="sub-menu" aria-label="셔츠 서브메뉴">
+            <li><a href="./shop.html?sub=shortshirt">반팔셔츠</a></li>
+            <li><a href="./shop.html?sub=longshirt">긴팔셔츠</a></li>
+            <li><a href="./shop.html?sub=overshirt">오버셔츠</a></li>
+            <li><a href="./shop.html?sub=denim-shirt">데님셔츠</a></li>
+          </ul>
+        </li>
+
+        <li class="category-nav__item has-sub">
+          <a href="./shop.html?category=top">상의</a>
+          <ul class="sub-menu" aria-label="상의 서브메뉴">
+            <li><a href="./shop.html?sub=shorttee">반팔티</a></li>
+            <li><a href="./shop.html?sub=longtee">긴팔티</a></li>
+            <li><a href="./shop.html?sub=sweatshirt">맨투맨</a></li>
+            <li><a href="./shop.html?sub=hoodie">후드티</a></li>
+            <li><a href="./shop.html?sub=sleeveless">민소매</a></li>
+          </ul>
+        </li>
+
+        <li class="category-nav__item has-sub">
+          <a href="./shop.html?category=knit">니트</a>
+          <ul class="sub-menu" aria-label="니트 서브메뉴">
+            <li><a href="./shop.html?sub=pullover">풀오버</a></li>
+            <li><a href="./shop.html?sub=zipup">집업니트</a></li>
+            <li><a href="./shop.html?sub=cardigan">가디건</a></li>
+            <li><a href="./shop.html?sub=vest">니트베스트</a></li>
+          </ul>
+        </li>
+
+        <li class="category-nav__item has-sub">
+          <a href="./shop.html?category=bottom">하의</a>
+          <ul class="sub-menu" aria-label="하의 서브메뉴">
+            <li><a href="./shop.html?sub=denim">데님팬츠</a></li>
+            <li><a href="./shop.html?sub=slacks">슬랙스</a></li>
+            <li><a href="./shop.html?sub=cargo">카고팬츠</a></li>
+            <li><a href="./shop.html?sub=jogger">조거팬츠</a></li>
+            <li><a href="./shop.html?sub=shorts">반바지</a></li>
+          </ul>
+        </li>
+
+        <li class="category-nav__item has-sub">
+          <a href="./shop.html?category=setup">세트업</a>
+          <ul class="sub-menu" aria-label="세트업 서브메뉴">
+            <li><a href="./shop.html?sub=set">상하의 세트</a></li>
+            <li><a href="./shop.html?sub=training">트레이닝 세트</a></li>
+            <li><a href="./shop.html?sub=suit">수트 세트</a></li>
+          </ul>
+        </li>
+
+        <li class="category-nav__item has-sub">
+          <a href="./shop.html?category=shoes">슈즈</a>
+          <ul class="sub-menu" aria-label="슈즈 서브메뉴">
+            <li><a href="./shop.html?sub=sneakers">스니커즈</a></li>
+            <li><a href="./shop.html?sub=loafer">로퍼</a></li>
+            <li><a href="./shop.html?sub=sandal">샌들</a></li>
+            <li><a href="./shop.html?sub=boots">부츠</a></li>
+          </ul>
+        </li>
+
+        <li class="category-nav__item"><a href="./shop.html?category=acc">악세서리</a></li>
+
+        <li class="category-nav__divider" aria-hidden="true"></li>
+
+        <li class="category-nav__item category-nav__item--event">
+          <a href="./event.html">1+1 이벤트</a>
+        </li>
+        <li class="category-nav__item category-nav__item--fast">
+          <a href="./shop.html?filter=fast">당일발송</a>
+        </li>
+        <li class="category-nav__item">
+          <a href="./community.html">커뮤니티</a>
+        </li>
+        <li class="category-nav__item category-nav__item--sale">
+          <a href="./shop.html?filter=sale">SALE</a>
+        </li>
+
+      </ul>
+    </nav>
+
+  </header>
+
+  <!-- ── 모바일 네비 드로어 ──────────────────────────── -->
+  <nav class="mobile-nav" id="mobileNav" aria-label="모바일 메뉴" aria-hidden="true">
+    <div class="mobile-nav__header">
+      <span class="site-header__logo">V<span>A</span>RO</span>
+      <button class="icon-btn mobile-nav__close" id="mobileNavClose" aria-label="메뉴 닫기">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <ul class="mobile-nav__list">
+      <li><a href="./shop.html?filter=best" class="mobile-nav__link">BEST</a></li>
+      <li><a href="./shop.html?filter=new" class="mobile-nav__link" style="color:#D96B3C">NEW 5%</a></li>
+      <li><a href="./shop.html" class="mobile-nav__link">COLLECTION</a></li>
+      <li><a href="./shop.html?category=outer" class="mobile-nav__link">아우터</a></li>
+      <li><a href="./shop.html?category=shirt" class="mobile-nav__link">셔츠</a></li>
+      <li><a href="./shop.html?category=top" class="mobile-nav__link">상의</a></li>
+      <li><a href="./shop.html?category=knit" class="mobile-nav__link">니트</a></li>
+      <li><a href="./shop.html?category=bottom" class="mobile-nav__link">하의</a></li>
+      <li><a href="./shop.html?category=setup" class="mobile-nav__link">세트업</a></li>
+      <li><a href="./shop.html?category=shoes" class="mobile-nav__link">슈즈</a></li>
+      <li><a href="./shop.html?category=acc" class="mobile-nav__link">악세서리</a></li>
+      <li><a href="./event.html" class="mobile-nav__link" style="color:#D96B3C;font-weight:700">1+1 이벤트</a></li>
+      <li><a href="./shop.html?filter=sale" class="mobile-nav__link" style="color:#E02020;font-weight:800">SALE</a></li>
+      <li><a href="./community.html" class="mobile-nav__link">커뮤니티</a></li>
+    </ul>
+    <div class="mobile-nav__footer">
+      <a href="./login.html" class="btn btn--outline btn--full">로그인</a>
+      <a href="./signup.html" class="btn btn--accent  btn--full">회원가입</a>
+    </div>
+  </nav>
+  <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+
+  <!-- ── 검색 오버레이 ──────────────────────────────── -->
+  <div class="search-overlay" id="searchOverlay" role="dialog" aria-label="검색" aria-hidden="true">
+    <div class="search-overlay__inner">
+      <form class="search-form" role="search" onsubmit="return false;">
+        <input type="search" class="search-input" id="searchInput" placeholder="브랜드, 상품, 카테고리 검색..." autocomplete="off"
+          maxlength="100" aria-label="검색어 입력">
+        <button type="button" class="icon-btn search-submit" aria-label="검색 실행">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            aria-hidden="true">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+        </button>
+      </form>
+      <button class="search-close" id="searchClose" aria-label="검색 닫기">ESC 닫기</button>
+    </div>
+  </div>
+
+  <main id="main-content">
+
+    <!-- ── SHOP HEADER ─────────────────────────── -->
+    <div class="shop-header container">
+      <div class="shop-header__top">
+        <nav class="breadcrumb" aria-label="페이지 경로">
+          <a href="./index.html">홈</a>
+          <span aria-hidden="true">/</span>
+          <span id="breadcrumbCurrent">전체</span>
+        </nav>
+        <h1 class="shop-header__title" id="shopTitle">ALL ITEMS</h1>
+        <p class="shop-header__count" id="shopCount">0개의 상품</p>
+      </div>
+
+      <!-- 카테고리 필터 탭 -->
+      <div class="filter-tabs" role="tablist" aria-label="카테고리 필터" id="filterTabs">
+        <button class="filter-tab is-active" role="tab" aria-selected="true" data-category="all">전체</button>
+        <button class="filter-tab" role="tab" aria-selected="false" data-category="outer">아우터</button>
+        <button class="filter-tab" role="tab" aria-selected="false" data-category="top">상의</button>
+        <button class="filter-tab" role="tab" aria-selected="false" data-category="bottom">하의</button>
+        <button class="filter-tab" role="tab" aria-selected="false" data-category="acc">악세서리</button>
+      </div>
+
+      <!-- 정렬 + 뷰 토글 -->
+      <div class="shop-toolbar">
+        <div class="sort-wrap">
+          <label for="sortSelect" class="sr-only">정렬 기준</label>
+          <select class="sort-select" id="sortSelect" aria-label="상품 정렬">
+            <option value="newest">최신순</option>
+            <option value="price-low">낮은 가격순</option>
+            <option value="price-high">높은 가격순</option>
+            <option value="popular">인기순</option>
+          </select>
+        </div>
+        <div class="view-toggle" role="group" aria-label="보기 방식">
+          <button class="view-btn is-active" id="viewGrid" aria-pressed="true" aria-label="격자 보기">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <rect x="0" y="0" width="7" height="7" />
+              <rect x="9" y="0" width="7" height="7" />
+              <rect x="0" y="9" width="7" height="7" />
+              <rect x="9" y="9" width="7" height="7" />
+            </svg>
+          </button>
+          <button class="view-btn" id="viewList" aria-pressed="false" aria-label="목록 보기">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <rect x="0" y="0" width="16" height="4" />
+              <rect x="0" y="6" width="16" height="4" />
+              <rect x="0" y="12" width="16" height="4" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SHOP BODY ────────────────────────────── -->
+    <div class="shop-body container">
+
+      <!-- 사이드 필터 (데스크탑) -->
+      <aside class="side-filter" aria-label="상세 필터">
+        <div class="side-filter__section">
+          <p class="side-filter__title">가격대</p>
+          <ul class="side-filter__list">
+            <li><label><input type="checkbox" name="price" value="under50"> 5만원 이하</label></li>
+            <li><label><input type="checkbox" name="price" value="50to100"> 5~10만원</label></li>
+            <li><label><input type="checkbox" name="price" value="100to200"> 10~20만원</label></li>
+            <li><label><input type="checkbox" name="price" value="over200"> 20만원 이상</label></li>
+          </ul>
+        </div>
+        <div class="side-filter__section">
+          <p class="side-filter__title">브랜드</p>
+          <ul class="side-filter__list" id="brandFilterList">
+            <!-- JS로 채워짐 -->
+          </ul>
+        </div>
+        <div class="side-filter__section">
+          <p class="side-filter__title">사이즈</p>
+          <div class="side-filter__sizes" id="sizeFilterList">
+            <button class="size-chip" data-size="XS">XS</button>
+            <button class="size-chip" data-size="S">S</button>
+            <button class="size-chip" data-size="M">M</button>
+            <button class="size-chip" data-size="L">L</button>
+            <button class="size-chip" data-size="XL">XL</button>
+            <button class="size-chip" data-size="XXL">XXL</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- 상품 그리드 -->
+      <div class="shop-main">
+        <div class="product-grid" id="shopGrid">
+          <!-- 스켈레톤 로딩 -->
+          <div class="skeleton skeleton--card"></div>
+          <div class="skeleton skeleton--card"></div>
+          <div class="skeleton skeleton--card"></div>
+          <div class="skeleton skeleton--card"></div>
+          <div class="skeleton skeleton--card"></div>
+          <div class="skeleton skeleton--card"></div>
+        </div>
+
+        <!-- 빈 상태 -->
+        <div class="shop-empty" id="shopEmpty" hidden>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"
+            aria-hidden="true">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <path d="M16 10a4 4 0 0 1-8 0" />
+          </svg>
+          <p>조건에 맞는 상품이 없습니다.</p>
+          <button class="btn btn--outline" id="resetFilter">필터 초기화</button>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <nav class="pagination" id="pagination" aria-label="페이지 이동">
+          <!-- JS로 채워짐 -->
+        </nav>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── FOOTER ──────────────────────────────── -->
+  <footer class="site-footer">
+    <div class="site-footer__inner container">
+      <!-- 1단: 고객센터 -->
+      <div class="footer-column">
+        <h3 class="footer-title">c/s center</h3>
+        <p class="footer-info"><strong>1588-0000</strong></p>
+        <p class="footer-sub">AM 10:00 - PM 05:30 <br>LUNCH PM 01:00 - PM 02:00 <br>SAT, SUN, HOLIDAY OFF</p>
+      </div>
+
+      <!-- 2단: 브랜드 정보 -->
+      <div class="footer-column footer-column--center">
+        <p class="footer-logo"
+          style="font-family:var(--font-serif); font-size:32px; text-transform:lowercase; margin-bottom:20px">varo</p>
+        <p class="footer-sub">상호: 바로패션(주) | 대표: 홍길동 <br>사업자등록번호: 000-00-00000 <br>통신판매업신고: 제0000-서울-0000호</p>
+        <p class="footer-copy">© varo all rights reserved.</p>
+      </div>
+
+      <!-- 3단: 링크/SNS -->
+      <div class="footer-column">
+        <h3 class="footer-title">account</h3>
+        <ul class="footer-links" style="list-style:none; padding:0">
+          <li> 우리은행 000-000-000000 (예금주: 바로패션)</li>
+          <li><a href="#" style="text-decoration:none; color:inherit">instagram: @varo_official</a></li>
+          <li><a href="#" style="text-decoration:none; color:inherit">kakao talk: @varo_cs</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="./js/data.js"></script>
+  <script src="./js/utils.js"></script>
+  <script src="./js/main.js"></script>
+  <script type="module" src="./js/shop.js"></script>
+  <script src="./js/mega-menu.js"></script>
+
+</body>
+
+</html>

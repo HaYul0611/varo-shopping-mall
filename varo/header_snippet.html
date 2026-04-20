@@ -1,0 +1,215 @@
+<!--
+  경로: header_snippet.html
+  ========================================================
+  VARO 2026 — 새 헤더 HTML 스니펫
+  ========================================================
+  이 파일 전체를 복사해서 모든 HTML 파일의 기존 <header> 태그와
+  .mobile-nav, .mobile-nav-overlay, .search-overlay 영역을
+  통째로 교체하세요.
+  ========================================================
+-->
+
+<!-- ── 상단 유틸리티 바 ────────────────────────────── -->
+<div class="header-top">
+  <div class="header-top__inner">
+    <p class="header-top__notice">무료배송 50,000원 이상 · 당일발송 가능 · 7일 무료반품</p>
+    <nav class="header-top__util" aria-label="유틸리티 메뉴">
+      <a href="./signup.html">회원가입</a>
+      <span class="header-top__sep" aria-hidden="true"></span>
+      <a href="./login.html">로그인</a>
+      <span class="header-top__sep" aria-hidden="true"></span>
+      <a href="#">주문조회</a>
+      <span class="header-top__sep" aria-hidden="true"></span>
+      <a href="./mypage.html">마이페이지</a>
+    </nav>
+  </div>
+</div>
+
+<!-- ── 메인 헤더 ──────────────────────────────────── -->
+<header class="site-header" id="siteHeader">
+
+  <div class="header-main">
+    <div class="header-main__inner">
+
+      <a href="./index.html" class="site-header__logo" aria-label="VARO 홈">varo</a>
+
+      <div class="header-main__actions">
+        <!-- ... (생략된 기존 액션 버튼들) ... -->
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── 카테고리 탭 바 (메가 패널 포함) ───────────────────── -->
+  <nav class="category-nav" aria-label="카테고리 메뉴">
+    <ul class="category-nav__list">
+
+      <li class="category-nav__item"><a href="./shop.html?filter=best">BEST</a></li>
+      <li class="category-nav__item category-nav__item--special"><a href="./shop.html">자체제작</a></li>
+      <li class="category-nav__item category-nav__item--new"><a href="./shop.html?filter=new">NEW 5%</a></li>
+      <li class="category-nav__item"><a href="./shop.html">COLLECTION</a></li>
+
+      <li class="category-nav__divider" aria-hidden="true"></li>
+
+      <!-- 아우터 -->
+      <li class="category-nav__item has-mega" data-mega="outer">
+        <a href="./shop.html?category=outer">아우터</a>
+        <div class="mega-panel" id="mega-outer">
+          <div class="mega-panel__inner">
+            <div class="mega-panel__cats">
+              <p class="mega-panel__cat-title">OUTER</p>
+              <ul class="mega-panel__cat-list">
+                <li><a href="./shop.html?category=outer" class="mega-panel__cat-link">전체보기</a></li>
+                <li><a href="./shop.html?sub=jacket" class="mega-panel__cat-link">자켓</a></li>
+                <li><a href="./shop.html?sub=coat" class="mega-panel__cat-link">코트</a></li>
+              </ul>
+            </div>
+            <div class="mega-panel__products">
+              <div class="mega-panel__prod-grid">
+                <a href="./shop.html?sub=jacket" class="mega-text-link">
+                  <span class="mega-text-link__title">JK: 2026 베스트 자켓</span>
+                  <span class="mega-text-link__sub">지금 가장 핫한 아우터 스타일</span>
+                </a>
+                <a href="./shop.html?sub=coat" class="mega-text-link">
+                  <span class="mega-text-link__title">CT: 미니멀 발마칸 코트</span>
+                  <span class="mega-text-link__sub">시즌 스테디셀러 아이템</span>
+                </a>
+                <a href="./shop.html?sub=padding" class="mega-text-link">
+                  <span class="mega-text-link__title">PD: 프리미엄 구스 패딩</span>
+                  <span class="mega-text-link__sub">한정 수량 타임세일 진행 중</span>
+                </a>
+                <a href="./shop.html?sub=leather" class="mega-text-link">
+                  <span class="mega-text-link__title">LT: 비건 레더 자켓</span>
+                  <span class="mega-text-link__sub">개성 있는 실루엣의 컬렉션</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <!-- 상의 -->
+      <li class="category-nav__item has-mega" data-mega="top">
+        <a href="./shop.html?category=top">상의</a>
+        <div class="mega-panel" id="mega-top">
+          <div class="mega-panel__inner">
+            <div class="mega-panel__cats">
+              <p class="mega-panel__cat-title">TOP</p>
+              <ul class="mega-panel__cat-list">
+                <li><a href="./shop.html?category=top" class="mega-panel__cat-link">전체보기</a></li>
+                <li><a href="./shop.html?sub=shirt" class="mega-panel__cat-link">셔츠</a></li>
+                <li><a href="./shop.html?sub=sweatshirt" class="mega-panel__cat-link">맨투맨/후드</a></li>
+              </ul>
+            </div>
+            <div class="mega-panel__products">
+              <div class="mega-panel__prod-grid">
+                <a href="./shop.html?sub=shirt" class="mega-text-link">
+                  <span class="mega-text-link__title">SS: 베이직 옥스포드 셔츠</span>
+                  <span class="mega-text-link__sub">매일 입기 좋은 데일리 아이템</span>
+                </a>
+                <a href="./shop.html?sub=sweatshirt" class="mega-text-link">
+                  <span class="mega-text-link__title">SW: 헤비 코튼 맨투맨</span>
+                  <span class="mega-text-link__sub">탄탄한 핏의 스테디 에디션</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <!-- 하의 -->
+      <li class="category-nav__item has-mega" data-mega="bottom">
+        <a href="./shop.html?category=bottom">하의</a>
+        <div class="mega-panel" id="mega-bottom">
+          <div class="mega-panel__inner">
+            <div class="mega-panel__cats">
+              <p class="mega-panel__cat-title">BOTTOM</p>
+              <ul class="mega-panel__cat-list">
+                <li><a href="./shop.html?category=bottom" class="mega-panel__cat-link">전체보기</a></li>
+                <li><a href="./shop.html?sub=denim" class="mega-panel__cat-link">데님</a></li>
+                <li><a href="./shop.html?sub=slacks" class="mega-panel__cat-link">슬랙스</a></li>
+              </ul>
+            </div>
+            <div class="mega-panel__products">
+              <div class="mega-panel__prod-grid">
+                <a href="./shop.html?sub=denim" class="mega-text-link">
+                  <span class="mega-text-link__title">DN: 와이드 셀비지 데님</span>
+                  <span class="mega-text-link__sub">체형을 보완하는 완벽한 핏</span>
+                </a>
+                <a href="./shop.html?sub=slacks" class="mega-text-link">
+                  <span class="mega-text-link__title">SL: 밴딩 테이퍼드 슬랙스</span>
+                  <span class="mega-text-link__sub">편안함과 스타일을 동시에</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <li class="category-nav__item has-sub"><a href="./shop.html?category=shoes">슈즈</a></li>
+      <li class="category-nav__item"><a href="./shop.html?category=acc">ACC</a></li>
+
+      <li class="category-nav__divider" aria-hidden="true"></li>
+
+      <li class="category-nav__item category-nav__item--event"><a href="./event.html">1+1 EVENT</a></li>
+      <li class="category-nav__item category-nav__item--fast"><a href="./shop.html?filter=fast">당일발송</a></li>
+      <li class="category-nav__item category-nav__item--sale"><a href="./shop.html?filter=sale">SALE</a></li>
+
+    </ul>
+  </nav>
+
+  <div class="mega-overlay" id="megaOverlay"></div>
+
+</header>
+
+<!-- ── 모바일 네비 드로어 ──────────────────────────── -->
+<nav class="mobile-nav" id="mobileNav" aria-label="모바일 메뉴" aria-hidden="true">
+  <div class="mobile-nav__header">
+    <span class="site-header__logo">V<span>A</span>RO</span>
+    <button class="icon-btn mobile-nav__close" id="mobileNavClose" aria-label="메뉴 닫기">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+        aria-hidden="true">
+        <path d="M18 6 6 18M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+  <ul class="mobile-nav__list">
+    <li><a href="./shop.html?filter=best" class="mobile-nav__link">BEST</a></li>
+    <li><a href="./shop.html?filter=new" class="mobile-nav__link" style="color:#D96B3C">NEW 5%</a></li>
+    <li><a href="./shop.html" class="mobile-nav__link">COLLECTION</a></li>
+    <li><a href="./shop.html?category=outer" class="mobile-nav__link">아우터</a></li>
+    <li><a href="./shop.html?category=shirt" class="mobile-nav__link">셔츠</a></li>
+    <li><a href="./shop.html?category=top" class="mobile-nav__link">상의</a></li>
+    <li><a href="./shop.html?category=knit" class="mobile-nav__link">니트</a></li>
+    <li><a href="./shop.html?category=bottom" class="mobile-nav__link">하의</a></li>
+    <li><a href="./shop.html?category=setup" class="mobile-nav__link">세트업</a></li>
+    <li><a href="./shop.html?category=shoes" class="mobile-nav__link">슈즈</a></li>
+    <li><a href="./shop.html?category=acc" class="mobile-nav__link">악세서리</a></li>
+    <li><a href="./event.html" class="mobile-nav__link" style="color:#D96B3C;font-weight:700">1+1 이벤트</a></li>
+    <li><a href="./shop.html?filter=sale" class="mobile-nav__link" style="color:#E02020;font-weight:800">SALE</a></li>
+    <li><a href="./community.html" class="mobile-nav__link">커뮤니티</a></li>
+  </ul>
+  <div class="mobile-nav__footer">
+    <a href="./login.html" class="btn btn--outline btn--full">로그인</a>
+    <a href="./signup.html" class="btn btn--accent  btn--full">회원가입</a>
+  </div>
+</nav>
+<div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+
+<!-- ── 검색 오버레이 ──────────────────────────────── -->
+<div class="search-overlay" id="searchOverlay" role="dialog" aria-label="검색" aria-hidden="true">
+  <div class="search-overlay__inner">
+    <form class="search-form" role="search" onsubmit="return false;">
+      <input type="search" class="search-input" id="searchInput" placeholder="브랜드, 상품, 카테고리 검색..." autocomplete="off"
+        maxlength="100" aria-label="검색어 입력">
+      <button type="button" class="icon-btn search-submit" aria-label="검색 실행">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          aria-hidden="true">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
+      </button>
+    </form>
+    <button class="search-close" id="searchClose" aria-label="검색 닫기">ESC 닫기</button>
+  </div>
+</div>

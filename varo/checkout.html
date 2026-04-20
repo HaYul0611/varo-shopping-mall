@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>주문/결제 — VARO</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="./styles/reset.css">
+  <link rel="stylesheet" href="./styles/variables.css">
+  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/header.css">
+  <link rel="stylesheet" href="./styles/mega-menu.css">
+  <link rel="stylesheet" href="./styles/checkout.css">
+</head>
+
+<body class="checkout-page">
+
+  <!-- ── 공통 헤더 ──────────────────────────────────── -->
+  <div class="header-top">
+    <div class="header-top__inner">
+      <p class="header-top__notice">무료배송 50,000원 이상 · 당일발송 가능 · 7일 무료반품</p>
+      <nav class="header-top__util" aria-label="유틸리티 메뉴">
+        <a href="./signup.html">회원가입</a>
+        <span class="header-top__sep" aria-hidden="true"></span>
+        <a href="./login.html">로그인</a>
+        <span class="header-top__sep" aria-hidden="true"></span>
+        <a href="#">주문조회</a>
+        <span class="header-top__sep" aria-hidden="true"></span>
+        <a href="./mypage.html">마이페이지</a>
+      </nav>
+    </div>
+  </div>
+
+  <header class="site-header" id="siteHeader">
+
+    <div class="header-main">
+      <div class="header-main__inner">
+
+        <a href="./index.html" class="site-header__logo" aria-label="VARO 홈">V<span>A</span>RO</a>
+
+        <div class="header-main__actions">
+          <button class="icon-btn" id="searchToggle" aria-label="검색">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+          </button>
+          <a href="#" class="icon-btn" aria-label="위시리스트">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              aria-hidden="true">
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+          </a>
+          <a href="./cart.html" class="icon-btn cart-icon-btn" aria-label="장바구니">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              aria-hidden="true">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
+            <span class="cart-badge" id="cartBadge" aria-live="polite"></span>
+          </a>
+          <a href="./login.html" class="icon-btn" aria-label="로그인/마이페이지">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              aria-hidden="true">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </a>
+          <button class="member-badge-btn" onclick="location.href='./mypage.html'" aria-label="GOLD 멤버십">GOLD</button>
+          <button class="icon-btn hamburger" id="mobileMenuToggle" aria-label="메뉴 열기" aria-expanded="false"
+            aria-controls="mobileNav">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── 카테고리 탭 바 ─────────────────────────────── -->
+    <nav class="category-nav" aria-label="카테고리 메뉴">
+      <ul class="category-nav__list">
+
+        <li class="category-nav__item"><a href="./shop.html?filter=best">BEST</a></li>
+        <li class="category-nav__item category-nav__item--special"><a href="./shop.html">자체제작</a></li>
+        <li class="category-nav__item category-nav__item--new"><a href="./shop.html?filter=new">NEW 5%</a></li>
+        <li class="category-nav__item"><a href="./shop.html">COLLECTION</a></li>
+
+        <li class="category-nav__divider" aria-hidden="true"></li>
+
+        <li class="category-nav__item has-sub">
+          <a href="./shop.html?category=outer">아우터</a>
+          <ul class="sub-menu" aria-label="아우터 서브메뉴">
+            <li><a href="./shop.html?sub=jacket">자켓</a></li>
+            <li><a href="./shop.html?sub=coat">코트</a></li>
+            <li><a href="./shop.html?sub=padding">패딩</a></li>
+            <li><a href="./shop.html?sub=jumper">점퍼</a></li>
+            <li><a href="./shop.html?sub=leather">레더</a></li>
+          </ul>
+        </li>
+
+        <li class="category-nav__item has-sub">
+          <a href="./shop.html?category=shirt">셔츠</a>
+          <ul class="sub-menu" aria-label="셔츠 서브메뉴">
+            <li><a href="./shop.html?sub=shortshirt">반팔셔츠</a></li>
+            <li><a href="./shop.html?sub=longshirt">긴팔셔츠</a></li>
+            <li><a href="./shop.html?sub=overshirt">오버셔츠</a></li>
+            <li><a href="./shop.html?sub=denim-shirt">데님셔츠</a></li>
+          </ul>
+        </li>
+
+        <li class="category-nav__item has-sub">
+          <a href="./shop.html?category=top">상의</a>
+          <ul class="sub-menu" aria-label="상의 서브메뉴">
+            <li><a href="./shop.html?sub=shorttee">반팔티</a></li>
+            <li><a href="./shop.html?sub=longtee">긴팔티</a></li>
+            <li><a href="./shop.html?sub=sweatshirt">맨투맨</a></li>
+            <li><a href="./shop.html?sub=hoodie">후드티</a></li>
+            <li><a href="./shop.html?sub=sleeveless">민소매</a></li>
+          </ul>
+        </li>
+
+        <li class="category-nav__item has-sub">
+          <a href="./shop.html?category=knit">니트</a>
+          <ul class="sub-menu" aria-label="니트 서브메뉴">
+            <li><a href="./shop.html?sub=pullover">풀오버</a></li>
+            <li><a href="./shop.html?sub=zipup">집업니트</a></li>
+            <li><a href="./shop.html?sub=cardigan">가디건</a></li>
+            <li><a href="./shop.html?sub=vest">니트베스트</a></li>
+          </ul>
+        </li>
+
+        <li class="category-nav__item has-sub">
+          <a href="./shop.html?category=bottom">하의</a>
+          <ul class="sub-menu" aria-label="하의 서브메뉴">
+            <li><a href="./shop.html?sub=denim">데님팬츠</a></li>
+            <li><a href="./shop.html?sub=slacks">슬랙스</a></li>
+            <li><a href="./shop.html?sub=cargo">카고팬츠</a></li>
+            <li><a href="./shop.html?sub=jogger">조거팬츠</a></li>
+            <li><a href="./shop.html?sub=shorts">반바지</a></li>
+          </ul>
+        </li>
+
+        <li class="category-nav__item has-sub">
+          <a href="./shop.html?category=setup">세트업</a>
+          <ul class="sub-menu" aria-label="세트업 서브메뉴">
+            <li><a href="./shop.html?sub=set">상하의 세트</a></li>
+            <li><a href="./shop.html?sub=training">트레이닝 세트</a></li>
+            <li><a href="./shop.html?sub=suit">수트 세트</a></li>
+          </ul>
+        </li>
+
+        <li class="category-nav__item has-sub">
+          <a href="./shop.html?category=shoes">슈즈</a>
+          <ul class="sub-menu" aria-label="슈즈 서브메뉴">
+            <li><a href="./shop.html?sub=sneakers">스니커즈</a></li>
+            <li><a href="./shop.html?sub=loafer">로퍼</a></li>
+            <li><a href="./shop.html?sub=sandal">샌들</a></li>
+            <li><a href="./shop.html?sub=boots">부츠</a></li>
+          </ul>
+        </li>
+
+        <li class="category-nav__item"><a href="./shop.html?category=acc">악세서리</a></li>
+
+        <li class="category-nav__divider" aria-hidden="true"></li>
+
+        <li class="category-nav__item category-nav__item--event">
+          <a href="./event.html">1+1 이벤트</a>
+        </li>
+        <li class="category-nav__item category-nav__item--fast">
+          <a href="./shop.html?filter=fast">당일발송</a>
+        </li>
+        <li class="category-nav__item">
+          <a href="./community.html">커뮤니티</a>
+        </li>
+        <li class="category-nav__item category-nav__item--sale">
+          <a href="./shop.html?filter=sale">SALE</a>
+        </li>
+
+      </ul>
+    </nav>
+
+  </header>
+
+  <!-- ── 모바일 네비 드로어 ──────────────────────────── -->
+  <nav class="mobile-nav" id="mobileNav" aria-label="모바일 메뉴" aria-hidden="true">
+    <div class="mobile-nav__header">
+      <span class="site-header__logo">V<span>A</span>RO</span>
+      <button class="icon-btn mobile-nav__close" id="mobileNavClose" aria-label="메뉴 닫기">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <ul class="mobile-nav__list">
+      <li><a href="./shop.html?filter=best" class="mobile-nav__link">BEST</a></li>
+      <li><a href="./shop.html?filter=new" class="mobile-nav__link" style="color:#D96B3C">NEW 5%</a></li>
+      <li><a href="./shop.html" class="mobile-nav__link">COLLECTION</a></li>
+      <li><a href="./shop.html?category=outer" class="mobile-nav__link">아우터</a></li>
+      <li><a href="./shop.html?category=shirt" class="mobile-nav__link">셔츠</a></li>
+      <li><a href="./shop.html?category=top" class="mobile-nav__link">상의</a></li>
+      <li><a href="./shop.html?category=knit" class="mobile-nav__link">니트</a></li>
+      <li><a href="./shop.html?category=bottom" class="mobile-nav__link">하의</a></li>
+      <li><a href="./shop.html?category=setup" class="mobile-nav__link">세트업</a></li>
+      <li><a href="./shop.html?category=shoes" class="mobile-nav__link">슈즈</a></li>
+      <li><a href="./shop.html?category=acc" class="mobile-nav__link">악세서리</a></li>
+      <li><a href="./event.html" class="mobile-nav__link" style="color:#D96B3C;font-weight:700">1+1 이벤트</a></li>
+      <li><a href="./shop.html?filter=sale" class="mobile-nav__link" style="color:#E02020;font-weight:800">SALE</a></li>
+      <li><a href="./community.html" class="mobile-nav__link">커뮤니티</a></li>
+    </ul>
+    <div class="mobile-nav__footer">
+      <a href="./login.html" class="btn btn--outline btn--full">로그인</a>
+      <a href="./signup.html" class="btn btn--accent  btn--full">회원가입</a>
+    </div>
+  </nav>
+  <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+
+  <!-- ── 검색 오버레이 ──────────────────────────────── -->
+  <div class="search-overlay" id="searchOverlay" role="dialog" aria-label="검색" aria-hidden="true">
+    <div class="search-overlay__inner">
+      <form class="search-form" role="search" onsubmit="return false;">
+        <input type="search" class="search-input" id="searchInput" placeholder="브랜드, 상품, 카테고리 검색..." autocomplete="off"
+          maxlength="100" aria-label="검색어 입력">
+        <button type="button" class="icon-btn search-submit" aria-label="검색 실행">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            aria-hidden="true">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+        </button>
+      </form>
+      <button class="search-close" id="searchClose" aria-label="검색 닫기">ESC 닫기</button>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <div class="container">
+      <h1 class="page-title">ORDER / CHECKOUT</h1>
+
+      <div class="checkout-layout">
+        <!-- 좌측: 주문 폼 -->
+        <div class="checkout-layout__form">
+          <section class="checkout-section">
+            <h2 class="checkout-section__title">배송지 정보</h2>
+            <div class="form-group-list">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="orderName" class="form-label">수령인 *</label>
+                  <input type="text" id="orderName" class="form-input" placeholder="이름을 입력해 주세요.">
+                </div>
+                <div class="form-group">
+                  <label for="orderTel" class="form-label">연락처 *</label>
+                  <input type="tel" id="orderTel" class="form-input" placeholder="010-0000-0000">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="orderAddr" class="form-label">주소 *</label>
+                <div class="input-with-btn">
+                  <input type="text" id="orderAddr" class="form-input" placeholder="우편번호 찾기" readonly>
+                  <button type="button" class="btn btn--secondary">주소찾기</button>
+                </div>
+                <input type="text" id="orderAddrBase" class="form-input mt-2" placeholder="기본 주소" readonly>
+                <input type="text" id="orderAddrDetail" class="form-input mt-2" placeholder="상세 주소를 입력해 주세요.">
+              </div>
+              <div class="form-group">
+                <label for="orderMemo" class="form-label">배송 메모</label>
+                <select id="orderMemo" class="form-input">
+                  <option value="">배송 메모를 선택해 주세요.</option>
+                  <option value="1">부재 시 문 앞에 놓아주세요.</option>
+                  <option value="2">배송 전 미리 연락 바랍니다.</option>
+                  <option value="3">직접 가입력</option>
+                </select>
+                <textarea id="orderMemoCustom" class="form-input mt-2" placeholder="직접 입력 내용을 기입해 주세요."
+                  style="display:none;"></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="checkout-section mt-10">
+            <h2 class="checkout-section__title">결제 수단</h2>
+            <div class="payment-methods">
+              <label class="payment-option">
+                <input type="radio" name="payment" value="card" checked>
+                <span class="payment-option__box">신용/체크카드</span>
+              </label>
+              <label class="payment-option">
+                <input type="radio" name="payment" value="kakao">
+                <span class="payment-option__box">카카오페이</span>
+              </label>
+              <label class="payment-option">
+                <input type="radio" name="payment" value="naver">
+                <span class="payment-option__box">네이버페이</span>
+              </label>
+              <label class="payment-option">
+                <input type="radio" name="payment" value="bank">
+                <span class="payment-option__box">무통장 입금</span>
+              </label>
+            </div>
+          </section>
+        </div>
+
+        <!-- 우측: 주문 요약 -->
+        <aside class="checkout-layout__summary">
+          <div class="summary-card">
+            <h2 class="summary-card__title">주문 요약</h2>
+
+            <div id="orderItemsList" class="order-items-mini">
+              <!-- JS에서 렌더링 -->
+              <p class="empty-msg">주문할 상품이 없습니다.</p>
+            </div>
+
+            <div class="summary-details">
+              <div class="summary-row">
+                <span>총 상품금액</span>
+                <span id="totalProductPrice">0원</span>
+              </div>
+              <div class="summary-row">
+                <span>배송비</span>
+                <span id="shippingFee">0원</span>
+              </div>
+              <div class="summary-row summary-row--total">
+                <span>최종 결제금액</span>
+                <span id="finalOrderPrice">0원</span>
+              </div>
+            </div>
+
+            <div class="agreement-section">
+              <label class="checkbox-group all-agree">
+                <input type="checkbox" id="agreeAll">
+                <span class="checkbox-label">주문내용 확인 및 결제 동의 (전체)</span>
+              </label>
+              <div class="agreement-sub">
+                <label class="checkbox-group">
+                  <input type="checkbox" class="agree-item" id="agreeTerms">
+                  <span class="checkbox-label">[필수] 이용약관 동의</span>
+                </label>
+                <label class="checkbox-group">
+                  <input type="checkbox" class="agree-item" id="agreePrivacy">
+                  <span class="checkbox-label">[필수] 개인정보 수집 및 이용 동의</span>
+                </label>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn--accent btn--full btn--large mt-6" id="btnPay">
+              <span id="payAmount">0원</span> 결제하기
+            </button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner container">
+      <!-- 1단: 고객센터 -->
+      <div class="footer-column">
+        <h3 class="footer-title">c/s center</h3>
+        <p class="footer-info"><strong>1588-0000</strong></p>
+        <p class="footer-sub">AM 10:00 - PM 05:30 <br>LUNCH PM 01:00 - PM 02:00 <br>SAT, SUN, HOLIDAY OFF</p>
+      </div>
+
+      <!-- 2단: 브랜드 정보 -->
+      <div class="footer-column footer-column--center">
+        <p class="footer-logo"
+          style="font-family:var(--font-serif); font-size:32px; text-transform:lowercase; margin-bottom:20px">varo</p>
+        <p class="footer-sub">상호: 바로패션(주) | 대표: 홍길동 <br>사업자등록번호: 000-00-00000 <br>통신판매업신고: 제0000-서울-0000호</p>
+        <p class="footer-copy">© varo all rights reserved.</p>
+      </div>
+
+      <!-- 3단: 링크/SNS -->
+      <div class="footer-column">
+        <h3 class="footer-title">account</h3>
+        <ul class="footer-links" style="list-style:none; padding:0">
+          <li> 우리은행 000-000-000000 (예금주: 바로패션)</li>
+          <li><a href="#" style="text-decoration:none; color:inherit">instagram: @varo_official</a></li>
+          <li><a href="#" style="text-decoration:none; color:inherit">kakao talk: @varo_cs</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 스크립트 -->
+  <script src="./js/data.js"></script>
+  <script src="./js/utils.js"></script>
+  <script src="./js/main.js"></script>
+  <script src="./js/mega-menu.js"></script>
+  <script type="module" src="./js/checkout.js"></script>
+</body>
+
+</html>

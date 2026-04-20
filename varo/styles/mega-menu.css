@@ -1,0 +1,268 @@
+/* 경로: styles/mega-menu.css */
+/* VARO 2026 — 룩플 스타일 이미지 패널 메가메뉴 */
+
+/* ══════════════════════════════════════════════════════
+   기존 sub-menu 드롭다운 → 메가 패널로 교체
+══════════════════════════════════════════════════════ */
+
+/* 기존 sub-menu 숨김 처리 */
+.category-nav__item.has-sub .sub-menu {
+  display: none !important;
+}
+
+/* ── 메가메뉴 컨테이너 ────────────────────────────── */
+.mega-panel {
+  position: fixed;
+  top: calc(var(--header-total-height, 122px));
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  border-top: 1px solid #E8E8E8;
+  border-bottom: 2px solid #EBEBEB;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.10);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  display: none;
+}
+
+.mega-panel.is-visible {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+  display: block;
+}
+
+.mega-panel__inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 28px 40px 32px;
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 0;
+}
+
+/* ── 왼쪽: 서브 카테고리 목록 ───────────────────────── */
+.mega-panel__cats {
+  padding-right: 32px;
+  border-right: 1px solid #F0F0F0;
+}
+
+.mega-panel__cat-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #1C1A16;
+  margin-bottom: 14px;
+}
+
+.mega-panel__cat-list {
+  list-style: none;
+}
+
+.mega-panel__cat-item {
+  display: block;
+}
+
+.mega-panel__cat-link {
+  display: block;
+  padding: 6px 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+  text-decoration: none;
+  transition: color 0.12s, padding-left 0.12s;
+  letter-spacing: -0.01em;
+  border: none;
+  background: none;
+}
+
+.mega-panel__cat-link:hover,
+.mega-panel__cat-link.is-hovered {
+  color: #D96B3C;
+  padding-left: 8px;
+}
+
+.mega-panel__cat-link .cat-count {
+  font-size: 10px;
+  color: #BBB;
+  margin-left: 4px;
+}
+
+/* ── 오른쪽: 상품 이미지 그리드 → 텍스트 카테고리 리스트로 변경 ────────────────── */
+.mega-panel__products {
+  padding-left: 48px;
+}
+
+.mega-panel__prod-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  /* 4열 텍스트 리스트 */
+  gap: 24px 32px;
+}
+
+@media (max-width: 1200px) {
+  .mega-panel__prod-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* 텍스트 기반 빠른 링크 스타일 */
+.mega-text-link {
+  display: block;
+  text-decoration: none;
+  margin-bottom: 12px;
+}
+
+.mega-text-link__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-black);
+  margin-bottom: 6px;
+  display: block;
+  letter-spacing: -0.02em;
+}
+
+.mega-text-link__sub {
+  font-size: 11px;
+  color: var(--color-gray);
+  display: block;
+}
+
+.mega-text-link:hover .mega-text-link__title {
+  text-decoration: underline;
+}
+
+/* ── 패널 하단 배너 ──────────────────────────────── */
+.mega-panel__footer {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #F0F0F0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  grid-column: 1 / -1;
+}
+
+.mega-panel__all-link {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #1C1A16;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mega-panel__all-link:hover {
+  color: #D96B3C;
+}
+
+.mega-panel__all-link svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+}
+
+.mega-panel__promo {
+  font-size: 11px;
+  color: #D96B3C;
+  font-weight: 600;
+}
+
+/* ── 오버레이 딤 ─────────────────────────────────── */
+.mega-overlay {
+  position: fixed;
+  inset: 0;
+  top: calc(var(--header-total-height, 122px));
+  background: rgba(28, 26, 22, .35);
+  z-index: 199;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.mega-overlay.is-visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── 커뮤니티 메가패널 (특수) ───────────────────────── */
+.mega-panel--community .mega-panel__inner {
+  grid-template-columns: 1fr;
+  padding: 20px 40px 24px;
+}
+
+.community-mega-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1200px) {
+  .community-mega-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.community-mega-item {
+  display: block;
+  text-decoration: none;
+  text-align: center;
+  padding: 16px 12px;
+  border: 1px solid #F0F0F0;
+  border-radius: 6px;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.community-mega-item:hover {
+  border-color: #D96B3C;
+  background: #FEF0E8;
+}
+
+.community-mega-item__icon {
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.community-mega-item__icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: #1C1A16;
+  fill: none;
+  stroke-width: 1.6;
+}
+
+.community-mega-item:hover .community-mega-item__icon svg {
+  stroke: #D96B3C;
+}
+
+.community-mega-item__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1C1A16;
+  margin-bottom: 3px;
+  letter-spacing: -0.01em;
+}
+
+.community-mega-item:hover .community-mega-item__name {
+  color: #D96B3C;
+}
+
+.community-mega-item__desc {
+  font-size: 10.5px;
+  color: #888;
+  line-height: 1.5;
+}

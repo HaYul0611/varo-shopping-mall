@@ -1,0 +1,302 @@
+/* 경로: styles/community.css */
+/* VARO 2026 — 커뮤니티 페이지 스타일 */
+
+/* ── 히어로 ─────────────────────────────────────── */
+.comm-hero {
+  background: #1C1A16;
+  padding: 44px 0 40px;
+  text-align: center;
+}
+.comm-hero__eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #D96B3C;
+  margin-bottom: 10px;
+}
+.comm-hero__title {
+  font-size: clamp(22px, 4vw, 36px);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.04em;
+  margin-bottom: 10px;
+}
+.comm-hero__sub {
+  font-size: 14px;
+  color: rgba(255,255,255,.55);
+}
+
+/* ── 탭 바 ─────────────────────────────────────── */
+.comm-tab-wrap {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  border-bottom: 1px solid #E8E8E8;
+  z-index: 40;
+}
+.comm-tabs {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.comm-tabs::-webkit-scrollbar { display: none; }
+.comm-tab {
+  padding: 14px 22px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #888;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+  transition: color 0.15s, border-color 0.15s;
+  font-family: inherit;
+}
+.comm-tab.is-active { color: #1C1A16; border-bottom-color: #D96B3C; font-weight: 700; }
+.comm-tab:hover:not(.is-active) { color: #1C1A16; }
+.comm-tab--membership { color: #BFA14A !important; }
+.comm-tab--membership.is-active { border-bottom-color: #BFA14A; }
+.comm-tab__count {
+  display: inline-block;
+  background: #D96B3C;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 10px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+/* ── 탭 패널 ─────────────────────────────────────── */
+.comm-body { padding: 36px 0 64px; }
+.comm-panel { display: none; }
+.comm-panel.is-active { display: block; }
+
+/* ── 공통 보드 헤더 ──────────────────────────────── */
+.comm-board { max-width: 860px; }
+.comm-board__head { margin-bottom: 24px; }
+.comm-board__head--flex { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.comm-board__title { font-size: 20px; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 4px; }
+.comm-board__desc { font-size: 13px; color: #888; }
+
+/* ── 공지사항 ────────────────────────────────────── */
+.notice-list { border-top: 2px solid #1C1A16; }
+.notice-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid #F0F0F0;
+}
+.notice-item--pinned { background: #FAFAFA; padding: 14px 12px; }
+.notice-badge {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border: 1px solid #E0E0E0;
+  color: #888;
+  white-space: nowrap;
+  border-radius: 2px;
+}
+.notice-badge--pin { background: #1C1A16; color: #fff; border-color: #1C1A16; }
+.notice-title {
+  flex: 1;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #1C1A16;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+.notice-title:hover { color: #D96B3C; text-decoration: underline; }
+.notice-date { flex-shrink: 0; font-size: 12px; color: #AAA; }
+
+/* ── FAQ ──────────────────────────────────────────── */
+.faq-category-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+.faq-cat {
+  padding: 6px 14px;
+  border: 1px solid #E0E0E0;
+  background: transparent;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: 20px;
+  transition: all 0.15s;
+}
+.faq-cat.is-active { background: #1C1A16; color: #fff; border-color: #1C1A16; }
+.faq-cat:hover:not(.is-active) { border-color: #1C1A16; }
+
+.faq-list { border-top: 2px solid #1C1A16; }
+.faq-item { border-bottom: 1px solid #F0F0F0; }
+.faq-q {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1C1A16;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  letter-spacing: -0.01em;
+  font-family: inherit;
+}
+.faq-arrow { font-size: 20px; color: #AAA; font-weight: 400; transition: transform 0.2s; }
+.faq-item.is-open .faq-arrow { transform: rotate(45deg); color: #D96B3C; }
+.faq-a {
+  display: none;
+  padding: 0 12px 18px;
+  font-size: 13.5px;
+  color: #555;
+  line-height: 1.8;
+  background: #FAFAFA;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+.faq-item.is-open .faq-a { display: block; }
+
+/* ── Q&A ──────────────────────────────────────────── */
+.qna-list { border-top: 2px solid #1C1A16; }
+.qna-item { border-bottom: 1px solid #F0F0F0; padding: 16px 0; }
+.qna-q-row, .qna-a-row { display: flex; gap: 12px; align-items: flex-start; }
+.qna-a-row { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #E8E8E8; }
+.qna-badge {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+}
+.qna-badge--q { background: #1C1A16; color: #fff; }
+.qna-badge--a { background: #D96B3C; color: #fff; }
+.qna-q-content, .qna-a-content { flex: 1; }
+.qna-subject { font-size: 14px; font-weight: 500; color: #1C1A16; margin-bottom: 4px; letter-spacing: -0.01em; }
+.qna-meta { font-size: 11.5px; color: #AAA; }
+.qna-author { font-weight: 500; color: #888; }
+.qna-a-content p:first-child { font-size: 13.5px; color: #444; line-height: 1.8; margin-bottom: 6px; }
+.qna-status {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.qna-status--done    { background: #EAF3FF; color: #4A7FA5; }
+.qna-status--pending { background: #FEF0E8; color: #D96B3C; }
+.btn--sm { padding: 8px 16px; font-size: 12px; }
+
+/* ── 리뷰 ─────────────────────────────────────────── */
+.review-summary-box { display: flex; align-items: center; gap: 12px; }
+.review-avg-big { font-size: 44px; font-weight: 800; color: #1C1A16; letter-spacing: -0.06em; line-height: 1; }
+.stars-row { color: #D96B3C; font-size: 15px; letter-spacing: 2px; margin-bottom: 3px; }
+.review-total-cnt { font-size: 12px; color: #888; }
+.review-filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+.review-filter {
+  padding: 6px 12px;
+  border: 1px solid #E0E0E0;
+  background: transparent;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: 20px;
+  transition: all 0.15s;
+}
+.review-filter.is-active { background: #1C1A16; color: #fff; border-color: #1C1A16; }
+.review-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; border-top: 2px solid #1C1A16; padding-top: 20px; }
+@media (max-width: 600px) { .review-grid { grid-template-columns: 1fr; } }
+.review-card-comm { border-bottom: 1px solid #F0F0F0; padding-bottom: 16px; }
+.review-card-comm__header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.review-card-comm__stars { color: #D96B3C; font-size: 12px; }
+.review-card-comm__user { font-size: 12px; font-weight: 600; }
+.review-card-comm__date { font-size: 11px; color: #AAA; margin-left: auto; }
+.review-card-comm__product { font-size: 11px; color: #888; margin-bottom: 6px; background: #F5F5F5; padding: 3px 8px; display: inline-block; }
+.review-card-comm__body { font-size: 13px; color: #444; line-height: 1.7; margin-bottom: 8px; }
+.review-card-comm__img { width: 60px; height: 80px; overflow: hidden; background: #EEE; }
+.review-card-comm__img img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── 이벤트 ────────────────────────────────────────── */
+.event-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 600px) { .event-grid { grid-template-columns: 1fr; } }
+.event-banner-card { display: block; text-decoration: none; color: inherit; border-radius: 8px; overflow: hidden; border: 1px solid #EBEBEB; }
+.event-banner-card--primary { grid-column: span 2; }
+@media (max-width: 600px) { .event-banner-card--primary { grid-column: span 1; } }
+.event-banner-card__img { aspect-ratio: 16/7; overflow: hidden; }
+.event-banner-card--primary .event-banner-card__img { aspect-ratio: 16/6; }
+.event-banner-card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+.event-banner-card:hover .event-banner-card__img img { transform: scale(1.03); }
+.event-banner-card__info { padding: 14px 16px; background: #fff; }
+.event-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  margin-bottom: 6px;
+  border-radius: 2px;
+}
+.event-badge--live   { background: #D96B3C; color: #fff; }
+.event-badge--gold   { background: #BFA14A; color: #fff; }
+.event-badge--collab { background: #4A7FA5; color: #fff; }
+.event-banner-card__title { font-size: 15px; font-weight: 700; color: #1C1A16; letter-spacing: -0.02em; margin-bottom: 4px; }
+.event-banner-card__period { font-size: 12px; color: #888; }
+
+/* ── 멤버십 ────────────────────────────────────────── */
+.membership-tiers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+@media (max-width: 900px) { .membership-tiers { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .membership-tiers { grid-template-columns: 1fr; } }
+.tier-card {
+  border: 1px solid #E8E8E8;
+  border-radius: 8px;
+  padding: 20px 16px;
+  text-align: center;
+  background: #fff;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.tier-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.08); transform: translateY(-3px); }
+.tier-card--gold  { border-color: #BFA14A; box-shadow: 0 2px 12px rgba(191,161,74,.15); }
+.tier-card--vip   { border-color: #D96B3C; background: #FEF0E8; }
+.tier-card__icon { font-size: 28px; margin-bottom: 8px; }
+.tier-card__name { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; margin-bottom: 4px; }
+.tier-card--silver .tier-card__name { color: #8A9AAA; }
+.tier-card--gold   .tier-card__name { color: #BFA14A; }
+.tier-card--vip    .tier-card__name { color: #D96B3C; }
+.tier-card__cond { font-size: 11px; color: #888; margin-bottom: 14px; }
+.tier-card__benefits { list-style: none; text-align: left; display: flex; flex-direction: column; gap: 7px; }
+.tier-card__benefits li { font-size: 12.5px; color: #555; padding-left: 14px; position: relative; line-height: 1.5; }
+.tier-card__benefits li::before { content: '✓'; position: absolute; left: 0; color: #D96B3C; font-weight: 700; }
+.tier-card__benefits strong { color: #1C1A16; }
+.membership-cta { text-align: center; padding: 28px 0; border-top: 1px solid #F0F0F0; }
+.membership-cta__text { font-size: 14px; color: #666; margin-bottom: 16px; }
+
+/* ── 공통 페이지네이션 ───────────────────────────── */
+.board-pagination { display: flex; justify-content: center; gap: 4px; padding: 24px 0 0; }
+.board-page-btn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #E0E0E0;
+  background: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  border-radius: 2px;
+}
+.board-page-btn:hover { border-color: #1C1A16; }
+.board-page-btn.is-active { background: #1C1A16; color: #fff; border-color: #1C1A16; cursor: default; }
+.board-page-btn--nav { color: #888; }
