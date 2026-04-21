@@ -10,15 +10,15 @@ const EventPage = (() => {
     const s = document.getElementById('timerS');
     if (!h) return;
     const tick = () => {
-      const now  = new Date();
-      const end  = new Date(); end.setHours(23,59,59,999);
+      const now = new Date();
+      const end = new Date(); end.setHours(23, 59, 59, 999);
       const diff = Math.max(0, end - now);
       const hh = Math.floor(diff / 3600000);
       const mm = Math.floor((diff % 3600000) / 60000);
       const ss = Math.floor((diff % 60000) / 1000);
-      h.textContent = String(hh).padStart(2,'0');
-      m.textContent = String(mm).padStart(2,'0');
-      s.textContent = String(ss).padStart(2,'0');
+      h.textContent = String(hh).padStart(2, '0');
+      m.textContent = String(mm).padStart(2, '0');
+      s.textContent = String(ss).padStart(2, '0');
     };
     tick();
     setInterval(tick, 1000);
@@ -31,24 +31,26 @@ const EventPage = (() => {
 
     let products = [];
     try {
-      products = await API.products.getAll({ filter: 'event', limit: 8 });
+      const res = await API.products.getAll({ filter: 'event', limit: 8 });
+      products = Array.isArray(res) ? res : (res.products || res.data || []);
+      if (products.length === 0) throw new Error('No data');
     } catch {
       products = (window.VARO_DATA?.PRODUCTS || []).filter(p => p.isEvent);
     }
 
-    const fmt  = n => n.toLocaleString('ko-KR') + '원';
-    const disc = (p, s) => Math.round((1-s/p)*100);
+    const fmt = n => n.toLocaleString('ko-KR') + '원';
+    const disc = (p, s) => Math.round((1 - s / p) * 100);
 
     grid.innerHTML = '';
     products.slice(0, 8).forEach(p => {
       const card = document.createElement('article');
       card.className = 'product-card';
       const mainImg = p.main_img || p.mainImg || '';
-      const subImg  = p.sub_img  || p.subImg  || mainImg;
-      const price   = p.sale_price || p.salePrice || p.price;
-      const origPr  = p.price;
+      const subImg = p.sub_img || p.subImg || mainImg;
+      const price = p.sale_price || p.salePrice || p.price;
+      const origPr = p.price;
       const priceHTML = price < origPr
-        ? `<span class="product-card__discount">-${disc(origPr,price)}%</span><span class="product-card__price product-card__price--sale">${fmt(price)}</span><span class="product-card__price--original">${fmt(origPr)}</span>`
+        ? `<span class="product-card__discount">-${disc(origPr, price)}%</span><span class="product-card__price product-card__price--sale">${fmt(price)}</span><span class="product-card__price--original">${fmt(origPr)}</span>`
         : `<span class="product-card__price">${fmt(price)}</span>`;
 
       card.innerHTML = `

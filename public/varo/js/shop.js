@@ -45,8 +45,28 @@ const Shop = (() => {
     if (!refs.grid) return;
 
     parseUrlParams();
+    renderBrandFilter(); // 브랜드 목록 동적 생성
     bindEvents();
     applyFilters();
+  };
+
+  /* ─── 브랜드 필터 렌더링 ────────────────────────────── */
+  const renderBrandFilter = () => {
+    const brands = [...new Set(state.products.map(p => p.brand))].sort();
+    const list = document.getElementById('brandFilterList');
+    if (!list) return;
+
+    list.innerHTML = brands.map(brand => `
+      <li><label><input type="checkbox" name="brand" value="${brand}"> ${brand}</label></li>
+    `).join('');
+
+    // 이벤트 바인딩 (새로 생성된 체크박스)
+    list.querySelectorAll('input[name="brand"]').forEach(input => {
+      input.addEventListener('change', () => {
+        state.filters.brands = Array.from(list.querySelectorAll('input[name="brand"]:checked')).map(i => i.value);
+        applyFilters();
+      });
+    });
   };
 
   /* ─── URL 파라미터 처리 ─────────────────────────────── */

@@ -10,22 +10,19 @@
   display: none !important;
 }
 
-/* ── 메가메뉴 컨테이너 ────────────────────────────── */
+/* ── 메가메뉴 컨테이너 (컴팩트 드롭다운 스타일) ────────────────────────────── */
 .mega-panel {
-  position: fixed;
-  top: calc(var(--header-total-height, 122px));
-  left: 0;
-  right: 0;
+  position: absolute;
   background: #FFFFFF;
-  border-top: 1px solid #E8E8E8;
-  border-bottom: 2px solid #EBEBEB;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.10);
+  border: 1px solid #EBEBEB;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   z-index: 200;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-8px);
-  transition: opacity 0.22s ease, transform 0.22s ease;
+  transform: translateY(10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
   display: none;
+  min-width: 200px;
 }
 
 .mega-panel.is-visible {
@@ -36,18 +33,14 @@
 }
 
 .mega-panel__inner {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 28px 40px 32px;
-  display: grid;
-  grid-template-columns: 160px 1fr;
-  gap: 0;
+  padding: 20px;
+  display: block;
 }
 
-/* ── 왼쪽: 서브 카테고리 목록 ───────────────────────── */
 .mega-panel__cats {
-  padding-right: 32px;
-  border-right: 1px solid #F0F0F0;
+  padding-bottom: 0;
+  border-bottom: none;
+  margin-bottom: 0;
 }
 
 .mega-panel__cat-title {
@@ -92,16 +85,14 @@
   margin-left: 4px;
 }
 
-/* ── 오른쪽: 상품 이미지 그리드 → 텍스트 카테고리 리스트로 변경 ────────────────── */
 .mega-panel__products {
-  padding-left: 48px;
+  padding-left: 0;
 }
 
 .mega-panel__prod-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  /* 4열 텍스트 리스트 */
-  gap: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 @media (max-width: 1200px) {
@@ -136,45 +127,9 @@
   text-decoration: underline;
 }
 
-/* ── 패널 하단 배너 ──────────────────────────────── */
+/* ── 패널 하단 (드롭다운에서는 숨김) ──────────────── */
 .mega-panel__footer {
-  margin-top: 18px;
-  padding-top: 14px;
-  border-top: 1px solid #F0F0F0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  grid-column: 1 / -1;
-}
-
-.mega-panel__all-link {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #1C1A16;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.mega-panel__all-link:hover {
-  color: #D96B3C;
-}
-
-.mega-panel__all-link svg {
-  width: 14px;
-  height: 14px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 2;
-}
-
-.mega-panel__promo {
-  font-size: 11px;
-  color: #D96B3C;
-  font-weight: 600;
+  display: none;
 }
 
 /* ── 오버레이 딤 ─────────────────────────────────── */

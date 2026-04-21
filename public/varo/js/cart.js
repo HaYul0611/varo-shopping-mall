@@ -153,17 +153,17 @@ const CartPage = (() => {
       const checkboxes = Array.from(refs.list.querySelectorAll('.item-checkbox'));
       const indicesToRemove = checkboxes
         .map((cb, idx) => cb.checked ? idx : -1)
-        .filter(idx => idx !== -1)
-        .reverse(); // 인덱스 밀림 방지
+        .filter(idx => idx !== -1);
 
       if (indicesToRemove.length === 0) {
         Utils.showToast('삭제할 상품을 선택해 주세요.', 'error');
         return;
       }
 
-      indicesToRemove.forEach(idx => window.App.Cart.removeItem(idx));
-      render();
-      Utils.showToast('선택한 상품이 삭제되었습니다.');
+      if (confirm('선택한 상품을 삭제하시겠습니까?')) {
+        window.App.Cart.removeSelected(indicesToRemove);
+        render();
+      }
     });
 
     // 쿠폰 적용

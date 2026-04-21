@@ -176,27 +176,11 @@ const MegaMenu = (() => {
         </li>
       `).join('');
 
-      // 상품 섹션을 텍스트 기반 추천 링크(mega-text-link)로 대체
-      const textLinksHTML = (data.products || []).slice(0, 4).map((p, idx) => `
-        <a href="${p.href}" class="mega-text-link">
-          <span class="mega-text-link__title">${['NEW', 'BEST', 'HOT', 'PICK'][idx] || 'ITEM'}: ${p.name}</span>
-          <span class="mega-text-link__sub">${p.salePrice ? '특별 할인가 적용 중' : '시즌 스테디셀러 아이템'}</span>
-        </a>
-      `).join('');
-
       panel.innerHTML = `
         <div class="mega-panel__inner">
           <div class="mega-panel__cats">
             <p class="mega-panel__cat-title">${data.title}</p>
             <ul class="mega-panel__cat-list">${catsHTML}</ul>
-          </div>
-          <div class="mega-panel__products">
-            <div class="mega-panel__prod-grid">${textLinksHTML}</div>
-            <div class="mega-panel__footer">
-              <a href="./shop.html?category=${key}" class="mega-panel__all-link">
-                ${data.title} 전체 컬렉션 보기 →
-              </a>
-            </div>
           </div>
         </div>
       `;
@@ -230,7 +214,7 @@ const MegaMenu = (() => {
   let currentPanel = null;
   let closeTimer = null;
 
-  const showPanel = (key) => {
+  const showPanel = (key, targetEl) => {
     if (!MEGA_DATA[key]) return;
     clearTimeout(closeTimer);
     if (currentPanel === key) return;
@@ -244,6 +228,15 @@ const MegaMenu = (() => {
       panel = buildPanel(key, MEGA_DATA[key]);
       document.body.appendChild(panel);
     }
+
+    // 위치 계산: targetEl(카테고리 항목) 아래에 위치하도록
+    if (targetEl) {
+      const rect = targetEl.getBoundingClientRect();
+      const scrollY = window.scrollY;
+      panel.style.top = `${rect.bottom + scrollY}px`;
+      panel.style.left = `${rect.left}px`;
+    }
+
     panel.classList.add('is-visible');
     if (overlay) overlay.classList.add('is-visible');
     currentPanel = key;
@@ -273,7 +266,7 @@ const MegaMenu = (() => {
       const megaKey = item.dataset.mega || getCatKey(item);
       if (!megaKey) return;
 
-      item.addEventListener('mouseenter', () => showPanel(megaKey));
+      item.addEventListener('mouseenter', () => showPanel(megaKey, item));
       item.addEventListener('mouseleave', () => hidePanel());
     });
 
@@ -283,7 +276,7 @@ const MegaMenu = (() => {
       const li = commItem.closest('.category-nav__item');
       if (li) {
         li.classList.add('has-comm');
-        li.addEventListener('mouseenter', () => showPanel('community'));
+        li.addEventListener('mouseenter', () => showPanel('community', li));
         li.addEventListener('mouseleave', () => hidePanel());
       }
     }
@@ -313,16 +306,16 @@ const MegaMenu = (() => {
   /* ── 카테고리 키 추론 ────────────────────────────── */
   const getCatKey = (item) => {
     const href = item.querySelector('a')?.getAttribute('href') || '';
-    const text = item.querySelector('a')?.textContent.trim() || '';
+    const text = item.querySelector('a')?.textContent.trim().toUpperCase() || '';
     const map = {
-      '아우터': 'outer', 'outer': 'outer',
-      '셔츠': 'shirt', 'shirt': 'shirt',
-      '상의': 'top', 'top': 'top',
-      '니트': 'knit', 'knit': 'knit',
-      '하의': 'bottom', 'bottom': 'bottom',
-      '세트업': 'setup', 'setup': 'setup',
-      '슈즈': 'shoes', 'shoes': 'shoes',
-      '커뮤니티': 'community',
+      '아우터': 'outer', 'OUTER': 'outer',
+      '셔츠': 'shirt', 'SHIRT': 'shirt',
+      '상의': 'top', 'TOP': 'top',
+      '니트': 'knit', 'KNIT': 'knit',
+      '하의': 'bottom', 'BOTTOM': 'bottom',
+      '세트업': 'setup', 'SET-UP': 'setup', 'SETUP': 'setup',
+      '슈즈': 'shoes', 'SHOES': 'shoes',
+      '커뮤니티': 'community', 'COMMUNITY': 'community',
     };
     if (href.includes('category=outer')) return 'outer';
     if (href.includes('category=shirt')) return 'shirt';

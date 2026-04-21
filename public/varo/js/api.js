@@ -5,12 +5,12 @@
 'use strict';
 
 const API = (() => {
-  const BASE = '/api';
+  const BASE = window.location.port === '5500' ? 'http://localhost:3000/api' : '/api';
   const TOKEN_KEY = 'varo_token';
 
   /* ── 토큰 관리 ──────────────────────────── */
-  const getToken  = () => localStorage.getItem(TOKEN_KEY);
-  const setToken  = (t) => localStorage.setItem(TOKEN_KEY, t);
+  const getToken = () => localStorage.getItem(TOKEN_KEY);
+  const setToken = (t) => localStorage.setItem(TOKEN_KEY, t);
   const removeToken = () => localStorage.removeItem(TOKEN_KEY);
 
   /* ── 공통 fetch ─────────────────────────── */
@@ -24,12 +24,23 @@ const API = (() => {
     if (body) opts.body = JSON.stringify(body);
     try {
       const res = await fetch(BASE + path, opts);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || '요청 실패');
-      return data;
+      const isJson = res.headers.get('content-type')?.includes('application/json');
+      if (isJson) {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || '요청 실패');
+        return data;
+      } else {
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        return await res.text();
+      }
     } catch (err) {
-      console.error(`[API] ${method} ${path}:`, err.message);
-      throw err;
+      if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
+        console.warn(`[API Dev Warning] 백엔드 서버(localhost:3000)가 응답하지 않습니다. 데이터 없이 시뮬레이션 모드로 실행합니다.`);
+      } else {
+        console.error(`[API Error] ${method} ${path}:`, err.message);
+      }
+      // 호출부에서 에러로 인해 런타임 중단이 발생하지 않도록 안전한 빈 객체 반환
+      return { success: false, error: err.message, products: [], data: [] };
     }
   };
 
@@ -74,12 +85,12 @@ const API = (() => {
      장바구니
   ══════════════════════════════════════════ */
   const cart = {
-    get:    () => req('GET', '/cart', null, true),
-    add:    (product_id, size, color, qty = 1) =>
-              req('POST', '/cart', { product_id, size, color, qty }, true),
+    get: () => req('GET', '/cart', null, true),
+    add: (product_id, size, color, qty = 1) =>
+      req('POST', '/cart', { product_id, size, color, qty }, true),
     update: (id, qty) => req('PUT', `/cart/${id}`, { qty }, true),
     remove: (id) => req('DELETE', `/cart/${id}`, null, true),
-    clear:  () => req('DELETE', '/cart', null, true),
+    clear: () => req('DELETE', '/cart', null, true),
   };
 
   /* ══════════════════════════════════════════
@@ -97,7 +108,7 @@ const API = (() => {
   ══════════════════════════════════════════ */
   const users = {
     getAll: () => req('GET', '/users', null, true),
-    me:     () => req('GET', '/users/me', null, true),
+    me: () => req('GET', '/users/me', null, true),
     update: (data) => req('PUT', '/users/me', data, true),
   };
 
@@ -117,7 +128,7 @@ const API = (() => {
     // 헤더 멤버십 배지 업데이트
     const badge = document.querySelector('.member-badge-btn');
     if (badge && user) {
-      const gradeMap = { basic:'BASIC', silver:'SILVER', gold:'GOLD', vip:'VIP' };
+      const gradeMap = { basic: 'BASIC', silver: 'SILVER', gold: 'GOLD', vip: 'VIP' };
       badge.textContent = gradeMap[user.grade] || 'LOGIN';
     }
     // 로그인/비로그인 분기 UI

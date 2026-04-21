@@ -54,6 +54,36 @@
   gap: 0;
 }
 
+.user-info-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+  margin-right: 12px;
+}
+
+.user-avatar-mini {
+  width: 18px;
+  height: 18px;
+  background: #E8E8E8;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+.header-top__badge {
+  background: #1C1A16;
+  color: #FFF;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  margin-left: 4px;
+}
+
 .header-top__util a {
   font-size: 11px;
   color: #666;
@@ -119,7 +149,8 @@
 .header-main__actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
+  /* 간격 소폭 확대 */
 }
 
 .header-main__actions .icon-btn {
@@ -224,7 +255,7 @@
 ══════════════════════════════════════════════════════ */
 .category-nav {
   background: #FFFFFF;
-  border-bottom: 2px solid #1C1A16;
+  border-bottom: 1px solid #EBEBEB;
   position: relative;
   z-index: 50;
 }
@@ -298,14 +329,16 @@
   color: #4A7FA5;
 }
 
-/* 구분선 아이템 */
+/* 구분선 아이템 (|) */
 .category-nav__divider {
   width: 1px;
-  height: 14px;
+  height: 12px;
   background: #E0E0E0;
-  margin: 0 4px;
+  margin: 0 12px;
+  /* 간격 조정 */
   flex-shrink: 0;
   align-self: center;
+  opacity: 0.8;
 }
 
 /* ══════════════════════════════════════════════════════

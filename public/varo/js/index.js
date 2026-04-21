@@ -199,42 +199,48 @@ const IndexPage = (() => {
     return card;
   };
 
-  /* ══════════════════════════════════════════
-     상품 그리드 렌더
-  ══════════════════════════════════════════ */
-  const renderGrid = (gridId, filterFn, darkBg = false, limit = 8) => {
-    const grid = document.getElementById(gridId);
+  /* ── 룩플 전용 렌더링 함수들 ───────────────────────── */
+
+  // 1:8 비대칭 렌더링 (Weekly Best)
+  const renderWeeklyBest = (category) => {
+    const grid = document.getElementById('weeklyBestGrid');
     if (!grid) return;
-    const list = PRODUCTS.filter(filterFn).slice(0, limit);
-    list.forEach(p => grid.appendChild(buildCard(p, darkBg)));
+    grid.innerHTML = '';
+
+    const filtered = category === 'best'
+      ? PRODUCTS.filter(p => p.badge === 'best').slice(0, 9)
+      : PRODUCTS.filter(p => p.category === category).slice(0, 9);
+
+    filtered.forEach(p => grid.appendChild(buildCard(p)));
   };
 
-  /* ══════════════════════════════════════════
-     스타일보드 커뮤니티 그리드
-  ══════════════════════════════════════════ */
-  const renderStyleBoard = () => {
-    const grid = document.getElementById('styleBoardGrid');
+  // 3열 그리드 렌더링 (New Product)
+  const renderNewProduct = () => {
+    const grid = document.getElementById('newProductGrid');
     if (!grid) return;
-    const hIcon = '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
-    const cIcon = '<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
-    COMMUNITY_POSTS.slice(0, 6).forEach(post => {
-      const item = document.createElement('a');
-      item.href = './community.html';
-      item.className = 'style-board-item';
-      const img = document.createElement('img');
-      img.src = post.img;
-      img.alt = post.username;
-      img.loading = 'lazy';
-      img.width = 400;
-      img.height = 400;
-      const overlay = document.createElement('div');
-      overlay.className = 'style-board-item__overlay';
-      overlay.innerHTML = `
-        <span class="style-board-stat">${hIcon} ${post.likes}</span>
-        <span class="style-board-stat">${cIcon} ${post.comments}</span>
-      `;
-      item.append(img, overlay);
-      grid.appendChild(item);
+    grid.innerHTML = '';
+    const filtered = PRODUCTS.filter(p => p.badge === 'new' || p.isNew).slice(0, 6);
+    filtered.forEach(p => grid.appendChild(buildCard(p)));
+  };
+
+  // 표준 4열 그리드 렌더링 (Lookple Best)
+  const renderLookpleBest = () => {
+    const grid = document.getElementById('lookpleBestGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    const filtered = PRODUCTS.filter(p => p.badge === 'best' || p.isSteady).slice(0, 8);
+    filtered.forEach(p => grid.appendChild(buildCard(p)));
+  };
+
+  // 탭 네비게이션 초기화
+  const initLookpleTabs = () => {
+    const tabs = document.querySelectorAll('.lookple-tab-btn');
+    tabs.forEach(btn => {
+      btn.addEventListener('click', function () {
+        tabs.forEach(t => t.classList.remove('is-active'));
+        this.classList.add('is-active');
+        renderWeeklyBest(this.dataset.category);
+      });
     });
   };
 
@@ -242,9 +248,13 @@ const IndexPage = (() => {
      초기화
   ══════════════════════════════════════════ */
   const init = () => {
-    initSlider(); // 슬라이더 초기화 명시적 호출
-    renderGrid('newInGrid', p => p.badge === 'new', false, 6);
-    renderGrid('bestGrid', p => p.badge === 'best', false, 6);
+    initSlider(); // 슬라이더 초기화
+    initLookpleTabs(); // 룩플 전용 탭 초기화
+
+    // 초기 렌더링 수행
+    renderWeeklyBest('best');
+    renderNewProduct();
+    renderLookpleBest();
   };
 
   return { init };

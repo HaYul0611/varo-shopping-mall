@@ -14,11 +14,18 @@ const Auth = (() => {
   /* ─── 정규표현식 (Regex) ────────────────────────────── */
   const REGEX = {
     email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-    password: /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+    password: /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/
   };
 
   /* ─── 초기화 (Init) ──────────────────────────────────── */
   const init = () => {
+    // 이미 로그인된 경우 리다이렉트 (로그인 페이지 무한 진입 방지)
+    const user = JSON.parse(localStorage.getItem('varo_user') || '{}');
+    if (user.email) {
+      const isAdmin = user.is_admin || user.role === 'ADMIN' || user.grade === 'ADMIN';
+      location.replace(isAdmin ? './admin.html' : './mypage.html');
+      return;
+    }
     try {
       bindCommonEvents();
       if (document.getElementById('loginForm')) initLogin();
@@ -62,9 +69,14 @@ const Auth = (() => {
     const pwInput = document.getElementById('loginPassword');
 
     form?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      let isValid = true;
+      e.preventDefault(); // 최상단 배치
 
+      if (!window.App) {
+        console.error('App is not initialized');
+        return;
+      }
+
+      let isValid = true;
       if (!REGEX.email.test(emailInput.value)) {
         showError(emailInput, '유효한 이메일 주소를 입력해 주세요.');
         isValid = false;
@@ -79,13 +91,11 @@ const Auth = (() => {
   };
 
   const handleLogin = (email, password) => {
-    const users = Utils.storage.get('varo_users') || [];
-    const user = users.find(u => u.email === email && u.password === password);
-
-    if (user) {
+    try {
+      const user = window.App.Auth.login(email, password);
       handleLoginSuccess(user);
-    } else {
-      Utils.showToast('이메일 또는 비밀번호가 일치하지 않습니다.', 'error');
+    } catch (err) {
+      Utils.showToast(err.message, 'error');
     }
   };
 
@@ -112,9 +122,14 @@ const Auth = (() => {
     });
 
     form?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      let isValid = true;
+      e.preventDefault(); // 최상단 배치
 
+      if (!window.App) {
+        console.error('App is not initialized');
+        return;
+      }
+
+      let isValid = true;
       if (!nameInput.value || nameInput.value.trim().length < 2) {
         showError(nameInput, '이름은 2자 이상 입력해 주세요.');
         isValid = false;
@@ -140,21 +155,26 @@ const Auth = (() => {
       }
 
       if (isValid) {
-        const users = Utils.storage.get('varo_users') || [];
-        if (users.some(u => u.email === emailInput.value)) {
-          showError(emailInput, '이미 가입된 이메일입니다.');
-          return;
+        try {
+          const newUser = {
+            name: nameInput.value,
+            email: emailInput.value,
+            password: pwInput.value,
+            joinDate: new Date().toISOString(),
+            grade: 'BRONZE',
+            role: 'USER'
+          };
+          window.App.Auth.signup(newUser);
+
+          // 데이터 저장 즉시 로컬 확인 (동기화 보장)
+          const savedUsers = Utils.storage.get('varo_users') || [];
+          console.log('[Signup Success] Data check:', savedUsers.find(u => u.email === newUser.email));
+
+          Utils.showToast(`${nameInput.value}님, 가입을 환영합니다!`, 'success');
+          setTimeout(() => location.href = './login.html', 1500);
+        } catch (err) {
+          Utils.showToast(err.message, 'error');
         }
-        const newUser = {
-          name: nameInput.value,
-          email: emailInput.value,
-          password: pwInput.value,
-          joinDate: new Date().toISOString()
-        };
-        users.push(newUser);
-        Utils.storage.set('varo_users', users);
-        Utils.showToast(`${nameInput.value}님, 가입을 환영합니다!`, 'success');
-        setTimeout(() => location.href = './login.html', 1500);
       }
     });
   };
@@ -175,12 +195,14 @@ const Auth = (() => {
       if (!modal || !modalBody) return;
       modalBody.innerHTML = termsData[key] || '준비 중입니다.';
       modal.setAttribute('aria-hidden', 'false');
+      modal.classList.add('is-active');
       document.body.style.overflow = 'hidden';
     };
 
     const closeModal = () => {
       if (!modal) return;
       modal.setAttribute('aria-hidden', 'true');
+      modal.classList.remove('is-active');
       document.body.style.overflow = '';
     };
 
@@ -200,8 +222,16 @@ const Auth = (() => {
   const showError = (input, message) => {
     if (!input) return;
     input.classList.add('is-error');
-    const errorEl = document.getElementById(input.getAttribute('aria-describedby')?.split(' ')[0] || (input.id + 'Error'));
-    if (errorEl) errorEl.textContent = message;
+    const describeAttr = input.getAttribute('aria-describedby') || '';
+    const errorId = describeAttr.split(' ')[0] || (input.id + 'Error');
+    const errorEl = document.getElementById(errorId);
+
+    if (errorEl) {
+      errorEl.textContent = message;
+      errorEl.style.display = 'block';
+    } else {
+      console.warn(`[Auth] Error element not found: ${errorId}`);
+    }
   };
 
   const hideError = (input) => {
@@ -238,7 +268,13 @@ const Auth = (() => {
   };
 
   const handleLoginSuccess = (user) => {
-    Utils.storage.set('varo_user', { email: user.email, name: user.name, loginTime: new Date().toISOString() });
+    Utils.storage.set('varo_user', {
+      email: user.email,
+      name: user.name,
+      grade: user.grade,
+      role: user.role,
+      loginTime: new Date().toISOString()
+    });
     Utils.showToast(`${user.name}님 안녕하세요. 로그인을 환영합니다!`, 'success');
     setTimeout(() => location.href = './index.html', 1000);
   };
@@ -246,12 +282,30 @@ const Auth = (() => {
   const logout = () => {
     Utils.storage.remove('varo_user');
     Utils.showToast('로그아웃 되었습니다.', 'success');
-    setTimeout(() => location.reload(), 800);
+    setTimeout(() => location.href = './index.html', 1000);
   };
 
-  return { init, logout };
+  const handleSocialSignup = (provider) => {
+    // API 연동 예시: 
+    // google.accounts.id.initialize({ client_id: 'YOUR_ID', callback: handleCredentialResponse });
+    Utils.showToast(`${provider} 간편 가입 API 연동이 필요합니다.`, 'info');
+  };
+
+  return { init, logout, handleSocialSignup };
 })();
 
-Auth.init();
-window.Auth = Auth;
+// 전역 이벤트 리스너 (구글 버튼 등)
+document.addEventListener('click', (e) => {
+  const socialBtn = e.target.closest('.social-btn--google');
+  if (socialBtn && window.Auth) {
+    window.Auth.handleSocialSignup('Google');
+  }
+});
+
+// DOMContentLoaded 시점에 초기화 (App.init과 동기화)
+document.addEventListener('DOMContentLoaded', () => {
+  Auth.init();
+  window.Auth = Auth;
+});
+
 export default Auth;

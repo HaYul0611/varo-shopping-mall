@@ -82,8 +82,8 @@ const PRODUCTS = [
   {
     id: 'P002', categoryId: 'outer', styles: ['boyfriend', 'casual'],
     brand: 'VARO', name: '오버사이즈 데님 자켓', price: 128000, salePrice: 98000, badge: 'sale',
-    mainImg: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=800&fit=crop&q=85',
-    subImg: 'https://images.unsplash.com/photo-1514473776127-61e2dc1dded3?w=600&h=800&fit=crop&q=85',
+    mainImg: 'https://images.unsplash.com/photo-1521509313432-84081efbc727?w=600&h=800&fit=crop&q=85', // 청자켓 (Denim Jacket)
+    subImg: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&h=800&fit=crop&q=85',
     images: [
       'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=800&fit=crop&q=85',
       'https://images.unsplash.com/photo-1514473776127-61e2dc1dded3?w=600&h=800&fit=crop&q=85',
@@ -146,9 +146,9 @@ const PRODUCTS = [
   {
     id: 'P007', categoryId: 'top', styles: ['casual', 'couple'],
     brand: 'VARO', name: '스웨트 오버사이즈 후드', price: 88000, salePrice: null, badge: 'best',
-    mainImg: 'https://images.unsplash.com/photo-1556821840-3a63f8550d64?w=600&h=800&fit=crop&q=85',
+    mainImg: 'https://images.unsplash.com/photo-1556821840-3a63f8550d64?w=600&h=800&fit=crop&q=85', // 스웨트 후드 (White/Oatmeal)
     subImg: 'https://images.unsplash.com/photo-1565084888279-aca607bb73f7?w=600&h=800&fit=crop&q=85',
-    images: ['https://images.unsplash.com/photo-1556821840-3a63f8550d64?w=600&h=800&fit=crop&q=85'],
+    images: ['https://images.unsplash.com/photo-1556821840-03a63f8550d64?w=600&h=800&fit=crop&q=85'],
     colors: [{ name: '차콜', hex: '#3A3A3A' }, { name: '아이보리', hex: '#F0EDE4' }],
     sizes: ['S', 'M', 'L', 'XL'], soldOutSizes: ['S'],
     description: '커플룩 1위! 프리미엄 플리스 후드.', material: '80% Cotton, 20% Poly', care: '단독 세탁',
@@ -275,7 +275,7 @@ const PRODUCTS = [
     salePrice: null,
     badge: 'new',
     isEvent: true,
-    mainImg: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=600&h=800&fit=crop&q=85',
+    mainImg: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=600&h=800&fit=crop&q=85', // 체인 팔찌
     subImg: 'https://images.unsplash.com/photo-1573408301185-9519f94816b5?w=600&h=800&fit=crop&q=85',
     images: ['https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=600&h=800&fit=crop&q=85'],
     colors: [{ name: '실버', hex: '#C0C0C0' }],
@@ -293,7 +293,7 @@ const PRODUCTS = [
     salePrice: null,
     badge: 'new',
     isEvent: true,
-    mainImg: 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&h=800&fit=crop&q=85',
+    mainImg: 'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&h=800&fit=crop&q=85', // 롱슬리브
     subImg: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&h=800&fit=crop&q=85',
     images: ['https://images.unsplash.com/photo-1562157873-818bc0726f68?w=600&h=800&fit=crop&q=85'],
     colors: [{ name: '빈티지블랙', hex: '#2A2A2A' }],
@@ -309,7 +309,7 @@ const PRODUCTS = [
 const HERO_SLIDES = [
   {
     id: 'H_JAN', tag: '01 JANUARY',
-    panels: ['./assets/lookbook/jan_winter.png'] // 3분할 합본 (울코트 룩북)
+    panels: ['https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=1200&h=800&fit=crop&q=85'] // 3분할 합본 대용 이미지
   },
   {
     id: 'H_FEB', tag: '02 FEBRUARY',
@@ -412,3 +412,15 @@ if (typeof window !== 'undefined') {
   };
   window.VARO_CONFIG = VARO_CONFIG;
 }
+
+export {
+  VARO_CONFIG,
+  CATEGORIES,
+  STYLE_THEMES,
+  PRODUCTS,
+  HERO_SLIDES,
+  COMMUNITY_POSTS,
+  REVIEWS,
+  MARQUEE_ITEMS,
+  SORT_OPTIONS
+};

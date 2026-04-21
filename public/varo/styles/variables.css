@@ -29,6 +29,8 @@
   --color-silver: #A9A9A9;
   --color-gold: #C5A059;
   --color-vip: #000000;
+  --color-success: #28A745;
+  --color-error: #E02020;
 
   /* ── 타이포그래피 (개성을 살린 폰트 조합) ────────────────── */
   /* 로고 및 헤드라인용 세리프 */
