@@ -85,6 +85,9 @@
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
           </a>
+          <!-- 멤버십 등급 (로그인 시 노출) -->
+          <button class="member-badge-btn" onclick="location.href='./mypage.html'" id="userGradeBadge"
+            style="display: none;">GOLD</button>
           <!-- 모바일 전용 햄버거 -->
           <button class="icon-btn hamburger" id="mobileMenuToggle" aria-expanded="false" aria-controls="mobileNav">
             <span></span><span></span><span></span>
@@ -94,10 +97,9 @@
       </div>
     </div>
 
-    <!-- ── 카테고리 탭 바 (메가 패널 포함) ───────────────────── -->
+    <!-- ── 카테고리 탭 바 ───────────────────── -->
     <nav class="category-nav" aria-label="카테고리 메뉴">
       <ul class="category-nav__list">
-
         <li class="category-nav__item"><a href="./shop.html?filter=best">BEST</a></li>
         <li class="category-nav__item category-nav__item--new"><a href="./shop.html?filter=new">NEW 5%</a></li>
         <li class="category-nav__item"><a href="./shop.html">COLLECTION</a></li>
@@ -117,8 +119,7 @@
 
         <li class="category-nav__item category-nav__item--event"><a href="./event.html">1+1 EVENT</a></li>
         <li class="category-nav__item category-nav__item--fast"><a href="./shop.html?filter=fast">당일발송</a></li>
-        <li class="category-nav__item category-nav__item--comm"><a href="./community.html">COMMUNITY</a></li>
-
+        <li class="category-nav__item"><a href="./community.html">COMMUNITY</a></li>
       </ul>
     </nav>
 
@@ -328,10 +329,10 @@
       <!-- 3단: 링크/SNS -->
       <div class="footer-column">
         <h3 class="footer-title">account</h3>
-        <ul class="footer-links">
+        <ul class="footer-links" style="list-style:none; padding:0">
           <li> 우리은행 000-000-000000 (예금주: 바로패션)</li>
-          <li><a href="#">instagram: @varo_official</a></li>
-          <li><a href="#">kakao talk: @varo_cs</a></li>
+          <li><a href="#" style="text-decoration:none; color:inherit">instagram: @varo_official</a></li>
+          <li><a href="#" style="text-decoration:none; color:inherit">kakao talk: @varo_cs</a></li>
         </ul>
       </div>
     </div>

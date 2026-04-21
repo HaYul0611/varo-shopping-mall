@@ -2,7 +2,8 @@
 <html lang="ko">
 
 <head>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="VARO 로그인 — 나만의 스타일 커뮤니티에 참여하세요.">
@@ -45,42 +46,45 @@
     <div class="header-main">
       <div class="header-main__inner">
 
-        <a href="./index.html" class="site-header__logo" aria-label="VARO 홈">V<span>A</span>RO</a>
+        <a href="./index.html" class="site-header__logo" aria-label="VARO 홈">varo</a>
 
         <div class="header-main__actions">
+          <!-- 검색 -->
           <button class="icon-btn" id="searchToggle" aria-label="검색">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-              aria-hidden="true">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
             </svg>
           </button>
+          <!-- 위시리스트 -->
           <a href="#" class="icon-btn" aria-label="위시리스트">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-              aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <path
-                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+              </path>
             </svg>
           </a>
+          <!-- 장바구니 -->
           <a href="./cart.html" class="icon-btn cart-icon-btn" aria-label="장바구니">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-              aria-hidden="true">
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <path d="M16 10a4 4 0 0 1-8 0" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
             </svg>
-            <span class="cart-badge" id="cartBadge" aria-live="polite"></span>
+            <span class="cart-badge" id="cartBadge"></span>
           </a>
-          <a href="./login.html" class="icon-btn" aria-label="로그인/마이페이지">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-              aria-hidden="true">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
+          <!-- 계정 -->
+          <a href="./login.html" class="icon-btn" aria-label="계정">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
             </svg>
           </a>
-          <button class="member-badge-btn" onclick="location.href='./mypage.html'" aria-label="GOLD 멤버십">GOLD</button>
-          <button class="icon-btn hamburger" id="mobileMenuToggle" aria-label="메뉴 열기" aria-expanded="false"
-            aria-controls="mobileNav">
+          <!-- 멤버십 등급 (로그인 시 노출) -->
+          <button class="member-badge-btn" onclick="location.href='./mypage.html'" id="userGradeBadge"
+            style="display: none;">GOLD</button>
+          <!-- 모바일 햄버거 -->
+          <button class="icon-btn hamburger" id="mobileMenuToggle" aria-expanded="false" aria-controls="mobileNav">
             <span></span><span></span><span></span>
           </button>
         </div>
@@ -91,103 +95,26 @@
     <!-- ── 카테고리 탭 바 ─────────────────────────────── -->
     <nav class="category-nav" aria-label="카테고리 메뉴">
       <ul class="category-nav__list">
-
         <li class="category-nav__item"><a href="./shop.html?filter=best">BEST</a></li>
-        <li class="category-nav__item category-nav__item--special"><a href="./shop.html">자체제작</a></li>
         <li class="category-nav__item category-nav__item--new"><a href="./shop.html?filter=new">NEW 5%</a></li>
         <li class="category-nav__item"><a href="./shop.html">COLLECTION</a></li>
 
         <li class="category-nav__divider" aria-hidden="true"></li>
 
-        <li class="category-nav__item has-sub">
-          <a href="./shop.html?category=outer">아우터</a>
-          <ul class="sub-menu" aria-label="아우터 서브메뉴">
-            <li><a href="./shop.html?sub=jacket">자켓</a></li>
-            <li><a href="./shop.html?sub=coat">코트</a></li>
-            <li><a href="./shop.html?sub=padding">패딩</a></li>
-            <li><a href="./shop.html?sub=jumper">점퍼</a></li>
-            <li><a href="./shop.html?sub=leather">레더</a></li>
-          </ul>
-        </li>
-
-        <li class="category-nav__item has-sub">
-          <a href="./shop.html?category=shirt">셔츠</a>
-          <ul class="sub-menu" aria-label="셔츠 서브메뉴">
-            <li><a href="./shop.html?sub=shortshirt">반팔셔츠</a></li>
-            <li><a href="./shop.html?sub=longshirt">긴팔셔츠</a></li>
-            <li><a href="./shop.html?sub=overshirt">오버셔츠</a></li>
-            <li><a href="./shop.html?sub=denim-shirt">데님셔츠</a></li>
-          </ul>
-        </li>
-
-        <li class="category-nav__item has-sub">
-          <a href="./shop.html?category=top">상의</a>
-          <ul class="sub-menu" aria-label="상의 서브메뉴">
-            <li><a href="./shop.html?sub=shorttee">반팔티</a></li>
-            <li><a href="./shop.html?sub=longtee">긴팔티</a></li>
-            <li><a href="./shop.html?sub=sweatshirt">맨투맨</a></li>
-            <li><a href="./shop.html?sub=hoodie">후드티</a></li>
-            <li><a href="./shop.html?sub=sleeveless">민소매</a></li>
-          </ul>
-        </li>
-
-        <li class="category-nav__item has-sub">
-          <a href="./shop.html?category=knit">니트</a>
-          <ul class="sub-menu" aria-label="니트 서브메뉴">
-            <li><a href="./shop.html?sub=pullover">풀오버</a></li>
-            <li><a href="./shop.html?sub=zipup">집업니트</a></li>
-            <li><a href="./shop.html?sub=cardigan">가디건</a></li>
-            <li><a href="./shop.html?sub=vest">니트베스트</a></li>
-          </ul>
-        </li>
-
-        <li class="category-nav__item has-sub">
-          <a href="./shop.html?category=bottom">하의</a>
-          <ul class="sub-menu" aria-label="하의 서브메뉴">
-            <li><a href="./shop.html?sub=denim">데님팬츠</a></li>
-            <li><a href="./shop.html?sub=slacks">슬랙스</a></li>
-            <li><a href="./shop.html?sub=cargo">카고팬츠</a></li>
-            <li><a href="./shop.html?sub=jogger">조거팬츠</a></li>
-            <li><a href="./shop.html?sub=shorts">반바지</a></li>
-          </ul>
-        </li>
-
-        <li class="category-nav__item has-sub">
-          <a href="./shop.html?category=setup">세트업</a>
-          <ul class="sub-menu" aria-label="세트업 서브메뉴">
-            <li><a href="./shop.html?sub=set">상하의 세트</a></li>
-            <li><a href="./shop.html?sub=training">트레이닝 세트</a></li>
-            <li><a href="./shop.html?sub=suit">수트 세트</a></li>
-          </ul>
-        </li>
-
-        <li class="category-nav__item has-sub">
-          <a href="./shop.html?category=shoes">슈즈</a>
-          <ul class="sub-menu" aria-label="슈즈 서브메뉴">
-            <li><a href="./shop.html?sub=sneakers">스니커즈</a></li>
-            <li><a href="./shop.html?sub=loafer">로퍼</a></li>
-            <li><a href="./shop.html?sub=sandal">샌들</a></li>
-            <li><a href="./shop.html?sub=boots">부츠</a></li>
-          </ul>
-        </li>
-
-        <li class="category-nav__item"><a href="./shop.html?category=acc">악세서리</a></li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=outer">OUTER</a></li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=shirt">SHIRT</a></li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=top">TOP</a></li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=knit">KNIT</a></li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=bottom">BOTTOM</a></li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=setup">SET-UP</a></li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=shoes">SHOES</a></li>
+        <li class="category-nav__item"><a href="./shop.html?category=acc">ACC</a></li>
 
         <li class="category-nav__divider" aria-hidden="true"></li>
 
-        <li class="category-nav__item category-nav__item--event">
-          <a href="./event.html">1+1 이벤트</a>
-        </li>
-        <li class="category-nav__item category-nav__item--fast">
-          <a href="./shop.html?filter=fast">당일발송</a>
-        </li>
-        <li class="category-nav__item">
-          <a href="./community.html">커뮤니티</a>
-        </li>
-        <li class="category-nav__item category-nav__item--sale">
-          <a href="./shop.html?filter=sale">SALE</a>
-        </li>
-
+        <li class="category-nav__item category-nav__item--event"><a href="./event.html">1+1 EVENT</a></li>
+        <li class="category-nav__item category-nav__item--fast"><a href="./shop.html?filter=fast">당일발송</a></li>
+        <li class="category-nav__item"><a href="./community.html">COMMUNITY</a></li>
       </ul>
     </nav>
 
