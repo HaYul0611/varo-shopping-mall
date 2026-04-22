@@ -7,7 +7,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="VARO 커뮤니티 — 공지사항, FAQ, Q&A, 리뷰, 이벤트, 멤버십">
-  <title>커뮤니티 — VARO</title>
+  <title>VARO — 커뮤니티</title>
+  <script src="./js/components.js"></script>
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet"
     href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
@@ -21,118 +22,8 @@
 
 <body data-page="community">
 
-  <!-- 헤더 — header_snippet.html 내용 붙여넣기 -->
-  <div class="header-top">
-    <div class="header-top__inner">
-      <p class="header-top__notice">무료배송 50,000원 이상 · 당일발송 가능 · 7일 무료반품</p>
-      <nav class="header-top__util">
-        <a href="./signup.html">회원가입</a><span class="header-top__sep"></span>
-        <a href="./login.html">로그인</a><span class="header-top__sep"></span>
-        <a href="#">주문조회</a><span class="header-top__sep"></span>
-        <a href="./mypage.html">마이페이지</a>
-      </nav>
-    </div>
-  </div>
-  <header class="site-header" id="siteHeader">
-    <div class="header-main">
-      <div class="header-main__inner">
-        <a href="./index.html" class="site-header__logo" aria-label="VARO 홈">varo</a>
-
-        <div class="header-main__actions">
-          <!-- 검색 -->
-          <button class="icon-btn" id="searchToggle" aria-label="검색">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.35-4.35"></path>
-            </svg>
-          </button>
-          <!-- 위시리스트 -->
-          <a href="#" class="icon-btn" aria-label="위시리스트">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path
-                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
-              </path>
-            </svg>
-          </a>
-          <!-- 장바구니 -->
-          <a href="./cart.html" class="icon-btn cart-icon-btn" aria-label="장바구니">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <path d="M16 10a4 4 0 0 1-8 0"></path>
-            </svg>
-            <span class="cart-badge" id="cartBadge"></span>
-          </a>
-          <!-- 계정 -->
-          <a href="./login.html" class="icon-btn" aria-label="계정">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </a>
-          <!-- 멤버십 등급 (로그인 시 노출) -->
-          <button class="member-badge-btn" onclick="location.href='./mypage.html'" id="userGradeBadge"
-            style="display: none;">GOLD</button>
-          <!-- 모바일 햄버거 -->
-          <button class="icon-btn hamburger" id="mobileMenuToggle" aria-expanded="false" aria-controls="mobileNav">
-            <span></span><span></span><span></span>
-          </button>
-        </div>
-      </div>
-    </div>
-    <nav class="category-nav" aria-label="카테고리 메뉴">
-      <ul class="category-nav__list">
-        <li class="category-nav__item"><a href="./shop.html?filter=best">BEST</a></li>
-        <li class="category-nav__item category-nav__item--new"><a href="./shop.html?filter=new">NEW 5%</a></li>
-        <li class="category-nav__item"><a href="./shop.html">COLLECTION</a></li>
-
-        <li class="category-nav__divider" aria-hidden="true"></li>
-
-        <li class="category-nav__item has-sub"><a href="./shop.html?category=outer">OUTER</a></li>
-        <li class="category-nav__item has-sub"><a href="./shop.html?category=shirt">SHIRT</a></li>
-        <li class="category-nav__item has-sub"><a href="./shop.html?category=top">TOP</a></li>
-        <li class="category-nav__item has-sub"><a href="./shop.html?category=knit">KNIT</a></li>
-        <li class="category-nav__item has-sub"><a href="./shop.html?category=bottom">BOTTOM</a></li>
-        <li class="category-nav__item has-sub"><a href="./shop.html?category=setup">SET-UP</a></li>
-        <li class="category-nav__item has-sub"><a href="./shop.html?category=shoes">SHOES</a></li>
-        <li class="category-nav__item"><a href="./shop.html?category=acc">ACC</a></li>
-
-        <li class="category-nav__divider" aria-hidden="true"></li>
-
-        <li class="category-nav__item category-nav__item--event"><a href="./event.html">1+1 EVENT</a></li>
-        <li class="category-nav__item category-nav__item--fast"><a href="./shop.html?filter=fast">당일발송</a></li>
-        <li class="category-nav__item is-active"><a href="./community.html">COMMUNITY</a></li>
-      </ul>
-    </nav>
-  </header>
-  <nav class="mobile-nav" id="mobileNav" aria-hidden="true">
-    <div class="mobile-nav__header"><span class="site-header__logo">V<span>A</span>RO</span><button
-        class="icon-btn mobile-nav__close" id="mobileNavClose"><svg width="22" height="22" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="1.8">
-          <path d="M18 6 6 18M6 6l12 12" />
-        </svg></button></div>
-    <ul class="mobile-nav__list">
-      <li><a href="./shop.html?filter=best" class="mobile-nav__link">BEST</a></li>
-      <li><a href="./shop.html?category=outer" class="mobile-nav__link">아우터</a></li>
-      <li><a href="./shop.html?category=top" class="mobile-nav__link">상의</a></li>
-      <li><a href="./shop.html?category=bottom" class="mobile-nav__link">하의</a></li>
-      <li><a href="./community.html" class="mobile-nav__link" style="color:#D96B3C">커뮤니티</a></li>
-    </ul>
-    <div class="mobile-nav__footer"><a href="./login.html" class="btn btn--outline btn--full">로그인</a><a
-        href="./signup.html" class="btn btn--accent btn--full">회원가입</a></div>
-  </nav>
-  <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
-  <div class="search-overlay" id="searchOverlay" role="dialog" aria-hidden="true">
-    <div class="search-overlay__inner">
-      <form class="search-form" onsubmit="return false;"><input type="search" class="search-input" id="searchInput"
-          placeholder="브랜드, 상품, 카테고리 검색..." autocomplete="off" maxlength="100"><button type="button"
-          class="icon-btn search-submit"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="1.8">
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.35-4.35" />
-          </svg></button></form><button class="search-close" id="searchClose">ESC 닫기</button>
-    </div>
-  </div>
+  <div id="header-placeholder"></div>
+  <div id="overlay-placeholder"></div>
 
   <main id="main-content">
 
@@ -433,49 +324,80 @@
           <!-- 등급 혜택 비교표 -->
           <div class="membership-tiers">
             <div class="tier-card tier-card--basic">
-              <div class="tier-card__icon">🔰</div>
+              <div class="tier-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                  style="color: #A87C6C;">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </div>
               <p class="tier-card__name">BASIC</p>
               <p class="tier-card__cond">누적 구매 0원~</p>
               <ul class="tier-card__benefits">
-                <li>구매 금액 1% 포인트 적립</li>
-                <li>생일 쿠폰 증정</li>
-                <li>신규 가입 웰컴 쿠폰</li>
+                <li>전 상품 1% 적립금 지급</li>
+                <li>생일 축하 기념 쿠폰 증정</li>
+                <li>회원가입 즉시 웰컴 쿠폰</li>
               </ul>
             </div>
             <div class="tier-card tier-card--silver">
-              <div class="tier-card__icon">🥈</div>
+              <div class="tier-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                  style="color: #A0A0A0;">
+                  <path d="M12 2l3 6h6l-5 4 2 6-6-4-6 4 2-6-5-4h6z"></path>
+                  <circle cx="12" cy="12" r="10"></circle>
+                </svg>
+              </div>
               <p class="tier-card__name">SILVER</p>
               <p class="tier-card__cond">누적 구매 10만원~</p>
               <ul class="tier-card__benefits">
-                <li>구매 금액 3% 포인트 적립</li>
-                <li>상시 5% 할인 쿠폰 매월 지급</li>
-                <li>신상품 사전 알림 서비스</li>
-                <li>생일 쿠폰 2배 증정</li>
+                <li>전 상품 3% 적립금 지급</li>
+                <li>매월 상시 5% 할인 쿠폰</li>
+                <li>신상품 선공개 알림 서비스</li>
+                <li>생일 쿠폰 2배 혜택</li>
               </ul>
             </div>
             <div class="tier-card tier-card--gold">
-              <div class="tier-card__icon">🥇</div>
+              <div class="tier-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                  style="color: #D4AF37;">
+                  <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                  <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                  <path d="M4 22h16"></path>
+                  <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                  <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                  <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                </svg>
+              </div>
               <p class="tier-card__name">GOLD</p>
               <p class="tier-card__cond">누적 구매 30만원~</p>
               <ul class="tier-card__benefits">
-                <li>구매 금액 5% 포인트 적립</li>
-                <li><strong>상시 10% 할인 적용</strong></li>
-                <li>무료배송 (금액 무관)</li>
-                <li>VIP 이벤트 우선 참여</li>
-                <li>전용 CS 채널 이용</li>
+                <li>전 상품 5% 적립금 지급</li>
+                <li><strong>모든 주문 상시 10% 자동 할인</strong></li>
+                <li>전 지역 무료배송 혜택</li>
+                <li>VIP 한정 이벤트 우선 참여</li>
+                <li>전 전 전담 CS 채널 이용</li>
               </ul>
             </div>
             <div class="tier-card tier-card--vip">
-              <div class="tier-card__icon">👑</div>
+              <div class="tier-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                  style="color: #1B2B4B;">
+                  <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7Z"></path>
+                  <path d="M19 16v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-2"></path>
+                </svg>
+              </div>
               <p class="tier-card__name">VARO VIP</p>
               <p class="tier-card__cond">누적 구매 100만원~</p>
               <ul class="tier-card__benefits">
-                <li>구매 금액 7% 포인트 적립</li>
-                <li><strong>상시 15% 할인 적용</strong></li>
-                <li>무료배송 + 당일발송 우선 처리</li>
-                <li>시즌 신상품 프리뷰 초대</li>
-                <li>전용 스타일리스트 상담</li>
-                <li>연 2회 특별 선물 발송</li>
+                <li>전 상품 7% 적립금 지급</li>
+                <li><strong>모든 주문 상시 15% 자동 할인</strong></li>
+                <li>무료배송 및 당일 우선 출고</li>
+                <li>시즌 룩북 프리뷰 대상</li>
+                <li>퍼스널 스타일리스트 매칭</li>
+                <li>연 2회 스페셜 기프트</li>
               </ul>
             </div>
           </div>
@@ -483,7 +405,7 @@
           <div class="membership-cta">
             <p class="membership-cta__text">현재 내 등급을 확인하고 다음 등급까지 얼마나 남았는지 알아보세요.</p>
             <a href="./mypage.html#membership" class="btn btn--primary">내 멤버십 확인하기</a>
-            <a href="./signup.html" class="btn btn--outline" style="margin-left:10px">회원가입하기</a>
+            <a href="./signup.html" class="btn btn--outline u-ml-10">회원가입하기</a>
           </div>
         </div>
       </section>
@@ -491,34 +413,7 @@
     </div><!-- /comm-body -->
   </main>
 
-  <!-- ── 푸터 ──────────────────────────────────────── -->
-  <footer class="site-footer">
-    <div class="site-footer__inner container">
-      <!-- 1단: 고객센터 -->
-      <div class="footer-column">
-        <h3 class="footer-title">c/s center</h3>
-        <p class="footer-info"><strong>1588-0000</strong></p>
-        <p class="footer-sub">평일 AM 10:00 - PM 06:00 <br>점심 PM 01:00 - PM 02:00 <br>토, 일, 공휴일 휴무</p>
-      </div>
-
-      <!-- 2단: 브랜드 정보 -->
-      <div class="footer-column footer-column--center">
-        <p class="footer-logo">varo</p>
-        <p class="footer-sub">상호: 바로패션(주) | 대표: 홍길동 <br>사업자등록번호: 000-00-00000 <br>통신판매업신고: 제0000-서울-0000호</p>
-        <p class="footer-copy">© varo all rights reserved.</p>
-      </div>
-
-      <!-- 3단: 링크/SNS -->
-      <div class="footer-column">
-        <h3 class="footer-title">account</h3>
-        <ul class="footer-links" style="list-style:none; padding:0">
-          <li> 우리은행 000-000-000000 (예금주: 바로패션)</li>
-          <li><a href="#" style="text-decoration:none; color:inherit">instagram: @varo_official</a></li>
-          <li><a href="#" style="text-decoration:none; color:inherit">kakao talk: @varo_cs</a></li>
-        </ul>
-      </div>
-    </div>
-  </footer>
+  <div id="footer-placeholder"></div>
 
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 

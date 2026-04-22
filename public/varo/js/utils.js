@@ -150,4 +150,3 @@ const Utils = (() => {
 })();
 
 window.Utils = Utils;
-export default Utils;

@@ -20,27 +20,45 @@ const API = (() => {
       const token = getToken();
       if (token) headers['Authorization'] = `Bearer ${token}`;
     }
-    const opts = { method, headers };
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5초 타임아웃
+
+    const opts = { method, headers, signal: controller.signal };
     if (body) opts.body = JSON.stringify(body);
+
     try {
       const res = await fetch(BASE + path, opts);
+      clearTimeout(timeout);
+
       const isJson = res.headers.get('content-type')?.includes('application/json');
       if (isJson) {
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || '요청 실패');
-        return data;
+        if (!res.ok) throw new Error(data.error || `요청 실패 (HTTP ${res.status})`);
+        return { success: true, ...data };
       } else {
         if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-        return await res.text();
+        return { success: true, data: await res.text() };
       }
     } catch (err) {
-      if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
-        console.warn(`[API Dev Warning] 백엔드 서버(localhost:3000)가 응답하지 않습니다. 데이터 없이 시뮬레이션 모드로 실행합니다.`);
-      } else {
-        console.error(`[API Error] ${method} ${path}:`, err.message);
-      }
-      // 호출부에서 에러로 인해 런타임 중단이 발생하지 않도록 안전한 빈 객체 반환
-      return { success: false, error: err.message, products: [], data: [] };
+      clearTimeout(timeout);
+      const isTimeout = err.name === 'AbortError';
+      const isNetwork = err.name === 'TypeError' && err.message === 'Failed to fetch';
+
+      let errorMsg = err.message;
+      if (isTimeout) errorMsg = '서버 응답 속도가 너무 느립니다 (Timeout)';
+      if (isNetwork) errorMsg = '백엔드 서버에 연결할 수 없습니다. 서버 실행 상태를 확인하세요.';
+
+      console.error(`[API ERROR] ${method} ${path}:`, errorMsg);
+
+      // 호출부 안전 장치: 에러 발생 시에도 규격화된 빈 객체 반환
+      return {
+        success: false,
+        error: errorMsg,
+        isMaintenance: isNetwork,
+        products: [],
+        data: []
+      };
     }
   };
 
@@ -128,8 +146,15 @@ const API = (() => {
     // 헤더 멤버십 배지 업데이트
     const badge = document.querySelector('.member-badge-btn');
     if (badge && user) {
-      const gradeMap = { basic: 'BASIC', silver: 'SILVER', gold: 'GOLD', vip: 'VIP' };
-      badge.textContent = gradeMap[user.grade] || 'LOGIN';
+      const gradeMap = {
+        bronze: 'BRONZE',
+        silver: 'SILVER',
+        gold: 'GOLD',
+        dia: 'DIAMOND',
+        manager: 'MANAGER',
+        admin: 'ADMIN'
+      };
+      badge.textContent = gradeMap[user.grade.toLowerCase()] || 'LOGIN';
     }
     // 로그인/비로그인 분기 UI
     document.querySelectorAll('[data-auth="logged-in"]').forEach(el => {

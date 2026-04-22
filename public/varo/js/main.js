@@ -17,7 +17,7 @@
   } catch (e) { }
 })();
 
-import Utils from './utils.js';
+
 
 const App = (() => {
 
@@ -133,6 +133,14 @@ const App = (() => {
   const Auth = {
     USERS_KEY: 'varo_users',
     SESSION_KEY: 'varo_user',
+
+    // 탭 가시성 강제 확보 (데스크탑)
+    ensureNavVisibility() {
+      const nav = document.getElementById('varoCategoryNav');
+      if (nav) {
+        nav.style.cssText = "display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 40px !important;";
+      }
+    },
 
     // 가입 (Create)
     signup(userData) {
@@ -319,6 +327,9 @@ const App = (() => {
 
     // 인증 상태 동기화
     syncAuthState();
+
+    // 탭 가시성 강제 확보
+    Auth.ensureNavVisibility();
   };
 
   /* ── 인증 상태 동기화 (Auth Sync) ──────────── */
@@ -326,10 +337,10 @@ const App = (() => {
     const user = Utils.storage.get('varo_user');
     const utilNav = document.querySelector('.header-top__util');
     const badge = document.getElementById('userGradeBadge');
+    const profileIcon = document.getElementById('headerProfileIcon');
 
     if (user) {
       if (utilNav) {
-        // 로그인 상태: [이름]님 안녕하세요. / 로그아웃 / 주문조회 / 마이페이지
         const gradeClass = `is-${user.grade.toLowerCase()}`;
         utilNav.innerHTML = `
           <div class="user-info-group">
@@ -348,12 +359,17 @@ const App = (() => {
           <span class="header-top__sep" aria-hidden="true"></span>
           <a href="./cart.html">주문조회</a>
           <span class="header-top__sep" aria-hidden="true"></span>
-          <a href="${(user.role === 'ADMIN' || user.grade === 'ADMIN') ? './admin.html' : './mypage.html'}">마이페이지</a>
+          <a href="${(user.role === 'ADMIN' || user.grade === 'ADMIN') ? './admin.html' : './mypage.html'}" class="top-util__mypage" style="display:inline-flex; align-items:center; gap:4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            마이페이지
+          </a>
           <span class="header-top__sep" aria-hidden="true"></span>
           <a href="#" id="logoutBtn">로그아웃</a>
         `;
 
-        // 로그아웃 버튼 이벤트 (둘 다 지원)
         const logoutHandler = (e) => {
           e.preventDefault();
           Utils.storage.remove('varo_user');
@@ -361,32 +377,29 @@ const App = (() => {
           setTimeout(() => location.href = './index.html', 800);
         };
         document.getElementById('logoutBtn')?.addEventListener('click', logoutHandler);
-        document.getElementById('btnLogout')?.addEventListener('click', logoutHandler);
       }
 
-      // 전역 등급 뱃지 컬러 동기화
+      // 전역 등급 뱃지 및 아이콘 동기화
       const gradeClass = `is-${user.grade.toLowerCase()}`;
       document.querySelectorAll('.header-top__badge, .member-badge-btn, .user-grade').forEach(badgeEl => {
-        const isManager = user.email === 'admin@varo.com' || user.role === 'ADMIN';
-        const isSidebar = badgeEl.classList.contains('user-grade');
-
-        // 텍스트 업데이트
-        if (isSidebar) {
-          badgeEl.textContent = `${user.grade} MEMBER`;
-        } else {
-          badgeEl.textContent = isManager ? `관리자(${user.grade})` : user.grade;
-        }
-
-        // 클래스 초기화 후 부여
-        badgeEl.classList.remove('is-bronze', 'is-silver', 'is-gold', 'is-dia', 'is-manager', 'is-admin');
+        badgeEl.textContent = user.grade;
+        badgeEl.classList.remove('is-bronze', 'is-silver', 'is-gold', 'is-diamond', 'is-manager', 'is-admin');
         badgeEl.classList.add(gradeClass);
-        if (isManager) badgeEl.classList.add('is-admin');
-
-        badgeEl.style.display = 'inline-block';
-        if (isManager) badgeEl.style.border = '1px solid gold';
+        badgeEl.classList.remove('u-hidden');
       });
+
+      if (profileIcon) {
+        profileIcon.href = (user.role === 'ADMIN' || user.grade === 'ADMIN') ? './admin.html' : './mypage.html';
+        profileIcon.setAttribute('aria-label', `${user.name}님 계정`);
+      }
     } else {
-      if (badge) badge.style.display = 'none';
+      // 비로그인 상태
+      if (badge) badge.classList.add('u-hidden');
+      if (profileIcon) {
+        profileIcon.href = './login.html';
+        profileIcon.setAttribute('aria-label', '로그인');
+      }
+
       if (utilNav) {
         utilNav.innerHTML = `
           <a href="./signup.html">회원가입</a>
@@ -420,49 +433,51 @@ const App = (() => {
   const initMobileMenu = () => {
     const hamburger = document.querySelector('.hamburger');
     const mobileNav = document.querySelector('.mobile-nav');
+    const overlay = document.querySelector('.mobile-nav-overlay');
     if (!hamburger || !mobileNav) return;
 
-    hamburger.addEventListener('click', () => {
-      const isOpen = hamburger.classList.toggle('hamburger--open');
-      mobileNav.classList.toggle('mobile-nav--open', isOpen);
+    const toggleMenu = (open) => {
+      const isOpen = typeof open === 'boolean' ? open : !mobileNav.classList.contains('is-open');
+      hamburger.classList.toggle('is-open', isOpen);
+      mobileNav.classList.toggle('is-open', isOpen);
+      overlay?.classList.toggle('is-visible', isOpen);
       isOpen ? Utils.lockScroll() : Utils.unlockScroll();
       hamburger.setAttribute('aria-expanded', String(isOpen));
-    });
+    };
+
+    hamburger.addEventListener('click', () => toggleMenu());
+    overlay?.addEventListener('click', () => toggleMenu(false));
 
     // 네비 링크 클릭 시 메뉴 닫기
     mobileNav.querySelectorAll('.mobile-nav__link').forEach(link => {
-      link.addEventListener('click', () => {
-        hamburger.classList.remove('hamburger--open');
-        mobileNav.classList.remove('mobile-nav--open');
-        Utils.unlockScroll();
-      });
+      link.addEventListener('click', () => toggleMenu(false));
     });
 
     // ESC 키
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && mobileNav.classList.contains('mobile-nav--open')) {
-        hamburger.classList.remove('hamburger--open');
-        mobileNav.classList.remove('mobile-nav--open');
-        Utils.unlockScroll();
+      if (e.key === 'Escape' && mobileNav.classList.contains('is-open')) {
+        toggleMenu(false);
       }
     });
   };
 
   /* ── 검색 오버레이 ──────────────────────────── */
   const initSearch = () => {
-    const searchBtn = document.querySelector('[data-action="open-search"]');
-    const overlay = document.querySelector('.search-overlay');
-    const closeBtn = document.querySelector('.search-overlay__close');
-    const input = document.querySelector('.search-overlay__input');
+    const searchBtn = document.getElementById('searchToggle');
+    const overlay = document.getElementById('searchOverlay');
+    const closeBtn = document.getElementById('searchClose');
+    const input = document.getElementById('searchInput');
     if (!searchBtn || !overlay) return;
 
     const open = () => {
-      overlay.classList.add('search-overlay--open');
+      overlay.classList.add('is-open');
+      overlay.setAttribute('aria-hidden', 'false');
       Utils.lockScroll();
       setTimeout(() => input?.focus(), 100);
     };
     const close = () => {
-      overlay.classList.remove('search-overlay--open');
+      overlay.classList.remove('is-open');
+      overlay.setAttribute('aria-hidden', 'true');
       Utils.unlockScroll();
     };
 
@@ -479,10 +494,10 @@ const App = (() => {
   /* ── 현재 페이지 네비 활성화 ─────────────────── */
   const initActiveNav = () => {
     const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-    document.querySelectorAll('.site-nav__link, .mobile-nav__link').forEach(link => {
+    document.querySelectorAll('.category-nav__item a, .mobile-nav__link').forEach(link => {
       const href = link.getAttribute('href')?.split('/').pop() || '';
-      if (href === currentPath) {
-        link.classList.add('site-nav__link--active');
+      if (href && currentPath && href.includes(currentPath)) {
+        link.classList.add('is-active');
       }
     });
   };
@@ -504,6 +519,9 @@ const App = (() => {
 
   /* ── 공개 API ───────────────────────────────── */
   const init = () => {
+    // 이미 초기화되었는지 확인 (중복 방지)
+    if (document.body.dataset.initialized === 'true') return;
+
     initHeader();
     initMobileMenu();
     initSearch();
@@ -511,6 +529,7 @@ const App = (() => {
     initLazyLoad();
     syncAuthState(); // 초기 인증 상태 반영
     initAuthSync();  // 실시간 동기화 시작
+    if (window.API?.syncUI) window.API.syncUI(); // 등급 배지 등 API 연동 UI 동기화
     Recent.render(); // 최근 본 상품 초기 렌더링
 
     // 상품 상세페이지일 경우 현재 상품을 최근 본 상품에 추가
@@ -519,6 +538,9 @@ const App = (() => {
     if (window.location.pathname.includes('product.html') && prodId) {
       Recent.add(prodId);
     }
+
+    document.body.dataset.initialized = 'true';
+    console.log('[App] Initialized');
   };
 
   return { init, Cart, Wishlist, Auth, Inquiry };
@@ -532,4 +554,112 @@ window.addEventListener('varo:authChange', () => {
   App.init(); // 상태 재동기화
 });
 
-document.addEventListener('DOMContentLoaded', App.init);
+// 컴포넌트 로드 완료 후 초기화 (동적 로딩 대응)
+document.addEventListener('varo:componentsLoaded', () => {
+  App.init();
+
+  // 네비게이션 탭 강제 생성 및 주입 (HTML 누락/파싱 오류 원천 차단)
+  let nav = document.getElementById('varoCategoryNav');
+  const header = document.getElementById('siteHeader');
+
+  if (!nav && header) {
+    console.log('[App] Nav missing, creating dynamically...');
+    const navHTML = `
+      <nav class="category-nav" id="varoCategoryNav" style="display: block !important; visibility: visible !important; background: #fff !important; border-bottom: 1px solid #ebebeb !important; min-height: 50px !important; opacity: 1 !important; width: 100% !important; position: relative !important; z-index: 100 !important;">
+        <ul class="category-nav__list" style="display: flex !important; align-items: center !important; justify-content: space-between !important; margin: 0 auto !important; padding: 0 24px !important; list-style: none !important; gap: 10px !important; min-height: 50px !important; flex-wrap: wrap !important; max-width: 1440px !important;">
+          <li class="category-nav__item"><a href="./shop.html?filter=best" style="font-size: 13px !important; font-weight: 700 !important; color: #000 !important; text-decoration: none !important; white-space: nowrap !important;">BEST</a></li>
+          <li class="category-nav__item"><a href="./shop.html?filter=new" style="font-size: 13px !important; font-weight: 700 !important; color: #D96B3C !important; text-decoration: none !important; white-space: nowrap !important;">NEW 5%</a></li>
+          <li class="category-nav__item"><a href="./shop.html" style="font-size: 13px !important; font-weight: 700 !important; color: #000 !important; text-decoration: none !important; white-space: nowrap !important;">COLLECTION</a></li>
+          <li class="category-nav__item has-sub">
+            <a href="./shop.html?category=outer" style="font-size: 12px !important; font-weight: 500 !important; color: #333 !important; text-decoration: none !important; white-space: nowrap !important;">OUTER</a>
+            <ul class="sub-menu">
+              <li><a href="./shop.html?category=outer">전체보기</a></li>
+              <li><a href="./shop.html?sub=jacket">자켓</a></li>
+              <li><a href="./shop.html?sub=coat">코트</a></li>
+              <li><a href="./shop.html?sub=padding">패딩</a></li>
+              <li><a href="./shop.html?sub=jumper">점퍼</a></li>
+              <li><a href="./shop.html?sub=leather">레더/무스탕</a></li>
+            </ul>
+          </li>
+          <li class="category-nav__item has-sub">
+            <a href="./shop.html?category=shirt" style="font-size: 12px !important; font-weight: 500 !important; color: #333 !important; text-decoration: none !important; white-space: nowrap !important;">SHIRT</a>
+            <ul class="sub-menu">
+              <li><a href="./shop.html?category=shirt">전체보기</a></li>
+              <li><a href="./shop.html?sub=shortshirt">반팔셔츠</a></li>
+              <li><a href="./shop.html?sub=longshirt">긴팔셔츠</a></li>
+              <li><a href="./shop.html?sub=overshirt">오버셔츠</a></li>
+              <li><a href="./shop.html?sub=denim-shirt">데님셔츠</a></li>
+            </ul>
+          </li>
+          <li class="category-nav__item has-sub">
+            <a href="./shop.html?category=top" style="font-size: 12px !important; font-weight: 500 !important; color: #333 !important; text-decoration: none !important; white-space: nowrap !important;">TOP</a>
+            <ul class="sub-menu">
+              <li><a href="./shop.html?category=top">전체보기</a></li>
+              <li><a href="./shop.html?sub=shorttee">반팔티</a></li>
+              <li><a href="./shop.html?sub=longtee">긴팔티</a></li>
+              <li><a href="./shop.html?sub=sweatshirt">맨투맨</a></li>
+              <li><a href="./shop.html?sub=hoodie">후드티</a></li>
+              <li><a href="./shop.html?sub=sleeveless">민소매</a></li>
+            </ul>
+          </li>
+          <li class="category-nav__item has-sub">
+            <a href="./shop.html?category=bottom" style="font-size: 12px !important; font-weight: 500 !important; color: #333 !important; text-decoration: none !important; white-space: nowrap !important;">BOTTOM</a>
+            <ul class="sub-menu">
+              <li><a href="./shop.html?category=bottom">전체보기</a></li>
+              <li><a href="./shop.html?sub=denim">데님팬츠</a></li>
+              <li><a href="./shop.html?sub=slacks">슬랙스</a></li>
+              <li><a href="./shop.html?sub=cargo">카고팬츠</a></li>
+              <li><a href="./shop.html?sub=jogger">조거팬츠</a></li>
+              <li><a href="./shop.html?sub=shorts">반바지</a></li>
+            </ul>
+          </li>
+          <li class="category-nav__item has-sub">
+            <a href="./shop.html?category=knit" style="font-size: 12px !important; font-weight: 500 !important; color: #333 !important; text-decoration: none !important; white-space: nowrap !important;">KNIT</a>
+            <ul class="sub-menu">
+              <li><a href="./shop.html?category=knit">전체보기</a></li>
+              <li><a href="./shop.html?sub=pullover">풀오버</a></li>
+              <li><a href="./shop.html?sub=zipup">집업니트</a></li>
+              <li><a href="./shop.html?sub=cardigan">가디건</a></li>
+              <li><a href="./shop.html?sub=vest">니트베스트</a></li>
+            </ul>
+          </li>
+          <li class="category-nav__item has-sub">
+            <a href="./shop.html?category=shoes" style="font-size: 12px !important; font-weight: 500 !important; color: #333 !important; text-decoration: none !important; white-space: nowrap !important;">SHOES</a>
+            <ul class="sub-menu">
+              <li><a href="./shop.html?category=shoes">전체보기</a></li>
+              <li><a href="./shop.html?sub=sneakers">스니커즈</a></li>
+              <li><a href="./shop.html?sub=loafer">로퍼</a></li>
+              <li><a href="./shop.html?sub=sandal">샌들</a></li>
+              <li><a href="./shop.html?sub=boots">부츠</a></li>
+            </ul>
+          </li>
+          <li class="category-nav__item"><a href="./event.html" style="font-size: 13px !important; font-weight: 700 !important; color: #D96B3C !important; text-decoration: none !important; white-space: nowrap !important;">1+1 EVENT</a></li>
+          <li class="category-nav__item"><a href="./community.html" style="font-size: 13px !important; font-weight: 500 !important; color: #333 !important; text-decoration: none !important; white-space: nowrap !important;">COMMUNITY</a></li>
+        </ul>
+      </nav>
+    `;
+    header.insertAdjacentHTML('beforeend', navHTML);
+    nav = document.getElementById('varoCategoryNav');
+
+    // 강제 주입 후 메가메뉴 다시 바인딩
+    if (window.MegaMenu) {
+      setTimeout(() => { window.MegaMenu.init(); }, 100);
+    }
+
+  }
+
+  if (nav) {
+    nav.style.cssText = "display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 50px !important; width: 100% !important;";
+    console.log('[App] VaroCategoryNav visibility established');
+  }
+});
+
+// 직접 로드된 경우 (컴포넌트 로더 미사용 페이지 등) 대비
+document.addEventListener('DOMContentLoaded', () => {
+  // 0.5초 후에도 컴포넌트 로드 이벤트가 없으면 직접 초기화 시도
+  setTimeout(() => {
+    if (document.body.dataset.initialized !== 'true') {
+      App.init();
+    }
+  }, 500);
+});

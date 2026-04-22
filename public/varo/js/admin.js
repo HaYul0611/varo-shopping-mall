@@ -53,7 +53,9 @@ const Admin = (() => {
             orders: '주문 관리',
             users: '회원 관리',
             claims: '클레임 관리',
-            qna: 'CS 관리'
+            qna: 'CS 관리',
+            categories: '카테고리 관리',
+            banners: '배너 관리'
           };
           document.getElementById('admPageTitle').textContent = titleMap[tab] || '관리';
         }
@@ -71,6 +73,8 @@ const Admin = (() => {
     if (activeTab === 'users') loadUsers();
     if (activeTab === 'claims') loadClaims();
     if (activeTab === 'qna') loadQna();
+    if (activeTab === 'categories') loadCategories();
+    if (activeTab === 'banners') loadBanners();
   };
 
   /* ── 실시간 검색 (Search) ────────────────── */
@@ -140,6 +144,10 @@ const Admin = (() => {
       if (!Utils.storage.get('varo_users')) {
         Utils.storage.set('varo_users', allUsers);
       }
+
+      // 카테고리 및 슬라이드 동기화 (초기 1회)
+      if (!Utils.storage.get('varo_categories')) Utils.storage.set('varo_categories', CATEGORIES);
+      if (!Utils.storage.get('varo_slides')) Utils.storage.set('varo_slides', HERO_SLIDES);
 
       const revenue = orders.filter(o => o.status !== 'cancelled').reduce((s, o) => s + (o.total || 0), 0);
       document.getElementById('statProducts').textContent = products.length;
@@ -561,6 +569,24 @@ const Admin = (() => {
       if (e.target.id === 'userModal') closeUserModal();
     });
 
+    // 카테고리 관리 이벤트
+    document.getElementById('btnAddCategory')?.addEventListener('click', () => openCategoryModal());
+    document.getElementById('categoryModalClose')?.addEventListener('click', () => document.getElementById('categoryModal').classList.remove('is-active'));
+    document.getElementById('categoryModalCancel')?.addEventListener('click', () => document.getElementById('categoryModal').classList.remove('is-active'));
+    document.getElementById('categoryModalSave')?.addEventListener('click', saveCategory);
+    document.getElementById('categoryModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'categoryModal') document.getElementById('categoryModal').classList.remove('is-active');
+    });
+
+    // 배너 관리 이벤트
+    document.getElementById('btnAddBanner')?.addEventListener('click', () => openBannerModal());
+    document.getElementById('bannerModalClose')?.addEventListener('click', () => document.getElementById('bannerModal').classList.remove('is-active'));
+    document.getElementById('bannerModalCancel')?.addEventListener('click', () => document.getElementById('bannerModal').classList.remove('is-active'));
+    document.getElementById('bannerModalSave')?.addEventListener('click', saveBanner);
+    document.getElementById('bannerModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'bannerModal') document.getElementById('bannerModal').classList.remove('is-active');
+    });
+
     document.getElementById('admLogout')?.addEventListener('click', () => {
       API.auth.logout();
       location.href = './login.html';
@@ -569,7 +595,159 @@ const Admin = (() => {
     loadDashboard();
   };
 
-  return { init, openProductModal, approveClaim, saveReply };
+  /* ── 카테고리 관리 ────────────────────────── */
+  const loadCategories = () => {
+    const tbody = document.getElementById('categoriesTbody');
+    if (!tbody) return;
+    const list = Utils.storage.get('varo_categories') || CATEGORIES;
+    tbody.innerHTML = list.map(c => `
+      <tr>
+        <td><code>${c.id}</code></td>
+        <td style="font-weight:600">${c.label}</td>
+        <td>${c.parentId ? `<span class="adm-badge">${c.parentId}</span>` : '-'}</td>
+        <td style="font-size:11px">${c.sort || 0}</td>
+        <td>
+          <button class="adm-btn adm-btn--sm" onclick="Admin.openCategoryModal('${c.id}')">수정</button>
+          <button class="adm-btn adm-btn--sm adm-btn--danger" onclick="Admin.deleteCategory('${c.id}')" style="margin-left:4px">삭제</button>
+        </td>
+      </tr>
+    `).join('') || '<tr><td colspan="5" class="adm-empty">카테고리 없음</td></tr>';
+  };
+
+  const openCategoryModal = (id = null) => {
+    const modal = document.getElementById('categoryModal');
+    if (!modal) return;
+    editingId = id;
+
+    // 부모 카테고리 드롭다운 채우기 (자신 제외)
+    const allCats = Utils.storage.get('varo_categories') || CATEGORIES;
+    const parentSel = document.getElementById('catParentId');
+    parentSel.innerHTML = '<option value="">없음 (최상위)</option>' +
+      allCats.filter(c => c.id !== id && !c.parentId).map(c => `<option value="${c.id}">${c.label}</option>`).join('');
+
+    if (id) {
+      const c = allCats.find(x => x.id === id);
+      if (c) {
+        document.getElementById('catId').value = c.id;
+        document.getElementById('catId').disabled = true;
+        document.getElementById('catLabel').value = c.label;
+        document.getElementById('catParentId').value = c.parentId || '';
+        document.getElementById('catSort').value = c.sort || 0;
+      }
+    } else {
+      document.getElementById('catId').value = '';
+      document.getElementById('catId').disabled = false;
+      document.getElementById('catLabel').value = '';
+      document.getElementById('catParentId').value = '';
+      document.getElementById('catSort').value = 0;
+    }
+    modal.classList.add('is-active');
+  };
+
+  const saveCategory = () => {
+    const id = document.getElementById('catId').value.trim();
+    const label = document.getElementById('catLabel').value.trim();
+    const parentId = document.getElementById('catParentId').value || null;
+    const sort = parseInt(document.getElementById('catSort').value) || 0;
+
+    if (!id || !label) { alert('ID와 라벨은 필수입니다.'); return; }
+
+    const list = Utils.storage.get('varo_categories') || CATEGORIES;
+    if (editingId) {
+      const idx = list.findIndex(c => c.id === editingId);
+      if (idx > -1) list[idx] = { ...list[idx], label, parentId, sort };
+    } else {
+      if (list.some(c => c.id === id)) { alert('이미 존재하는 ID입니다.'); return; }
+      list.push({ id, label, parentId, sort });
+    }
+
+    Utils.storage.set('varo_categories', list);
+    Utils.showToast('카테고리가 저장되었습니다.', 'success');
+    document.getElementById('categoryModal').classList.remove('is-active');
+    loadCategories();
+  };
+
+  const deleteCategory = (id) => {
+    if (!confirm('카테고리를 삭제하시겠습니까? 연결된 상품이 있는 경우 주의가 필요합니다.')) return;
+    const list = (Utils.storage.get('varo_categories') || CATEGORIES).filter(c => c.id !== id);
+    Utils.storage.set('varo_categories', list);
+    loadCategories();
+  };
+
+  /* ── 배너 관리 ───────────────────────────── */
+  const loadBanners = () => {
+    const list = Utils.storage.get('varo_slides') || HERO_SLIDES;
+    const container = document.getElementById('bannerList');
+    if (!container) return;
+
+    container.innerHTML = list.map((b, i) => `
+      <div class="adm-banner-card">
+        <div class="adm-banner-card__img">
+          <img src="${b.img1}" alt="">
+          <span class="tag">${b.tag}</span>
+        </div>
+        <div class="adm-banner-card__actions">
+          <button class="adm-btn adm-btn--sm" onclick="Admin.openBannerModal(${i})">수정</button>
+          <button class="adm-btn adm-btn--sm adm-btn--danger" onclick="Admin.deleteBanner(${i})">삭제</button>
+        </div>
+      </div>
+    `).join('') || '<p class="adm-empty">등록된 배너가 없습니다.</p>';
+  };
+
+  const openBannerModal = (idx = null) => {
+    const modal = document.getElementById('bannerModal');
+    if (!modal) return;
+    editingId = idx;
+
+    const list = Utils.storage.get('varo_slides') || HERO_SLIDES;
+    if (idx !== null) {
+      const b = list[idx];
+      document.getElementById('bTag').value = b.tag;
+      document.getElementById('bImg1').value = b.img1;
+      document.getElementById('bImg2').value = b.img2 || '';
+      document.getElementById('bImg3').value = b.img3 || '';
+    } else {
+      document.getElementById('bTag').value = '';
+      document.getElementById('bImg1').value = '';
+      document.getElementById('bImg2').value = '';
+      document.getElementById('bImg3').value = '';
+    }
+    modal.classList.add('is-active');
+  };
+
+  const saveBanner = () => {
+    const tag = document.getElementById('bTag').value.trim();
+    const img1 = document.getElementById('bImg1').value.trim();
+    const img2 = document.getElementById('bImg2').value.trim();
+    const img3 = document.getElementById('bImg3').value.trim();
+
+    if (!tag || !img1) { alert('태그와 대표 이미지는 필수입니다.'); return; }
+
+    const list = Utils.storage.get('varo_slides') || HERO_SLIDES;
+    const data = { tag, img1, img2, img3 };
+
+    if (editingId !== null) list[editingId] = data;
+    else list.push(data);
+
+    Utils.storage.set('varo_slides', list);
+    Utils.showToast('배너 정보가 저장되었습니다.', 'success');
+    document.getElementById('bannerModal').classList.remove('is-active');
+    loadBanners();
+  };
+
+  const deleteBanner = (idx) => {
+    if (!confirm('배너를 삭제하시겠습니까?')) return;
+    const list = Utils.storage.get('varo_slides') || HERO_SLIDES;
+    list.splice(idx, 1);
+    Utils.storage.set('varo_slides', list);
+    loadBanners();
+  };
+
+  return {
+    init, openProductModal, approveClaim, saveReply,
+    openCategoryModal, saveCategory, deleteCategory,
+    openBannerModal, saveBanner, deleteBanner
+  };
 })();
 
 document.addEventListener('DOMContentLoaded', Admin.init);

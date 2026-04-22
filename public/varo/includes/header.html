@@ -1,0 +1,136 @@
+<div id="site-header-wrapper">
+  <!-- 상단 유틸리티 바 -->
+  <div class="header-top">
+    <div class="header-top__inner">
+      <p class="header-top__notice">무료배송 50,000원 이상 · 당일발송 가능 · 7일 무료반품</p>
+      <nav class="header-top__util">
+        <a href="./signup.html">회원가입</a>
+        <span class="header-top__sep"></span>
+        <a href="./login.html">로그인</a>
+        <span class="header-top__sep"></span>
+        <a href="#">주문조회</a>
+        <span class="header-top__sep"></span>
+        <a href="./mypage.html">마이페이지</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- 메인 헤더 -->
+  <header class="site-header" id="siteHeader"
+    style="background: #fff !important; height: auto !important; display: block !important; visibility: visible !important;">
+    <div class="header-main" style="border-bottom: none !important;">
+      <div class="header-main__inner"
+        style="display: flex !important; justify-content: space-between !important; align-items: center !important; max-width: 1440px !important; margin: 0 auto !important; padding: 10px 24px !important;">
+        <!-- 로고 -->
+        <a href="./index.html" class="site-header__logo"
+          style="font-size: 24px !important; font-weight: 700 !important; color: #000 !important; text-decoration: none !important; text-transform: lowercase !important;">varo</a>
+
+        <!-- 액션 버튼들 -->
+        <div class="header-main__actions"
+          style="display: flex !important; align-items: center !important; gap: 12px !important;">
+          <button class="icon-btn" id="searchToggle" aria-label="검색">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+          </button>
+          <a href="#" class="icon-btn" aria-label="위시리스트">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+              </path>
+            </svg>
+          </a>
+          <a href="./cart.html" class="icon-btn cart-icon-btn" aria-label="장바구니">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            <span class="cart-badge" id="cartBadge"></span>
+          </a>
+          <a href="./login.html" class="icon-btn" id="headerProfileIcon"
+            style="display: inline-flex !important; visibility: visible !important;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </a>
+          <button class="member-badge-btn u-hidden" id="userGradeBadge">GOLD</button>
+          <button class="icon-btn hamburger" id="mobileMenuToggle"><span></span><span></span><span></span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 카테고리 메뉴 탭 바 -->
+    <nav class="category-nav" id="varoCategoryNav"
+      style="display: block !important; visibility: visible !important; background: #fff !important; border-bottom: 1px solid #ebebeb !important; min-height: 50px !important; opacity: 1 !important;">
+      <ul class="category-nav__list"
+        style="display: flex !important; align-items: center !important; justify-content: space-between !important; margin: 0 auto !important; padding: 0 24px !important; list-style: none !important; gap: 10px !important; height: auto !important; min-height: 50px !important; flex-wrap: wrap !important; width: 100% !important;">
+        <li class="category-nav__item"><a href="./shop.html?filter=best">BEST</a></li>
+        <li class="category-nav__item category-nav__item--new"><a href="./shop.html?filter=new">NEW 5%</a></li>
+        <li class="category-nav__item"><a href="./shop.html">COLLECTION</a></li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=outer">OUTER</a>
+          <ul class="sub-menu">
+            <li><a href="./shop.html?category=outer">전체보기</a></li>
+            <li><a href="./shop.html?sub=jacket">자켓</a></li>
+            <li><a href="./shop.html?sub=coat">코트</a></li>
+            <li><a href="./shop.html?sub=padding">패딩</a></li>
+            <li><a href="./shop.html?sub=jumper">점퍼</a></li>
+            <li><a href="./shop.html?sub=leather">레더/무스탕</a></li>
+          </ul>
+        </li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=shirt">SHIRT</a>
+          <ul class="sub-menu">
+            <li><a href="./shop.html?category=shirt">전체보기</a></li>
+            <li><a href="./shop.html?sub=shortshirt">반팔셔츠</a></li>
+            <li><a href="./shop.html?sub=longshirt">긴팔셔츠</a></li>
+            <li><a href="./shop.html?sub=overshirt">오버셔츠</a></li>
+            <li><a href="./shop.html?sub=denim-shirt">데님셔츠</a></li>
+          </ul>
+        </li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=top">TOP</a>
+          <ul class="sub-menu">
+            <li><a href="./shop.html?category=top">전체보기</a></li>
+            <li><a href="./shop.html?sub=shorttee">반팔티</a></li>
+            <li><a href="./shop.html?sub=longtee">긴팔티</a></li>
+            <li><a href="./shop.html?sub=sweatshirt">맨투맨</a></li>
+            <li><a href="./shop.html?sub=hoodie">후드티</a></li>
+            <li><a href="./shop.html?sub=sleeveless">민소매</a></li>
+          </ul>
+        </li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=bottom">BOTTOM</a>
+          <ul class="sub-menu">
+            <li><a href="./shop.html?category=bottom">전체보기</a></li>
+            <li><a href="./shop.html?sub=denim">데님팬츠</a></li>
+            <li><a href="./shop.html?sub=slacks">슬랙스</a></li>
+            <li><a href="./shop.html?sub=cargo">카고팬츠</a></li>
+            <li><a href="./shop.html?sub=jogger">조거팬츠</a></li>
+            <li><a href="./shop.html?sub=shorts">반바지</a></li>
+          </ul>
+        </li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=knit">KNIT</a>
+          <ul class="sub-menu">
+            <li><a href="./shop.html?category=knit">전체보기</a></li>
+            <li><a href="./shop.html?sub=pullover">풀오버</a></li>
+            <li><a href="./shop.html?sub=zipup">집업니트</a></li>
+            <li><a href="./shop.html?sub=cardigan">가디건</a></li>
+            <li><a href="./shop.html?sub=vest">니트베스트</a></li>
+          </ul>
+        </li>
+        <li class="category-nav__item has-sub"><a href="./shop.html?category=shoes">SHOES</a>
+          <ul class="sub-menu">
+            <li><a href="./shop.html?category=shoes">전체보기</a></li>
+            <li><a href="./shop.html?sub=sneakers">스니커즈</a></li>
+            <li><a href="./shop.html?sub=loafer">로퍼</a></li>
+            <li><a href="./shop.html?sub=sandal">샌들</a></li>
+            <li><a href="./shop.html?sub=boots">부츠</a></li>
+          </ul>
+        </li>
+        <li class="category-nav__item category-nav__item--event"><a href="./event.html">1+1 EVENT</a></li>
+        <li class="category-nav__item"><a href="./community.html">COMMUNITY</a></li>
+      </ul>
+    </nav>
+  </header>
+  <div class="mega-overlay" id="megaOverlay"></div>
+</div>

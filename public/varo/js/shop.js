@@ -1,334 +1,305 @@
 /**
  * js/shop.js — VARO 쇼핑몰 상품 페이지 기능 구현
- * 
- * - ES6+ 모듈 방식 사용 (import/export)
- * - 필터링 (카테고리, 가격, 사이즈)
- * - 정렬 (최신순, 인기순, 가격순)
- * - 렌더링 (상품 카드 BEM 구조, XSS 방지)
- * - URL 파라미터 연동
  */
 
-import { PRODUCTS, VARO_CONFIG } from './data.js';
-import Utils from './utils.js';
+(() => {
+  const runShop = () => {
+    console.log('[Shop] Initializing...');
 
-const Shop = (() => {
-  /* ─── 상태 관리 (State) ──────────────────────────────── */
-  const state = {
-    products: [...PRODUCTS],      // 전체 상품 데이터 복사본
-    filteredProducts: [],         // 필터링/정렬된 결과
-    filters: {
-      category: 'all',
-      badge: null,
-      price: [],
-      size: null,
-      query: '',
-    },
-    sort: 'newest',
-  };
+    // ── 전역 데이터 참조
+    const PRODUCTS = (window.VARO_DATA && window.VARO_DATA.PRODUCTS) ? window.VARO_DATA.PRODUCTS : [];
+    const Utils = window.Utils;
 
-  /* ─── DOM 요소 ───────────────────────────────────────── */
-  const refs = {
-    grid: document.getElementById('shopGrid'),
-    count: document.getElementById('shopCount'),
-    title: document.getElementById('shopTitle'),
-    breadcrumb: document.getElementById('breadcrumbCurrent'),
-    sortSelect: document.getElementById('sortSelect'),
-    emptyState: document.getElementById('shopEmpty'),
-    resetBtn: document.getElementById('resetFilter'),
-    filterTabs: document.querySelectorAll('.filter-tab'),
-    priceInputs: document.querySelectorAll('input[name="price"]'),
-    sizeChips: document.querySelectorAll('.size-chip'),
-  };
+    // ── DOM 요소
+    const grid = document.getElementById('shopGrid');
+    const countEl = document.getElementById('shopCount');
+    const titleEl = document.getElementById('shopTitle');
+    const breadcrumb = document.getElementById('breadcrumbCurrent');
+    const sortSelect = document.getElementById('sortSelect');
+    const pageSizeSelect = document.getElementById('pageSizeSelect');
+    const emptyState = document.getElementById('shopEmpty');
+    const resetBtn = document.getElementById('resetFilter');
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    const priceInputs = document.querySelectorAll('input[name="price"]');
+    const minPriceInput = document.getElementById('minPrice');
+    const maxPriceInput = document.getElementById('maxPrice');
+    const applyPriceBtn = document.getElementById('applyPrice');
+    const sizeChips = document.querySelectorAll('.size-chip');
+    const viewGridBtn = document.getElementById('viewGrid');
+    const viewListBtn = document.getElementById('viewList');
 
-  /* ─── 초기화 (Init) ──────────────────────────────────── */
-  const init = () => {
-    if (!refs.grid) return;
-
-    parseUrlParams();
-    renderBrandFilter(); // 브랜드 목록 동적 생성
-    bindEvents();
-    applyFilters();
-  };
-
-  /* ─── 브랜드 필터 렌더링 ────────────────────────────── */
-  const renderBrandFilter = () => {
-    const brands = [...new Set(state.products.map(p => p.brand))].sort();
-    const list = document.getElementById('brandFilterList');
-    if (!list) return;
-
-    list.innerHTML = brands.map(brand => `
-      <li><label><input type="checkbox" name="brand" value="${brand}"> ${brand}</label></li>
-    `).join('');
-
-    // 이벤트 바인딩 (새로 생성된 체크박스)
-    list.querySelectorAll('input[name="brand"]').forEach(input => {
-      input.addEventListener('change', () => {
-        state.filters.brands = Array.from(list.querySelectorAll('input[name="brand"]:checked')).map(i => i.value);
-        applyFilters();
-      });
-    });
-  };
-
-  /* ─── URL 파라미터 처리 ─────────────────────────────── */
-  const parseUrlParams = () => {
-    const params = new URLSearchParams(window.location.search);
-
-    // 카테고리
-    const category = params.get('category') || 'all';
-    state.filters.category = category;
-
-    // 특정 필터 (new, best, sale)
-    const quickFilter = params.get('filter');
-    if (quickFilter) {
-      if (['new', 'best', 'sale'].includes(quickFilter)) {
-        state.filters.badge = quickFilter;
-      }
+    if (!grid) {
+      console.warn('[Shop] grid element (#shopGrid) not found. Skipping.');
+      return;
     }
 
-    // 검색어
-    state.filters.query = params.get('q') || '';
+    // ── 상태
+    const state = {
+      products: [...PRODUCTS],
+      filteredProducts: [],
+      filters: {
+        category: 'all',
+        badge: null,
+        price: [],
+        minPrice: null,
+        maxPrice: null,
+        size: null,
+        query: ''
+      },
+      sort: 'newest',
+      pageSize: 20
+    };
 
-    // UI 동기화 (카테고리 탭)
-    refs.filterTabs.forEach(tab => {
-      const isActive = tab.dataset.category === category;
-      tab.classList.toggle('is-active', isActive);
-      tab.setAttribute('aria-selected', String(isActive));
-    });
-  };
+    // ── URL 파라미터 처리
+    const parseUrlParams = () => {
+      const params = new URLSearchParams(window.location.search);
+      state.filters.category = params.get('category') || 'all';
+      const quickFilter = params.get('filter');
+      if (quickFilter && ['new', 'best', 'sale'].includes(quickFilter)) {
+        state.filters.badge = quickFilter;
+      }
+      state.filters.query = params.get('q') || '';
 
-  /* ─── 이벤트 바인딩 ─────────────────────────────────── */
-  const bindEvents = () => {
-    // 카테고리 탭
-    refs.filterTabs.forEach(tab => {
+      // UI 동기화 (카테고리 탭)
+      filterTabs.forEach(tab => {
+        const isActive = tab.dataset.category === state.filters.category;
+        tab.classList.toggle('is-active', isActive);
+        tab.setAttribute('aria-selected', String(isActive));
+      });
+    };
+
+    // ── 필터 적용
+    const applyFilters = () => {
+      let result = [...state.products];
+
+      // 카테고리 필터
+      if (state.filters.category !== 'all') {
+        result = result.filter(p => p.categoryId === state.filters.category);
+      }
+
+      // 뱃지(퀵) 필터
+      if (state.filters.badge) {
+        result = result.filter(p => p.badge === state.filters.badge);
+      }
+
+      // 가격 필터 (프리셋)
+      if (state.filters.price && state.filters.price.length > 0) {
+        result = result.filter(p => {
+          const price = p.salePrice ?? p.price;
+          return state.filters.price.some(range => {
+            if (range === 'under50') return price <= 50000;
+            if (range === '50to100') return price > 50000 && price <= 100000;
+            if (range === '100to200') return price > 100000 && price <= 200000;
+            if (range === 'over200') return price > 200000;
+            return false;
+          });
+        });
+      }
+
+      // 가격 필터 (수동 입력)
+      if (state.filters.minPrice !== null || state.filters.maxPrice !== null) {
+        result = result.filter(p => {
+          const price = p.salePrice ?? p.price;
+          const min = state.filters.minPrice ?? 0;
+          const max = state.filters.maxPrice ?? Infinity;
+          return price >= min && price <= max;
+        });
+      }
+
+      // 사이즈 필터
+      if (state.filters.size) {
+        result = result.filter(p => p.sizes && p.sizes.includes(state.filters.size));
+      }
+
+      // 검색어 필터
+      if (state.filters.query) {
+        const q = state.filters.query.toLowerCase();
+        result = result.filter(p =>
+          p.name.toLowerCase().includes(q) || (p.brand && p.brand.toLowerCase().includes(q))
+        );
+      }
+
+      // 정렬
+      switch (state.sort) {
+        case 'newest': result.sort((a, b) => b.id.localeCompare(a.id)); break;
+        case 'price-low': result.sort((a, b) => (a.salePrice ?? a.price) - (b.salePrice ?? b.price)); break;
+        case 'price-high': result.sort((a, b) => (b.salePrice ?? b.price) - (a.salePrice ?? a.price)); break;
+        case 'popular': result.sort((a, b) => (b.rating || 0) - (a.rating || 0)); break;
+      }
+
+      state.filteredProducts = result;
+      render();
+    };
+
+    // ── 렌더링
+    const render = () => {
+      // 페이지당 개수 제한 (사용자 요청 사항: O개씩 보기)
+      const totalCount = state.filteredProducts.length;
+      const items = state.filteredProducts.slice(0, state.pageSize);
+
+      const categoryLabel = state.filters.category.toUpperCase();
+      if (titleEl) titleEl.textContent = categoryLabel === 'ALL' ? 'ALL ITEMS' : categoryLabel;
+      if (breadcrumb) breadcrumb.textContent = state.filters.category === 'all' ? '전체' : state.filters.category;
+      if (countEl) countEl.textContent = `${totalCount}개의 상품 (상위 ${items.length}개 노출)`;
+
+      if (totalCount === 0) {
+        grid.innerHTML = '';
+        emptyState?.removeAttribute('hidden');
+        return;
+      }
+      emptyState?.setAttribute('hidden', '');
+
+      grid.innerHTML = items.map(p => createCardHtml(p)).join('');
+
+      // 이벤트 재바인딩
+      grid.querySelectorAll('.product-card__wish').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          const id = btn.dataset.id;
+          const isActive = window.App?.Wishlist?.toggle(id);
+          btn.classList.toggle('product-card__wish--active', !!isActive);
+        });
+      });
+    };
+
+    // ── 카드 HTML
+    const createCardHtml = (p) => {
+      const { id, brand, name, price, salePrice, badge, mainImg, subImg } = p;
+      const isSale = salePrice != null;
+      const currentPrice = isSale ? salePrice : price;
+      const fmt = (v) => Utils ? Utils.formatPrice(v) : v.toLocaleString() + '원';
+
+      return `
+        <article class="product-card" onclick="location.href='./product.html?id=${id}'">
+          <div class="product-card__img-wrap">
+            ${badge ? `<span class="product-card__badge product-card__badge--${badge}">${badge.toUpperCase()}</span>` : ''}
+            <img src="${mainImg}" alt="${name}" class="product-card__img product-card__img--main" crossorigin="anonymous" loading="lazy">
+            <img src="${subImg}"  alt="${name}" class="product-card__img product-card__img--sub"  crossorigin="anonymous" loading="lazy" onerror="this.src='${mainImg}'">
+            
+            <!-- ── 호버 상세 오버레이 (추가) ── -->
+            <div class="product-card__overlay">
+              <div class="overlay-content">
+                ${badge === 'sale' ? '<div class="overlay-event">1+1</div>' : ''}
+                <div class="overlay-name">${name}</div>
+                <div class="overlay-colors">${p.colors ? p.colors.length : 0}color / Free Size</div>
+                <div class="overlay-desc">${p.description || 'VARO의 감성을 담은 데일리 아이템입니다.'}</div>
+                <div class="overlay-marketing">${badge === 'best' ? 'MD추천 / 주문폭주' : 'VARO BEST ITEM'}</div>
+                <div class="overlay-price">
+                  ${isSale ? `<span class="original">${fmt(price)}</span>` : ''}
+                  <span class="current">${fmt(currentPrice)}</span>
+                </div>
+                <div class="overlay-reviews">Review ${p.reviewCount || 0}</div>
+              </div>
+            </div>
+
+            <button class="product-card__wish ${window.App?.Wishlist?.has(id) ? 'product-card__wish--active' : ''}" data-id="${id}">
+              ${Utils ? Utils.icon('heart') : '♡'}
+            </button>
+          </div>
+          <div class="product-card__info">
+            <div class="product-card__name-row">
+              <h3 class="product-card__name">${name}</h3>
+              <span class="product-card__color-count"> / ${p.colors ? p.colors.length : 0}color</span>
+            </div>
+            
+            <div class="product-card__price-row">
+              ${isSale ? `<span class="product-card__price--original">${fmt(price)}</span>` : ''}
+              <span class="product-card__price ${isSale ? 'product-card__price--sale' : ''}">${fmt(currentPrice)}</span>
+            </div>
+
+            <p class="product-card__desc">${p.description || 'VARO가 제안하는 이번 시즌 필수 아이템입니다.'}</p>
+
+            <div class="product-card__labels">
+              ${badge === 'best' ? '<span class="label-point label-point--blue">MD추천/주문폭주</span>' : ''}
+              ${badge === 'new' ? '<span class="label-point label-point--green">NEW 5% 신상 추가 할인</span>' : ''}
+            </div>
+
+            <p class="product-card__review-count">Review ${p.reviewCount || 0}</p>
+          </div>
+        </article>
+      `;
+    };
+
+    // ── 이벤트 핸들러
+    filterTabs.forEach(tab => {
       tab.addEventListener('click', () => {
         state.filters.category = tab.dataset.category;
-        state.filters.badge = null; // 카테고리 클릭 시 퀵필터 해제
-
-        // UI 업데이트
-        refs.filterTabs.forEach(t => {
-          t.classList.remove('is-active');
-          t.setAttribute('aria-selected', 'false');
-        });
-        tab.classList.add('is-active');
-        tab.setAttribute('aria-selected', 'true');
-
+        state.filters.badge = null;
         applyFilters();
+        // UI 갱신
+        filterTabs.forEach(t => { t.classList.remove('is-active'); t.setAttribute('aria-selected', 'false'); });
+        tab.classList.add('is-active'); tab.setAttribute('aria-selected', 'true');
       });
     });
 
-    // 정렬 변경
-    refs.sortSelect?.addEventListener('change', (e) => {
+    sortSelect?.addEventListener('change', (e) => {
       state.sort = e.target.value;
       applyFilters();
     });
 
-    // 가격 필터 (체크박스)
-    refs.priceInputs.forEach(input => {
+    pageSizeSelect?.addEventListener('change', (e) => {
+      state.pageSize = parseInt(e.target.value, 10);
+      render();
+    });
+
+    priceInputs.forEach(input => {
       input.addEventListener('change', () => {
-        const checked = Array.from(refs.priceInputs)
-          .filter(i => i.checked)
-          .map(i => i.value);
-        state.filters.price = checked;
+        state.filters.price = Array.from(priceInputs).filter(i => i.checked).map(i => i.value);
         applyFilters();
       });
     });
 
-    // 사이즈 필터 (칩)
-    refs.sizeChips.forEach(chip => {
+    applyPriceBtn?.addEventListener('click', () => {
+      const min = parseInt(minPriceInput.value, 10);
+      const max = parseInt(maxPriceInput.value, 10);
+      state.filters.minPrice = isNaN(min) ? null : min;
+      state.filters.maxPrice = isNaN(max) ? null : max;
+      applyFilters();
+    });
+
+    sizeChips.forEach(chip => {
       chip.addEventListener('click', () => {
         const size = chip.dataset.size;
-        if (state.filters.size === size) {
-          state.filters.size = null; // 토글 해제
-          chip.classList.remove('is-active');
-        } else {
-          refs.sizeChips.forEach(c => c.classList.remove('is-active'));
-          state.filters.size = size;
-          chip.classList.add('is-active');
-        }
+        state.filters.size = (state.filters.size === size) ? null : size;
+        sizeChips.forEach(c => c.classList.toggle('is-active', c.dataset.size === state.filters.size));
         applyFilters();
       });
     });
 
-    // 필터 초기화 버튼
-    refs.resetBtn?.addEventListener('click', resetAllFilters);
-  };
-
-  /* ─── 필터 초기화 ───────────────────────────────────── */
-  const resetAllFilters = () => {
-    state.filters = {
-      category: 'all',
-      badge: null,
-      price: [],
-      size: null,
-      query: '',
-    };
-    state.sort = 'newest';
-
-    // UI 리셋
-    refs.sortSelect.value = 'newest';
-    refs.priceInputs.forEach(i => i.checked = false);
-    refs.sizeChips.forEach(c => c.classList.remove('is-active'));
-    refs.filterTabs.forEach(t => {
-      const isAll = t.dataset.category === 'all';
-      t.classList.toggle('is-active', isAll);
+    resetBtn?.addEventListener('click', () => {
+      state.filters = { category: 'all', badge: null, price: [], minPrice: null, maxPrice: null, size: null, query: '' };
+      state.sort = 'newest';
+      state.pageSize = 20;
+      if (sortSelect) sortSelect.value = 'newest';
+      if (pageSizeSelect) pageSizeSelect.value = '20';
+      if (minPriceInput) minPriceInput.value = '';
+      if (maxPriceInput) maxPriceInput.value = '';
+      priceInputs.forEach(i => i.checked = false);
+      sizeChips.forEach(c => c.classList.remove('is-active'));
+      applyFilters();
     });
 
+    if (viewGridBtn && viewListBtn) {
+      viewGridBtn.addEventListener('click', () => {
+        grid.classList.remove('product-grid--list');
+        viewGridBtn.classList.add('is-active'); viewListBtn.classList.remove('is-active');
+      });
+      viewListBtn.addEventListener('click', () => {
+        grid.classList.add('product-grid--list');
+        viewListBtn.classList.add('is-active'); viewGridBtn.classList.remove('is-active');
+      });
+    }
+
+    // ── 초기 실행
+    parseUrlParams();
     applyFilters();
   };
 
-  /* ─── 필터 및 정렬 적용 ────────────────────────────── */
-  const applyFilters = () => {
-    let result = [...state.products];
-
-    // 1. 카테고리 필터
-    if (state.filters.category !== 'all') {
-      result = result.filter(p => p.categoryId === state.filters.category);
-    }
-
-    // 2. 퀵 필터 (badge)
-    if (state.filters.badge) {
-      result = result.filter(p => p.badge === state.filters.badge);
-    }
-
-    // 3. 가격 필터
-    if (state.filters.price.length > 0) {
-      result = result.filter(p => {
-        const price = p.salePrice ?? p.price;
-        return state.filters.price.some(range => {
-          if (range === 'under50') return price <= 50000;
-          if (range === '50to100') return price > 50000 && price <= 100000;
-          if (range === '100to200') return price > 100000 && price <= 200000;
-          if (range === 'over200') return price > 200000;
-          return false;
-        });
-      });
-    }
-
-    // 4. 사이즈 필터
-    if (state.filters.size) {
-      result = result.filter(p => p.sizes.includes(state.filters.size));
-    }
-
-    // 5. 검색어 필터
-    if (state.filters.query) {
-      const q = state.filters.query.toLowerCase();
-      result = result.filter(p =>
-        p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q)
-      );
-    }
-
-    // 6. 정렬
-    sortProducts(result);
-
-    state.filteredProducts = result;
-    render();
-  };
-
-  /* ─── 상품 정렬 ────────────────────────────────────── */
-  const sortProducts = (list) => {
-    switch (state.sort) {
-      case 'newest':
-        // 데이터상 id 역순을 최신순으로 가정
-        list.sort((a, b) => b.id.localeCompare(a.id));
-        break;
-      case 'price-low':
-        list.sort((a, b) => (a.salePrice ?? a.price) - (b.salePrice ?? b.price));
-        break;
-      case 'price-high':
-        list.sort((a, b) => (b.salePrice ?? b.price) - (a.salePrice ?? a.price));
-        break;
-      case 'popular':
-        list.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'review':
-        list.sort((a, b) => b.reviewCount - a.reviewCount);
-        break;
-    }
-  };
-
-  /* ─── 렌더링 (Render) ───────────────────────────────── */
-  const render = () => {
-    const { grid, count, title, breadcrumb, emptyState } = refs;
-    const items = state.filteredProducts;
-
-    // 카운트 및 타이틀 업데이트
-    const categoryLabel = state.filters.category.toUpperCase();
-    if (title) title.textContent = categoryLabel === 'ALL' ? 'ALL ITEMS' : categoryLabel;
-    if (breadcrumb) breadcrumb.textContent = state.filters.category === 'all' ? '전체' : state.filters.category;
-    if (count) count.textContent = `${items.length}개의 상품`;
-
-    // 빈 상태 처리
-    if (items.length === 0) {
-      grid.innerHTML = '';
-      emptyState?.removeAttribute('hidden');
-      return;
-    }
-    emptyState?.setAttribute('hidden', '');
-
-    // 결과 렌더링
-    grid.innerHTML = items.map(p => createProductCardHtml(p)).join('');
-
-    // 위시리스트 버튼 이벤트 바인딩 (이벤트 위임 권장이나 여기서는 간단히 처리)
-    grid.querySelectorAll('.product-card__wish').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation(); // 카드 상세 이동 방지
-        e.preventDefault();
-        const id = btn.dataset.id;
-        const isActive = window.App?.Wishlist.toggle(id);
-        btn.classList.toggle('product-card__wish--active', isActive);
-      });
-    });
-  };
-
-  /* ─── 상품 카드 HTML 생성 (BEM) ─────────────────────── */
-  const createProductCardHtml = (p) => {
-    const { id, brand, name, price, salePrice, badge, mainImg, subImg } = p;
-    const isSale = salePrice !== null;
-    const currentPrice = isSale ? salePrice : price;
-    const isWishlisted = window.App?.Wishlist.has(id);
-
-    // XSS 방지 처리
-    const safeName = Utils.escapeHTML(name);
-    const safeBrand = Utils.escapeHTML(brand);
-
-    return `
-      <article class="product-card" onclick="location.href='./product.html?id=${id}'">
-        <div class="product-card__img-wrap">
-          ${badge ? `<span class="product-card__badge product-card__badge--${badge}">${badge.toUpperCase()}</span>` : ''}
-          <img src="${mainImg}" alt="${safeName}" class="product-card__img product-card__img--main" loading="lazy">
-          <img src="${subImg}" alt="${safeName}" class="product-card__img product-card__img--sub" loading="lazy">
-          
-          <button class="product-card__wish ${isWishlisted ? 'product-card__wish--active' : ''}" 
-                  data-id="${id}" aria-label="위시리스트 추가">
-            ${Utils.icon('heart')}
-          </button>
-          
-          <div class="product-card__quick-add" onclick="event.stopPropagation(); window.App?.Cart.addItem(window.VARO_DATA.PRODUCTS.find(x=>x.id==='${id}'),'M','블랙')">
-            QUICK ADD +
-          </div>
-        </div>
-        
-        <div class="product-card__info">
-          <p class="product-card__brand">${safeBrand}</p>
-          <h3 class="product-card__name">${safeName}</h3>
-          <div class="product-card__price-wrap">
-            <span class="product-card__price ${isSale ? 'product-card__price--sale' : ''}">
-              ${Utils.formatPrice(currentPrice)}
-            </span>
-            ${isSale ? `
-              <span class="product-card__price--original">${Utils.formatPrice(price)}</span>
-              <span class="product-card__discount">${Utils.discountRate(price, salePrice)}%</span>
-            ` : ''}
-          </div>
-        </div>
-      </article>
-    `;
-  };
-
-  return { init };
+  // ── 실행 제어
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runShop);
+  } else {
+    runShop();
+  }
 })();
-
-// 초기화 실행
-document.addEventListener('DOMContentLoaded', Shop.init);
-
-export default Shop;

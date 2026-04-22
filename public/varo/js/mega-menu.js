@@ -261,7 +261,7 @@ const MegaMenu = (() => {
     overlay.addEventListener('mouseenter', () => hidePanel(0));
 
     // 카테고리 nav 항목에 이벤트 연결 (has-sub, has-mega 모두 포함)
-    const navItems = document.querySelectorAll('.category-nav__item.has-sub, .category-nav__item.has-mega');
+    const navItems = document.querySelectorAll('.category-nav__item.has-mega');
     navItems.forEach(item => {
       const megaKey = item.dataset.mega || getCatKey(item);
       if (!megaKey) return;

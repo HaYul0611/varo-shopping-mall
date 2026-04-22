@@ -266,8 +266,8 @@
   max-width: 1440px;
   margin: 0 auto;
   padding: 0 24px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  overflow: visible !important;
+  
   gap: 0;
   list-style: none;
 }

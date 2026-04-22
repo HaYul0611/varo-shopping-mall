@@ -30,14 +30,14 @@ const IndexPage = (() => {
       const slide = document.createElement('div');
       slide.className = 'main-slider__slide';
 
-      const userMasterImg = "https://hanggi4043.cafe24.com/bin%20main/4.16%20%ED%94%BC%EC%94%A8/%EC%A0%9C%EC%9E%91-%EC%85%94%EC%B8%A0%20%ED%94%BC%EC%94%A8.jpg";
+      const userMasterImg = "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1600&q=80";
       const imgPanels = Array.isArray(data.panels) ? data.panels : [data.image || userMasterImg];
       const isFull = imgPanels.length === 1;
 
       slide.innerHTML = `
         <a href="${data.ctaHref || './shop.html'}" class="main-slider__panel ${isFull ? 'main-slider__panel--full' : ''}">
           ${imgPanels.map((src, i) => `
-            <img src="${src}" alt="배너 이미지 ${i + 1}" loading="${idx === 0 ? 'eager' : 'lazy'}">
+            <img src="${src}" alt="배너 이미지 ${i + 1}" crossorigin="anonymous" loading="${idx === 0 ? 'eager' : 'lazy'}">
           `).join('')}
         </a>
       `;
@@ -98,18 +98,21 @@ const IndexPage = (() => {
     mainImg.className = 'product-card__img product-card__img--main';
     mainImg.src = product.mainImg;
     mainImg.alt = product.name;
+    mainImg.crossOrigin = 'anonymous'; // ORB 방지
     mainImg.loading = 'lazy';
     mainImg.width = 600;
     mainImg.height = 800;
 
     const subImg = document.createElement('img');
     subImg.className = 'product-card__img product-card__img--sub';
-    subImg.src = product.subImg;
+    subImg.src = product.subImg || product.mainImg;
     subImg.alt = '';
+    subImg.crossOrigin = 'anonymous'; // ORB 방지
     subImg.loading = 'lazy';
     subImg.width = 600;
     subImg.height = 800;
     subImg.setAttribute('aria-hidden', 'true');
+    subImg.onerror = () => { subImg.src = product.mainImg; }; // 폴백
 
     imgWrap.append(mainImg, subImg);
 
@@ -142,54 +145,92 @@ const IndexPage = (() => {
     });
     imgWrap.appendChild(wishBtn);
 
-    // 퀵 담기
-    const quick = document.createElement('div');
-    quick.className = 'product-card__quick-add';
-    quick.textContent = '빠른 담기';
-    quick.addEventListener('click', e => {
-      e.stopPropagation();
-      if (typeof App !== 'undefined') {
-        App.Cart.addItem(product, product.sizes[0], product.colors[0]?.name ?? '', 1);
-      }
-    });
-    imgWrap.appendChild(quick);
+    // ── 호버 상세 오버레이 (추가) ──
+    const hoverOverlay = document.createElement('div');
+    hoverOverlay.className = 'product-card__overlay';
+
+    // MD추천 / 주문폭주 매핑
+    const badgeText = product.badge === 'best' ? 'MD 추천' : (product.badge === 'new' ? '주문 폭주' : '');
+    const ratingStars = '★'.repeat(Math.round(product.rating || 5)) + '☆'.repeat(5 - Math.round(product.rating || 5));
+
+    hoverOverlay.innerHTML = `
+      <div class="overlay-content">
+        ${product.badge === 'sale' || product.isEvent ? '<div class="overlay-event">1+1</div>' : ''}
+        <div class="overlay-name">${product.name}</div>
+        <div class="overlay-colors">${product.colors ? product.colors.length : 0}color / Free Size</div>
+        <div class="overlay-desc">${product.description || 'VARO의 감성을 담은 데일리 아이템입니다.'}</div>
+        <div class="overlay-marketing">${product.badge === 'best' ? 'MD추천 / 주문폭주' : 'VARO BEST ITEM'}</div>
+        <div class="overlay-price">
+          ${product.salePrice ? `<span class="original">${fmt(product.price)}</span>` : ''}
+          <span class="current">${fmt(product.salePrice ?? product.price)}</span>
+        </div>
+        <div class="overlay-reviews">Review ${product.reviewCount || 0}</div>
+      </div>
+    `;
+    imgWrap.appendChild(hoverOverlay);
+
     card.appendChild(imgWrap);
 
-    // 정보
+    // ── 정보 (평상시 노출) ──
     const info = document.createElement('div');
     info.className = 'product-card__info';
-    const brand = document.createElement('p');
-    brand.className = 'product-card__brand';
-    brand.textContent = product.brand;
-    const name = document.createElement('p');
-    name.className = 'product-card__name';
-    name.textContent = product.name;
-    const priceWrap = document.createElement('div');
-    priceWrap.className = 'product-card__price-wrap';
 
+    // 1. 이름 / 색상 수
+    const nameRow = document.createElement('div');
+    nameRow.className = 'product-card__name-row';
+    const nameEl = document.createElement('p');
+    nameEl.className = 'product-card__name';
+    nameEl.textContent = product.name;
+    const colorCount = document.createElement('span');
+    colorCount.className = 'product-card__color-count';
+    colorCount.textContent = ` / ${product.colors ? product.colors.length : 0}color`;
+    nameRow.append(nameEl, colorCount);
+
+    // 2. 가격 원가 / 할인가
+    const priceRow = document.createElement('div');
+    priceRow.className = 'product-card__price-row';
     if (product.salePrice) {
-      const dEl = document.createElement('span');
-      dEl.className = 'product-card__discount';
-      dEl.textContent = `-${disc(product.price, product.salePrice)}%`;
       const sEl = document.createElement('span');
       sEl.className = 'product-card__price product-card__price--sale';
       sEl.textContent = fmt(product.salePrice);
       const oEl = document.createElement('span');
       oEl.className = 'product-card__price--original';
       oEl.textContent = fmt(product.price);
-      priceWrap.append(dEl, sEl, oEl);
+      priceRow.append(oEl, sEl);
     } else {
       const pEl = document.createElement('span');
       pEl.className = 'product-card__price';
       pEl.textContent = fmt(product.price);
-      if (darkBg) pEl.style.color = '#fff';
-      priceWrap.appendChild(pEl);
+      priceRow.appendChild(pEl);
     }
-    if (darkBg) {
-      brand.style.color = 'rgba(255,255,255,.5)';
-      name.style.color = '#fff';
+
+    // 3. 설명
+    const descEl = document.createElement('p');
+    descEl.className = 'product-card__desc';
+    descEl.textContent = product.description || 'VARO가 제안하는 이번 시즌 필수 아이템입니다.';
+
+    // 4. 포인트 라벨 (Badge 기반 색상 포인트)
+    const labels = document.createElement('div');
+    labels.className = 'product-card__labels';
+    if (product.badge === 'best') {
+      const l1 = document.createElement('span');
+      l1.className = 'label-point label-point--blue';
+      l1.textContent = 'MD추천/주문폭주';
+      labels.appendChild(l1);
     }
-    info.append(brand, name, priceWrap);
+    if (product.isNew || product.badge === 'new') {
+      const l2 = document.createElement('span');
+      l2.className = 'label-point label-point--green';
+      l2.textContent = 'NEW 5% 신상 추가 할인';
+      labels.appendChild(l2);
+    }
+
+    // 5. 리뷰 수
+    const reviews = document.createElement('p');
+    reviews.className = 'product-card__review-count';
+    reviews.textContent = `Review ${product.reviewCount || 0}`;
+
+    info.append(nameRow, priceRow, descEl, labels, reviews);
     card.appendChild(info);
 
     card.addEventListener('click', e => {
@@ -211,7 +252,11 @@ const IndexPage = (() => {
       ? PRODUCTS.filter(p => p.badge === 'best').slice(0, 9)
       : PRODUCTS.filter(p => p.category === category).slice(0, 9);
 
-    filtered.forEach(p => grid.appendChild(buildCard(p)));
+    filtered.forEach(p => {
+      const card = buildCard(p);
+      card.classList.add('product-card--hover-only');
+      grid.appendChild(card);
+    });
   };
 
   // 3열 그리드 렌더링 (New Product)

@@ -1,0 +1,51 @@
+<!-- ── 모바일 네비 드로어 ──────────────────────────── -->
+<nav class="mobile-nav" id="mobileNav" aria-label="모바일 메뉴" aria-hidden="true">
+  <div class="mobile-nav__header">
+    <span class="site-header__logo">V<span>A</span>RO</span>
+    <button class="icon-btn mobile-nav__close" id="mobileNavClose" aria-label="메뉴 닫기">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+        aria-hidden="true">
+        <path d="M18 6 6 18M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+  <ul class="mobile-nav__list">
+    <li><a href="./shop.html?filter=best" class="mobile-nav__link">BEST</a></li>
+    <li><a href="./shop.html?filter=new" class="mobile-nav__link u-color-accent">NEW 5%</a></li>
+    <li><a href="./shop.html" class="mobile-nav__link">COLLECTION</a></li>
+    <li><a href="./shop.html?category=outer" class="mobile-nav__link">아우터</a></li>
+    <li><a href="./shop.html?category=shirt" class="mobile-nav__link">셔츠</a></li>
+    <li><a href="./shop.html?category=top" class="mobile-nav__link">상의</a></li>
+    <li><a href="./shop.html?category=knit" class="mobile-nav__link">니트</a></li>
+    <li><a href="./shop.html?category=bottom" class="mobile-nav__link">하의</a></li>
+    <li><a href="./shop.html?category=setup" class="mobile-nav__link">세트업</a></li>
+    <li><a href="./shop.html?category=shoes" class="mobile-nav__link">슈즈</a></li>
+    <li><a href="./shop.html?category=acc" class="mobile-nav__link">악세서리</a></li>
+    <li><a href="./event.html" class="mobile-nav__link u-color-accent u-fw-700">1+1 이벤트</a></li>
+    <li><a href="./shop.html?filter=sale" class="mobile-nav__link u-color-error u-fw-800">SALE</a></li>
+    <li><a href="./community.html" class="mobile-nav__link">커뮤니티</a></li>
+  </ul>
+  <div class="mobile-nav__footer">
+    <a href="./login.html" class="btn btn--outline btn--full">로그인</a>
+    <a href="./signup.html" class="btn btn--accent  btn--full">회원가입</a>
+  </div>
+</nav>
+<div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+
+<!-- ── 검색 오버레이 ──────────────────────────────── -->
+<div class="search-overlay" id="searchOverlay" role="dialog" aria-label="검색" aria-hidden="true">
+  <div class="search-overlay__inner">
+    <form class="search-form" role="search" onsubmit="return false;">
+      <input type="search" class="search-input" id="searchInput" placeholder="브랜드, 상품, 카테고리 검색..." autocomplete="off"
+        maxlength="100" aria-label="검색어 입력">
+      <button type="button" class="icon-btn search-submit" aria-label="검색 실행">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          aria-hidden="true">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
+      </button>
+    </form>
+    <button class="search-close" id="searchClose" aria-label="검색 닫기">ESC 닫기</button>
+  </div>
+</div>

@@ -53,12 +53,28 @@ const EventPage = (() => {
         ? `<span class="product-card__discount">-${disc(origPr, price)}%</span><span class="product-card__price product-card__price--sale">${fmt(price)}</span><span class="product-card__price--original">${fmt(origPr)}</span>`
         : `<span class="product-card__price">${fmt(price)}</span>`;
 
+      const badgeText = '1+1 이벤트';
+      const ratingStars = '★'.repeat(Math.round(p.rating || 5)) + '☆'.repeat(5 - Math.round(p.rating || 5));
+
       card.innerHTML = `
         <div class="product-card__img-wrap">
           <span class="product-card__badge--11">1+1</span>
           <img class="product-card__img product-card__img--main" src="${mainImg}" alt="${p.name}" loading="lazy">
           <img class="product-card__img product-card__img--sub" src="${subImg}" alt="" loading="lazy" aria-hidden="true">
           <div class="product-card__quick-add">빠른 담기</div>
+
+          <!-- 호버 오버레이 -->
+          <div class="product-card__hover-info">
+            <p class="pc-hover__title">${p.name}</p>
+            <p class="pc-hover__intro">${p.description || ''}</p>
+            <div class="pc-hover__meta">
+              <span class="pc-hover__badge">${badgeText}</span>
+              <span class="pc-hover__price">${fmt(price)}</span>
+            </div>
+            <div class="pc-hover__rating">
+              ${ratingStars} <span>(${p.reviewCount || 0} reviews)</span>
+            </div>
+          </div>
         </div>
         <div class="product-card__info">
           <p class="product-card__brand">VARO</p>

@@ -674,3 +674,8 @@
   margin-bottom: 28px;
 }
 
+
+/* 푸터, 광고바 여백 최소화 */
+.footer-ad-bar { margin-bottom: 0 !important; }
+.site-footer { margin-top: 0 !important; padding-top: 20px !important; }
+#main-content { margin-bottom: 0 !important; padding-bottom: 0 !important; }

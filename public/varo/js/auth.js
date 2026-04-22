@@ -27,6 +27,7 @@ const Auth = (() => {
       return;
     }
     try {
+      restoreRememberState();
       bindCommonEvents();
       if (document.getElementById('loginForm')) initLogin();
       if (document.getElementById('signupForm')) initSignup();
@@ -34,6 +35,27 @@ const Auth = (() => {
     } catch (e) {
       console.error('[Auth Init Error]', e);
     }
+  };
+
+  /* ── 상태 복원 (Restore) ────────────────────────────── */
+  const restoreRememberState = () => {
+    const rememberMe = localStorage.getItem('varo_remember_me') === 'true';
+    const savedEmail = localStorage.getItem('varo_remembered_email');
+    const rememberCheckbox = document.getElementById('loginRemember');
+    const emailInput = document.getElementById('loginEmail');
+
+    if (rememberCheckbox) rememberCheckbox.checked = rememberMe;
+    if (rememberMe && savedEmail && emailInput) {
+      emailInput.value = savedEmail;
+    }
+
+    // 토글 상태 변경 시 자동 저장
+    rememberCheckbox?.addEventListener('change', (e) => {
+      localStorage.setItem('varo_remember_me', e.target.checked);
+      if (!e.target.checked) {
+        localStorage.removeItem('varo_remembered_email');
+      }
+    });
   };
 
   /* ─── 공통 이벤트 (Common) ───────────────────────────── */
@@ -92,7 +114,23 @@ const Auth = (() => {
 
   const handleLogin = (email, password) => {
     try {
-      const user = window.App.Auth.login(email, password);
+      const authModule = window.App?.Auth || window.Auth; // 안전한 모듈 참조
+      if (!authModule || typeof authModule.login !== 'function') {
+        throw new Error('인증 시스템이 초기화되지 않았습니다. 잠시 후 쇼핑몰 보기 버튼을 눌러 다시 시도해주세요.');
+      }
+
+      const user = authModule.login(email, password);
+
+      // 로그인 상태 유지 처리
+      const rememberCheckbox = document.getElementById('loginRemember');
+      if (rememberCheckbox?.checked) {
+        localStorage.setItem('varo_remember_me', 'true');
+        localStorage.setItem('varo_remembered_email', email);
+      } else {
+        localStorage.setItem('varo_remember_me', 'false');
+        localStorage.removeItem('varo_remembered_email');
+      }
+
       handleLoginSuccess(user);
     } catch (err) {
       Utils.showToast(err.message, 'error');
@@ -302,8 +340,8 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// DOMContentLoaded 시점에 초기화 (App.init과 동기화)
-document.addEventListener('DOMContentLoaded', () => {
+// 컴포넌트 로드 완료 후 초기화 (App.init과 동기화)
+document.addEventListener('varo:componentsLoaded', () => {
   Auth.init();
   window.Auth = Auth;
 });

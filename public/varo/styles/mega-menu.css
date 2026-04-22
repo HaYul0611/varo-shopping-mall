@@ -5,11 +5,6 @@
    기존 sub-menu 드롭다운 → 메가 패널로 교체
 ══════════════════════════════════════════════════════ */
 
-/* 기존 sub-menu 숨김 처리 */
-.category-nav__item.has-sub .sub-menu {
-  display: none !important;
-}
-
 /* ── 메가메뉴 컨테이너 (컴팩트 드롭다운 스타일) ────────────────────────────── */
 .mega-panel {
   position: absolute;

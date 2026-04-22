@@ -7,7 +7,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="VARO 이벤트 — 1+1 기획전, Flash Sale, GOLD 전용 혜택">
-  <title>이벤트 — VARO</title>
+  <title>VARO — 이벤트</title>
+  <script src="./js/components.js"></script>
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet"
     href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
@@ -21,112 +22,8 @@
 
 <body data-page="event">
 
-  <!-- HEADER (공통) -->
-  <div class="header-top">
-    <div class="header-top__inner">
-      <p class="header-top__notice">무료배송 50,000원 이상 · 당일발송 가능 · 7일 무료반품 · <strong style="color:#D96B3C">1+1 이벤트 진행
-          중</strong></p>
-      <nav class="header-top__util"><a href="./signup.html">회원가입</a><span class="header-top__sep"></span><a
-          href="./login.html">로그인</a><span class="header-top__sep"></span><a href="./mypage.html">마이페이지</a></nav>
-    </div>
-  </div>
-  <header class="site-header" id="siteHeader">
-    <div class="header-main">
-      <div class="header-main__inner">
-        <a href="./index.html" class="site-header__logo" aria-label="VARO 홈">varo</a>
-        <div class="header-main__actions">
-          <!-- 검색 -->
-          <button class="icon-btn" id="searchToggle" aria-label="검색">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.35-4.35"></path>
-            </svg>
-          </button>
-          <!-- 위시리스트 -->
-          <a href="#" class="icon-btn" aria-label="위시리스트">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path
-                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
-              </path>
-            </svg>
-          </a>
-          <!-- 장바구니 -->
-          <a href="./cart.html" class="icon-btn cart-icon-btn" aria-label="장바구니">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <path d="M16 10a4 4 0 0 1-8 0"></path>
-            </svg>
-            <span class="cart-badge" id="cartBadge"></span>
-          </a>
-          <!-- 계정 -->
-          <a href="./login.html" class="icon-btn" aria-label="계정">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </a>
-          <!-- 멤버십 등급 (로그인 시 노출) -->
-          <button class="member-badge-btn" onclick="location.href='./mypage.html'" id="userGradeBadge"
-            style="display: none;">GOLD</button>
-          <!-- 모바일 햄버거 -->
-          <button class="icon-btn hamburger" id="mobileMenuToggle" aria-expanded="false" aria-controls="mobileNav">
-            <span></span><span></span><span></span>
-          </button>
-        </div>
-      </div>
-    </div>
-    <nav class="category-nav" aria-label="카테고리 메뉴">
-      <ul class="category-nav__list">
-        <li class="category-nav__item"><a href="./shop.html?filter=best">BEST</a></li>
-        <li class="category-nav__item category-nav__item--new"><a href="./shop.html?filter=new">NEW 5%</a></li>
-        <li class="category-nav__item"><a href="./shop.html">COLLECTION</a></li>
-
-        <li class="category-nav__divider" aria-hidden="true"></li>
-
-        <li class="category-nav__item has-sub"><a href="./shop.html?category=outer">OUTER</a></li>
-        <li class="category-nav__item has-sub"><a href="./shop.html?category=shirt">SHIRT</a></li>
-        <li class="category-nav__item has-sub"><a href="./shop.html?category=top">TOP</a></li>
-        <li class="category-nav__item has-sub"><a href="./shop.html?category=knit">KNIT</a></li>
-        <li class="category-nav__item has-sub"><a href="./shop.html?category=bottom">BOTTOM</a></li>
-        <li class="category-nav__item has-sub"><a href="./shop.html?category=setup">SET-UP</a></li>
-        <li class="category-nav__item has-sub"><a href="./shop.html?category=shoes">SHOES</a></li>
-        <li class="category-nav__item"><a href="./shop.html?category=acc">ACC</a></li>
-
-        <li class="category-nav__divider" aria-hidden="true"></li>
-
-        <li class="category-nav__item category-nav__item--event is-active"><a href="./event.html">1+1 EVENT</a></li>
-        <li class="category-nav__item category-nav__item--fast"><a href="./shop.html?filter=fast">당일발송</a></li>
-        <li class="category-nav__item"><a href="./community.html">COMMUNITY</a></li>
-      </ul>
-    </nav>
-  </header>
-  <nav class="mobile-nav" id="mobileNav" aria-hidden="true">
-    <div class="mobile-nav__header"><span class="site-header__logo">V<span>A</span>RO</span><button
-        class="icon-btn mobile-nav__close" id="mobileNavClose"><svg width="22" height="22" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="1.8">
-          <path d="M18 6 6 18M6 6l12 12" />
-        </svg></button></div>
-    <ul class="mobile-nav__list">
-      <li><a href="./shop.html?filter=best" class="mobile-nav__link">BEST</a></li>
-      <li><a href="./shop.html?category=outer" class="mobile-nav__link">아우터</a></li>
-      <li><a href="./shop.html?category=top" class="mobile-nav__link">상의</a></li>
-      <li><a href="./event.html" class="mobile-nav__link" style="color:#D96B3C;font-weight:700">이벤트</a></li>
-    </ul>
-    <div class="mobile-nav__footer"><a href="./login.html" class="btn btn--outline btn--full">로그인</a><a
-        href="./signup.html" class="btn btn--accent btn--full">회원가입</a></div>
-  </nav>
-  <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
-  <div class="search-overlay" id="searchOverlay" aria-hidden="true">
-    <div class="search-overlay__inner">
-      <form class="search-form" onsubmit="return false;"><input type="search" class="search-input" id="searchInput"
-          placeholder="검색..."><button type="button" class="icon-btn search-submit"><svg width="22" height="22"
-            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.35-4.35" />
-          </svg></button></form><button class="search-close" id="searchClose">ESC 닫기</button>
-    </div>
-  </div>
+  <div id="header-placeholder"></div>
+  <div id="overlay-placeholder"></div>
 
   <main id="main-content">
 
@@ -209,7 +106,7 @@
     <section class="ev-section ev-section--gray">
       <div class="container">
         <div class="ev-section__head">
-          <h2 class="ev-section__title" style="color:#4A7FA5">1+1 이벤트 상품</h2>
+          <h2 class="ev-section__title u-color-event-blue">1+1 이벤트 상품</h2>
           <p class="ev-section__sub">상의 전품목 구매 시 동일 상품 1개 추가 증정</p>
         </div>
         <div class="product-grid" id="eventProductGrid">
@@ -237,34 +134,7 @@
 
   </main>
 
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="site-footer__inner container">
-      <!-- 1단: 고객센터 -->
-      <div class="footer-column">
-        <h3 class="footer-title">c/s center</h3>
-        <p class="footer-info"><strong>1588-0000</strong></p>
-        <p class="footer-sub">평일 AM 10:00 - PM 06:00 <br>점심 PM 01:00 - PM 02:00 <br>토, 일, 공휴일 휴무</p>
-      </div>
-
-      <!-- 2단: 브랜드 정보 -->
-      <div class="footer-column footer-column--center">
-        <p class="footer-logo">varo</p>
-        <p class="footer-sub">상호: 바로패션(주) | 대표: 홍길동 <br>사업자등록번호: 000-00-00000 <br>통신판매업신고: 제0000-서울-0000호</p>
-        <p class="footer-copy">© varo all rights reserved.</p>
-      </div>
-
-      <!-- 3단: 링크/SNS -->
-      <div class="footer-column">
-        <h3 class="footer-title">account</h3>
-        <ul class="footer-links" style="list-style:none; padding:0">
-          <li> 우리은행 000-000-000000 (예금주: 바로패션)</li>
-          <li><a href="#" style="text-decoration:none; color:inherit">instagram: @varo_official</a></li>
-          <li><a href="#" style="text-decoration:none; color:inherit">kakao talk: @varo_cs</a></li>
-        </ul>
-      </div>
-    </div>
-  </footer>
+  <div id="footer-placeholder"></div>
 
   <div class="toast-container" id="toastContainer"></div>
 

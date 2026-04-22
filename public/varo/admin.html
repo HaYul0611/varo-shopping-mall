@@ -1,189 +1,401 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>관리자 대시보드 — VARO</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <link rel="stylesheet" href="./styles/reset.css">
   <link rel="stylesheet" href="./styles/variables.css">
   <link rel="stylesheet" href="./styles/admin.css">
-  <script>
-    // 관리자 체크 — 로그인 전 차단
-    (function(){
-      const token = localStorage.getItem('varo_token');
-      const user  = JSON.parse(localStorage.getItem('varo_user') || '{}');
-      if (!token || !user.is_admin) {
-        if (token && !user.is_admin) { alert('관리자 권한이 필요합니다.'); }
-        location.replace('./login.html?redirect=./admin.html');
-      }
-    })();
-  </script>
+  <script src="./js/admin-check.js"></script>
 </head>
+
 <body class="admin-body">
 
-<!-- ── 사이드바 ────────────────────────────── -->
-<aside class="adm-sidebar" id="admSidebar">
-  <div class="adm-sidebar__logo">V<span>A</span>RO <span class="adm-label">ADMIN</span></div>
-  <nav class="adm-nav">
-    <button class="adm-nav__item is-active" data-tab="dashboard">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>대시보드
-    </button>
-    <button class="adm-nav__item" data-tab="products">
-      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>상품 관리
-    </button>
-    <button class="adm-nav__item" data-tab="orders">
-      <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>주문 관리
-    </button>
-    <button class="adm-nav__item" data-tab="users">
-      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>회원 관리
-    </button>
-  </nav>
-  <div class="adm-sidebar__footer">
-    <span id="admUserName">관리자</span>
-    <button id="admLogout" class="adm-logout-btn">로그아웃</button>
-  </div>
-</aside>
-
-<!-- ── 메인 콘텐츠 ─────────────────────────── -->
-<div class="adm-main">
-
-  <!-- 상단 헤더 -->
-  <header class="adm-header">
-    <button class="adm-hamburger" id="admHamburger">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-    <h1 class="adm-header__title" id="admPageTitle">대시보드</h1>
-    <a href="./index.html" class="adm-header__shop-link" target="_blank">쇼핑몰 보기 →</a>
-  </header>
-
-  <!-- ① 대시보드 -->
-  <section class="adm-panel is-active" id="tab-dashboard">
-    <div class="adm-stats" id="admStats">
-      <div class="adm-stat-card"><p class="adm-stat-label">전체 상품</p><p class="adm-stat-val" id="statProducts">-</p></div>
-      <div class="adm-stat-card"><p class="adm-stat-label">전체 주문</p><p class="adm-stat-val" id="statOrders">-</p></div>
-      <div class="adm-stat-card"><p class="adm-stat-label">전체 회원</p><p class="adm-stat-val" id="statUsers">-</p></div>
-      <div class="adm-stat-card adm-stat-card--accent"><p class="adm-stat-label">총 매출</p><p class="adm-stat-val" id="statRevenue">-</p></div>
+  <!-- ── 사이드바 ────────────────────────────── -->
+  <aside class="adm-sidebar" id="admSidebar">
+    <div class="adm-sidebar__logo">V<span>A</span>RO <span class="adm-label">ADMIN</span></div>
+    <nav class="adm-nav">
+      <button class="adm-nav__item is-active" data-tab="dashboard">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" />
+        </svg>대시보드
+      </button>
+      <button class="adm-nav__item" data-tab="products">
+        <svg viewBox="0 0 24 24">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <path d="M16 10a4 4 0 0 1-8 0" />
+        </svg>상품 관리
+      </button>
+      <button class="adm-nav__item" data-tab="orders">
+        <svg viewBox="0 0 24 24">
+          <polyline points="9 11 12 14 22 4" />
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+        </svg>주문 관리
+      </button>
+      <button class="adm-nav__item" data-tab="categories">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="7" />
+          <path d="M14 3h7v7h-7z" />
+          <path d="M14 14h7v7h-7z" />
+          <path d="M3 14h7v7H3z" />
+        </svg>카테고리 관리
+      </button>
+      <button class="adm-nav__item" data-tab="banners">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <polyline points="21 15 16 10 5 21" />
+        </svg>배너 관리
+      </button>
+      <button class="adm-nav__item" data-tab="users">
+        <svg viewBox="0 0 24 24">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>회원 관리
+      </button>
+    </nav>
+    <div class="adm-sidebar__footer">
+      <span id="admUserName">관리자</span>
+      <button id="admLogout" class="adm-logout-btn">로그아웃</button>
     </div>
-    <div class="adm-recent">
-      <h2 class="adm-section-title">최근 주문</h2>
-      <table class="adm-table" id="recentOrdersTable">
-        <thead><tr><th>주문번호</th><th>주문자</th><th>금액</th><th>상태</th><th>일시</th></tr></thead>
-        <tbody id="recentOrdersTbody"><tr><td colspan="5" class="adm-empty">로딩 중...</td></tr></tbody>
-      </table>
-    </div>
-  </section>
+  </aside>
 
-  <!-- ② 상품 관리 -->
-  <section class="adm-panel" id="tab-products">
-    <div class="adm-toolbar">
-      <h2 class="adm-section-title">상품 관리</h2>
-      <button class="adm-btn adm-btn--primary" id="btnAddProduct">+ 상품 등록</button>
-    </div>
-    <table class="adm-table" id="productsTable">
-      <thead><tr><th>ID</th><th>이미지</th><th>상품명</th><th>카테고리</th><th>가격</th><th>배지</th><th>재고</th><th>관리</th></tr></thead>
-      <tbody id="productsTbody"><tr><td colspan="8" class="adm-empty">로딩 중...</td></tr></tbody>
-    </table>
-  </section>
+  <!-- ── 메인 콘텐츠 ─────────────────────────── -->
+  <div class="adm-main">
 
-  <!-- ③ 주문 관리 -->
-  <section class="adm-panel" id="tab-orders">
-    <h2 class="adm-section-title">주문 관리</h2>
-    <div class="adm-filter-bar">
-      <button class="adm-filter-btn is-active" data-status="all">전체</button>
-      <button class="adm-filter-btn" data-status="pending">결제대기</button>
-      <button class="adm-filter-btn" data-status="preparing">준비중</button>
-      <button class="adm-filter-btn" data-status="shipped">배송중</button>
-      <button class="adm-filter-btn" data-status="delivered">배송완료</button>
-    </div>
-    <table class="adm-table" id="ordersTable">
-      <thead><tr><th>주문번호</th><th>주문자</th><th>상품</th><th>금액</th><th>결제수단</th><th>상태</th><th>일시</th><th>변경</th></tr></thead>
-      <tbody id="ordersTbody"><tr><td colspan="8" class="adm-empty">로딩 중...</td></tr></tbody>
-    </table>
-  </section>
+    <!-- 상단 헤더 -->
+    <header class="adm-header">
+      <button class="adm-hamburger" id="admHamburger">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+      <h1 class="adm-header__title" id="admPageTitle">대시보드</h1>
+      <a href="./index.html" class="adm-header__shop-link" target="_blank">쇼핑몰 보기 →</a>
+    </header>
 
-  <!-- ④ 회원 관리 -->
-  <section class="adm-panel" id="tab-users">
-    <h2 class="adm-section-title">회원 관리</h2>
-    <table class="adm-table" id="usersTable">
-      <thead><tr><th>ID</th><th>이름</th><th>이메일</th><th>등급</th><th>포인트</th><th>누적구매</th><th>가입일</th></tr></thead>
-      <tbody id="usersTbody"><tr><td colspan="7" class="adm-empty">로딩 중...</td></tr></tbody>
-    </table>
-  </section>
-
-</div>
-
-<!-- ── 상품 등록/수정 모달 ─────────────────── -->
-<div class="adm-modal-overlay" id="productModal" hidden>
-  <div class="adm-modal">
-    <div class="adm-modal__header">
-      <h3 id="productModalTitle">상품 등록</h3>
-      <button class="adm-modal__close" id="productModalClose">✕</button>
-    </div>
-    <div class="adm-modal__body">
-      <div class="adm-form-grid">
-        <div class="adm-form-group">
-          <label>상품명 *</label><input type="text" id="pName" placeholder="상품명 입력">
+    <!-- ① 대시보드 -->
+    <section class="adm-panel is-active" id="tab-dashboard">
+      <div class="adm-stats" id="admStats">
+        <div class="adm-stat-card">
+          <p class="adm-stat-label">전체 상품</p>
+          <p class="adm-stat-val" id="statProducts">-</p>
         </div>
-        <div class="adm-form-group">
-          <label>카테고리 *</label>
-          <select id="pCategory">
-            <option value="outer">아우터</option><option value="shirt">셔츠</option>
-            <option value="top">상의</option><option value="knit">니트</option>
-            <option value="bottom">하의</option><option value="setup">세트업</option>
-            <option value="shoes">슈즈</option><option value="acc">악세서리</option>
-          </select>
+        <div class="adm-stat-card">
+          <p class="adm-stat-label">전체 주문</p>
+          <p class="adm-stat-val" id="statOrders">-</p>
         </div>
-        <div class="adm-form-group">
-          <label>정가 *</label><input type="number" id="pPrice" placeholder="0">
+        <div class="adm-stat-card">
+          <p class="adm-stat-label">전체 회원</p>
+          <p class="adm-stat-val" id="statUsers">-</p>
         </div>
-        <div class="adm-form-group">
-          <label>할인가 (없으면 빈칸)</label><input type="number" id="pSalePrice" placeholder="0">
-        </div>
-        <div class="adm-form-group">
-          <label>배지</label>
-          <select id="pBadge"><option value="">없음</option><option value="new">NEW</option><option value="best">BEST</option><option value="sale">SALE</option></select>
-        </div>
-        <div class="adm-form-group">
-          <label>스타일 테마</label>
-          <div class="adm-checkbox-group">
-            <label><input type="checkbox" value="boyfriend"> 남친룩</label>
-            <label><input type="checkbox" value="couple"> 커플룩</label>
-            <label><input type="checkbox" value="casual"> 캐주얼룩</label>
-            <label><input type="checkbox" value="formal"> 하객룩</label>
-          </div>
-        </div>
-        <div class="adm-form-group adm-form-group--full">
-          <label>대표 이미지 URL *</label><input type="url" id="pMainImg" placeholder="https://images.unsplash.com/...">
-        </div>
-        <div class="adm-form-group adm-form-group--full">
-          <label>서브 이미지 URL</label><input type="url" id="pSubImg" placeholder="https://images.unsplash.com/...">
-        </div>
-        <div class="adm-form-group adm-form-group--full">
-          <label>상품 설명</label><textarea id="pDesc" rows="3" placeholder="상품 설명 입력"></textarea>
-        </div>
-        <div class="adm-form-group">
-          <label>소재</label><input type="text" id="pMaterial" placeholder="예: 100% Cotton">
-        </div>
-        <div class="adm-form-group">
-          <label>관리방법</label><input type="text" id="pCare" placeholder="예: 30°C 이하 세탁">
-        </div>
-        <div class="adm-form-group">
-          <label>1+1 이벤트 대상</label>
-          <label class="adm-toggle"><input type="checkbox" id="pIsEvent"><span class="adm-toggle__slider"></span></label>
+        <div class="adm-stat-card adm-stat-card--accent">
+          <p class="adm-stat-label">총 매출</p>
+          <p class="adm-stat-val" id="statRevenue">-</p>
         </div>
       </div>
-    </div>
-    <div class="adm-modal__footer">
-      <button class="adm-btn" id="productModalCancel">취소</button>
-      <button class="adm-btn adm-btn--primary" id="productModalSave">저장</button>
+      <div class="adm-recent">
+        <h2 class="adm-section-title">최근 주문</h2>
+        <table class="adm-table" id="recentOrdersTable">
+          <thead>
+            <tr>
+              <th>주문번호</th>
+              <th>주문자</th>
+              <th>금액</th>
+              <th>상태</th>
+              <th>일시</th>
+            </tr>
+          </thead>
+          <tbody id="recentOrdersTbody">
+            <tr>
+              <td colspan="5" class="adm-empty">로딩 중...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ② 상품 관리 -->
+    <section class="adm-panel" id="tab-products">
+      <div class="adm-toolbar">
+        <h2 class="adm-section-title">상품 관리</h2>
+        <button class="adm-btn adm-btn--primary" id="btnAddProduct">+ 상품 등록</button>
+      </div>
+      <table class="adm-table" id="productsTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>이미지</th>
+            <th>상품명</th>
+            <th>카테고리</th>
+            <th>가격</th>
+            <th>배지</th>
+            <th>재고</th>
+            <th>관리</th>
+          </tr>
+        </thead>
+        <tbody id="productsTbody">
+          <tr>
+            <td colspan="8" class="adm-empty">로딩 중...</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ③ 주문 관리 -->
+    <section class="adm-panel" id="tab-orders">
+      <h2 class="adm-section-title">주문 관리</h2>
+      <div class="adm-filter-bar">
+        <button class="adm-filter-btn is-active" data-status="all">전체</button>
+        <button class="adm-filter-btn" data-status="pending">결제대기</button>
+        <button class="adm-filter-btn" data-status="preparing">준비중</button>
+        <button class="adm-filter-btn" data-status="shipped">배송중</button>
+        <button class="adm-filter-btn" data-status="delivered">배송완료</button>
+      </div>
+      <table class="adm-table" id="ordersTable">
+        <thead>
+          <tr>
+            <th>주문번호</th>
+            <th>주문자</th>
+            <th>상품</th>
+            <th>금액</th>
+            <th>결제수단</th>
+            <th>상태</th>
+            <th>일시</th>
+            <th>변경</th>
+          </tr>
+        </thead>
+        <tbody id="ordersTbody">
+          <tr>
+            <td colspan="8" class="adm-empty">로딩 중...</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ④ 회원 관리 -->
+    <section class="adm-panel" id="tab-users">
+      <h2 class="adm-section-title">회원 관리</h2>
+      <table class="adm-table" id="usersTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>이름</th>
+            <th>이메일</th>
+            <th>등급</th>
+            <th>포인트</th>
+            <th>누적구매</th>
+            <th>가입일</th>
+          </tr>
+        </thead>
+        <tbody id="usersTbody">
+          <tr>
+            <td colspan="7" class="adm-empty">로딩 중...</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ⑤ 카테고리 관리 -->
+    <section class="adm-panel" id="tab-categories">
+      <div class="adm-toolbar">
+        <h2 class="adm-section-title">카테고리 관리</h2>
+        <button class="adm-btn adm-btn--primary" id="btnAddCategory">+ 카테고리 등록</button>
+      </div>
+      <table class="adm-table" id="categoriesTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>라벨</th>
+            <th>상위 카테고리</th>
+            <th>정렬순서</th>
+            <th>관리</th>
+          </tr>
+        </thead>
+        <tbody id="categoriesTbody">
+          <tr>
+            <td colspan="5" class="adm-empty">로딩 중...</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ⑥ 배너 관리 -->
+    <section class="adm-panel" id="tab-banners">
+      <div class="adm-toolbar">
+        <h2 class="adm-section-title">메인 배너 관리</h2>
+        <button class="adm-btn adm-btn--primary" id="btnAddBanner">+ 배너 등록</button>
+      </div>
+      <div class="adm-banner-grid" id="bannerList">
+        <!-- JS로 채워짐 -->
+        <p class="adm-empty">로딩 중...</p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ── 상품 등록/수정 모달 ─────────────────── -->
+  <div class="adm-modal-overlay" id="productModal" hidden>
+    <div class="adm-modal">
+      <div class="adm-modal__header">
+        <h3 id="productModalTitle">상품 등록</h3>
+        <button class="adm-modal__close" id="productModalClose">✕</button>
+      </div>
+      <div class="adm-modal__body">
+        <div class="adm-form-grid">
+          <div class="adm-form-group">
+            <label>상품명 *</label><input type="text" id="pName" placeholder="상품명 입력">
+          </div>
+          <div class="adm-form-group">
+            <label>카테고리 *</label>
+            <select id="pCategory">
+              <optgroup label="여성의류" id="catOptGroup">
+                <!-- JS에서 동적 생성 추천하나 일단 하드코딩 유지 -->
+                <option value="outer">아우터</option>
+                <option value="shirt">셔츠</option>
+                <option value="top">상의</option>
+                <option value="knit">니트</option>
+                <option value="bottom">하의</option>
+                <option value="setup">세트업</option>
+                <option value="shoes">슈즈</option>
+                <option value="acc">악세서리</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="adm-form-group">
+            <label>정가 *</label><input type="number" id="pPrice" placeholder="0">
+          </div>
+          <div class="adm-form-group">
+            <label>할인가 (없으면 빈칸)</label><input type="number" id="pSalePrice" placeholder="0">
+          </div>
+          <div class="adm-form-group">
+            <label>배지</label>
+            <select id="pBadge">
+              <option value="">없음</option>
+              <option value="new">NEW</option>
+              <option value="best">BEST</option>
+              <option value="sale">SALE</option>
+            </select>
+          </div>
+          <div class="adm-form-group">
+            <label>스타일 테마</label>
+            <div class="adm-checkbox-group">
+              <label><input type="checkbox" value="boyfriend"> 남친룩</label>
+              <label><input type="checkbox" value="couple"> 커플룩</label>
+              <label><input type="checkbox" value="casual"> 캐주얼룩</label>
+              <label><input type="checkbox" value="formal"> 하객룩</label>
+            </div>
+          </div>
+          <div class="adm-form-group adm-form-group--full">
+            <label>대표 이미지 URL *</label><input type="url" id="pMainImg" placeholder="https://images.unsplash.com/...">
+          </div>
+          <div class="adm-form-group adm-form-group--full">
+            <label>서브 이미지 URL</label><input type="url" id="pSubImg" placeholder="https://images.unsplash.com/...">
+          </div>
+          <div class="adm-form-group adm-form-group--full">
+            <label>상품 설명</label><textarea id="pDesc" rows="3" placeholder="상품 설명 입력"></textarea>
+          </div>
+          <div class="adm-form-group">
+            <label>소재</label><input type="text" id="pMaterial" placeholder="예: 100% Cotton">
+          </div>
+          <div class="adm-form-group">
+            <label>관리방법</label><input type="text" id="pCare" placeholder="예: 30°C 이하 세탁">
+          </div>
+          <div class="adm-form-group">
+            <label>1+1 이벤트 대상</label>
+            <label class="adm-toggle"><input type="checkbox" id="pIsEvent"><span
+                class="adm-toggle__slider"></span></label>
+          </div>
+        </div>
+      </div>
+      <div class="adm-modal__footer">
+        <button class="adm-btn" id="productModalCancel">취소</button>
+        <button class="adm-btn adm-btn--primary" id="productModalSave">저장</button>
+      </div>
     </div>
   </div>
-</div>
 
-<script src="./js/api.js"></script>
-<script src="./js/admin.js"></script>
+  <!-- ── 카테고리 등록/수정 모달 ─────────────────── -->
+  <div class="adm-modal-overlay" id="categoryModal" hidden>
+    <div class="adm-modal">
+      <div class="adm-modal__header">
+        <h3 id="categoryModalTitle">카테고리 등록</h3>
+        <button class="adm-modal__close" id="categoryModalClose">✕</button>
+      </div>
+      <div class="adm-modal__body">
+        <div class="adm-form-grid">
+          <div class="adm-form-group">
+            <label>카테고리 ID *</label><input type="text" id="catId" placeholder="예: outer">
+          </div>
+          <div class="adm-form-group">
+            <label>카테고리 명 *</label><input type="text" id="catLabel" placeholder="예: 아우터">
+          </div>
+          <div class="adm-form-group">
+            <label>상위 카테고리</label>
+            <select id="catParentId">
+              <option value="">없음 (최상위)</option>
+              <!-- JS로 채워짐 -->
+            </select>
+          </div>
+          <div class="adm-form-group">
+            <label>정렬 순서</label><input type="number" id="catSort" value="0">
+          </div>
+        </div>
+      </div>
+      <div class="adm-modal__footer">
+        <button class="adm-btn" id="categoryModalCancel">취소</button>
+        <button class="adm-btn adm-btn--primary" id="categoryModalSave">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 배너 등록/수정 모달 ─────────────────── -->
+  <div class="adm-modal-overlay" id="bannerModal" hidden>
+    <div class="adm-modal">
+      <div class="adm-modal__header">
+        <h3 id="bannerModalTitle">배너 등록/수정</h3>
+        <button class="adm-modal__close" id="bannerModalClose">✕</button>
+      </div>
+      <div class="adm-modal__body">
+        <div class="adm-form-grid">
+          <div class="adm-form-group">
+            <label>배너 태그 (예: 05 MAY)</label><input type="text" id="bTag" placeholder="APR-GUEST">
+          </div>
+          <div class="adm-form-group adm-form-group--full">
+            <label>이미지 URL 1 *</label><input type="url" id="bImg1" placeholder="URL 입력">
+          </div>
+          <div class="adm-form-group adm-form-group--full">
+            <label>이미지 URL 2</label><input type="url" id="bImg2" placeholder="URL 입력">
+          </div>
+          <div class="adm-form-group adm-form-group--full">
+            <label>이미지 URL 3</label><input type="url" id="bImg3" placeholder="URL 입력">
+          </div>
+        </div>
+      </div>
+      <div class="adm-modal__footer">
+        <button class="adm-btn" id="bannerModalCancel">취소</button>
+        <button class="adm-btn adm-btn--primary" id="bannerModalSave">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/admin.js"></script>
 </body>
+
 </html>

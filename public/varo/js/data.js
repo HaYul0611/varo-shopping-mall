@@ -28,10 +28,12 @@ const VARO_CONFIG = {
     password: 'varo2026admin',
   },
   MEMBERSHIP_TIERS: [
-    { id: 'basic', label: 'BASIC', min: 0, max: 99999, discount: 0, points: 1, color: '#888' },
-    { id: 'silver', label: 'SILVER', min: 100000, max: 299999, discount: 5, points: 3, color: '#8A9AAA' },
-    { id: 'gold', label: 'GOLD', min: 300000, max: 999999, discount: 10, points: 5, color: '#BFA14A' },
-    { id: 'vip', label: 'VARO VIP', min: 1000000, max: Infinity, discount: 15, points: 7, color: '#D96B3C' },
+    { id: 'bronze', label: 'BRONZE', min: 0, max: 99999, discount: 0, points: 1, color: '#A87C6C' },
+    { id: 'silver', label: 'SILVER', min: 100000, max: 299999, discount: 5, points: 3, color: '#A0A0A0' },
+    { id: 'gold', label: 'GOLD', min: 300000, max: 999999, discount: 10, points: 5, color: '#D4AF37' },
+    { id: 'dia', label: 'DIAMOND', min: 1000000, max: 2999999, discount: 15, points: 7, color: '#00D1FF' },
+    { id: 'manager', label: 'MANAGER', min: 3000000, max: 9999999, discount: 20, points: 10, color: '#D1D1FF' },
+    { id: 'admin', label: 'ADMIN', min: 10000000, max: Infinity, discount: 0, points: 0, color: '#1B2B4B' },
   ],
 };
 
@@ -39,15 +41,18 @@ const VARO_CONFIG = {
    카테고리
 ══════════════════════════════════════════════ */
 const CATEGORIES = [
-  { id: 'all', label: '전체' },
-  { id: 'outer', label: '아우터' },
-  { id: 'shirt', label: '셔츠' },
-  { id: 'top', label: '상의' },
-  { id: 'knit', label: '니트' },
-  { id: 'bottom', label: '하의' },
-  { id: 'setup', label: '세트업' },
-  { id: 'shoes', label: '슈즈' },
-  { id: 'acc', label: '악세서리' },
+  { id: 'all', label: '전체', parentId: null },
+  { id: 'outer', label: '아우터', parentId: null },
+  { id: 'shirt', label: '셔츠', parentId: null },
+  { id: 'top', label: '상의', parentId: null },
+  { id: 'knit', label: '니트', parentId: null },
+  { id: 'bottom', label: '하의', parentId: null },
+  { id: 'setup', label: '세트업', parentId: null },
+  { id: 'shoes', label: '슈즈', parentId: null },
+  { id: 'acc', label: '악세서리', parentId: null },
+  // 예시 서브 카테고리 (필요 시 추가)
+  { id: 'coat', label: '코트', parentId: 'outer' },
+  { id: 'jacket', label: '자켓', parentId: 'outer' },
 ];
 
 /* ══════════════════════════════════════════════
@@ -146,8 +151,8 @@ const PRODUCTS = [
   {
     id: 'P007', categoryId: 'top', styles: ['casual', 'couple'],
     brand: 'VARO', name: '스웨트 오버사이즈 후드', price: 88000, salePrice: null, badge: 'best',
-    mainImg: 'https://images.unsplash.com/photo-1556821840-3a63f8550d64?w=600&h=800&fit=crop&q=85', // 스웨트 후드 (White/Oatmeal)
-    subImg: 'https://images.unsplash.com/photo-1565084888279-aca607bb73f7?w=600&h=800&fit=crop&q=85',
+    mainImg: 'https://images.unsplash.com/photo-1556821840-03a63f8550d64?w=600&h=800&fit=crop&q=85',
+    subImg: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&h=800&fit=crop&q=85',
     images: ['https://images.unsplash.com/photo-1556821840-03a63f8550d64?w=600&h=800&fit=crop&q=85'],
     colors: [{ name: '차콜', hex: '#3A3A3A' }, { name: '아이보리', hex: '#F0EDE4' }],
     sizes: ['S', 'M', 'L', 'XL'], soldOutSizes: ['S'],
@@ -247,7 +252,7 @@ const PRODUCTS = [
     salePrice: null,
     badge: 'new',
     isEvent: false,
-    mainImg: 'https://images.unsplash.com/photo-1548036161-2b1a0e5b4a7b?w=600&h=800&fit=crop&q=85',
+    mainImg: 'https://images.unsplash.com/photo-1554062614-69755137dbad?w=600&h=800&fit=crop&q=85',
     subImg: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600&h=800&fit=crop&q=85',
     images: [
       'https://images.unsplash.com/photo-1548036161-2b1a0e5b4a7b?w=600&h=800&fit=crop&q=85',
@@ -275,8 +280,8 @@ const PRODUCTS = [
     salePrice: null,
     badge: 'new',
     isEvent: true,
-    mainImg: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=600&h=800&fit=crop&q=85', // 체인 팔찌
-    subImg: 'https://images.unsplash.com/photo-1573408301185-9519f94816b5?w=600&h=800&fit=crop&q=85',
+    mainImg: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=800&fit=crop&q=85',
+    subImg: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=600&h=800&fit=crop&q=85',
     images: ['https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=600&h=800&fit=crop&q=85'],
     colors: [{ name: '실버', hex: '#C0C0C0' }],
     sizes: ['FREE'], soldOutSizes: [],
@@ -413,14 +418,5 @@ if (typeof window !== 'undefined') {
   window.VARO_CONFIG = VARO_CONFIG;
 }
 
-export {
-  VARO_CONFIG,
-  CATEGORIES,
-  STYLE_THEMES,
-  PRODUCTS,
-  HERO_SLIDES,
-  COMMUNITY_POSTS,
-  REVIEWS,
-  MARQUEE_ITEMS,
-  SORT_OPTIONS
-};
+// End of data.js
+
