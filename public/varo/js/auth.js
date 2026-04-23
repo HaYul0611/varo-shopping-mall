@@ -107,6 +107,16 @@ const Auth = (() => {
           } else {
             localStorage.removeItem('varo_remembered_email');
           }
+
+          // [비회원 데이터 병합 이식]
+          if (window.GuestManager) {
+            try {
+              await window.GuestManager.mergeAfterLogin(res.token);
+            } catch (mergeErr) {
+              console.error('[Auth] Guest data merge failed:', mergeErr);
+            }
+          }
+
           location.href = './index.html';
         } else {
           alert('로그인 실패: ' + (res.error || '정보를 확인하세요.'));

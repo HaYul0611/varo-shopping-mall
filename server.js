@@ -22,6 +22,8 @@ app.use('/api/cart', require('./routes/cart'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/reviews', require('./routes/reviews'));
+app.use('/api/wishlist', require('./routes/wishlist'));
+app.use('/api/checkout', require('./routes/checkout'));
 
 /* ── 헬스 체크 ───────────────────────────── */
 app.get('/api/health', (req, res) => {
@@ -48,6 +50,22 @@ app.use((err, req, res, next) => {
     error: err.message || '서버 오류가 발생했습니다.',
   });
 });
+
+/* ── 만료 데이터 정리 로직 (비회원 장바구니/위시리스트) ── */
+const db = require('./db/database');
+const purgeExpiredGuestData = () => {
+  try {
+    const now = "datetime('now', 'localtime')";
+    db.exec(`DELETE FROM guest_carts      WHERE expires_at < ${now}`);
+    db.exec(`DELETE FROM guest_wishlists  WHERE expires_at < ${now}`);
+    console.info(`[Purge] 만료 비회원 데이터 정리 완료 - ${new Date().toLocaleString()}`);
+  } catch (err) {
+    console.error('[Purge] 정리 실패:', err.message);
+  }
+};
+// 서버 시작 시 1회 + 24시간마다 실행
+purgeExpiredGuestData();
+setInterval(purgeExpiredGuestData, 24 * 60 * 60 * 1000);
 
 /* ── 서버 시작 ───────────────────────────── */
 app.listen(PORT, () => {
