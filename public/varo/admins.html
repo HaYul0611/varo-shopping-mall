@@ -1,0 +1,2698 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VARO ADMIN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f4f4f4;
+            --white: #ffffff;
+            --black: #111111;
+            --gray-50: #f9f9f9;
+            --gray-100: #f0f0f0;
+            --gray-200: #e0e0e0;
+            --gray-300: #c8c8c8;
+            --gray-400: #9e9e9e;
+            --gray-500: #6e6e6e;
+            --gray-600: #4e4e4e;
+            --gray-700: #333333;
+            --accent: #111111;
+            --accent-light: #f5f5f5;
+            --danger: #e53e3e;
+            --danger-light: #fff5f5;
+            --success: #2f855a;
+            --success-light: #f0fff4;
+            --warning: #c05621;
+            --warning-light: #fffaf0;
+            --info: #2b6cb0;
+            --info-light: #ebf8ff;
+            --radius: 10px;
+            --radius-sm: 6px;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.14);
+            --nav-h: 60px;
+            --sidebar-w: 220px;
+            --transition: 0.18s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Noto Sans KR', 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--black);
+            font-size: 14px;
+        }
+
+        /* ── TOP NAV ── */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--nav-h);
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            z-index: 100;
+            gap: 0;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: var(--sidebar-w);
+        }
+
+        .nav-logo .brand {
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 2px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .nav-logo .badge {
+            background: var(--black);
+            color: var(--white);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            letter-spacing: 1px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .nav-tab {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--gray-500);
+            transition: var(--transition);
+            border: none;
+            background: none;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            background: var(--gray-100);
+            color: var(--black);
+        }
+
+        .nav-tab.active {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .nav-tab svg {
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+        }
+
+        .nav-btn {
+            padding: 7px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--gray-200);
+            background: var(--white);
+            color: var(--gray-600);
+            transition: var(--transition);
+        }
+
+        .nav-btn:hover {
+            background: var(--gray-100);
+        }
+
+        .nav-btn.primary {
+            background: var(--black);
+            color: var(--white);
+            border-color: var(--black);
+        }
+
+        .nav-btn.primary:hover {
+            background: var(--gray-700);
+        }
+
+        .nav-notif {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notif-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid var(--white);
+        }
+
+        /* ── LAYOUT ── */
+        .layout {
+            display: flex;
+            margin-top: var(--nav-h);
+            min-height: calc(100vh - var(--nav-h));
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 28px 32px;
+            overflow: hidden;
+        }
+
+        /* ── PAGE ── */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn .2s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        /* ── SECTION HEADER ── */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -.3px;
+        }
+
+        .section-sub {
+            font-size: 13px;
+            color: var(--gray-400);
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        /* ── STAT CARDS ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .stat-card.dark {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .stat-card.dark .stat-label {
+            color: rgba(255, 255, 255, .55);
+        }
+
+        .stat-card.dark .stat-change {
+            color: rgba(255, 255, 255, .7);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -.5px;
+            line-height: 1;
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 8px;
+            color: var(--gray-400);
+        }
+
+        .stat-change.up {
+            color: var(--success);
+        }
+
+        .stat-change.down {
+            color: var(--danger);
+        }
+
+        .stat-icon {
+            position: absolute;
+            right: 18px;
+            top: 18px;
+            opacity: .07;
+        }
+
+        .stat-icon svg {
+            width: 44px;
+            height: 44px;
+        }
+
+        .stat-card.dark .stat-icon {
+            opacity: .15;
+        }
+
+        /* ── TWO COL ── */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .three-col {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* ── CARD ── */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 16px 20px;
+        }
+
+        .card-link {
+            font-size: 12px;
+            color: var(--gray-400);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .card-link:hover {
+            color: var(--black);
+        }
+
+        /* ── TABLE ── */
+        .tbl-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead tr {
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        th {
+            padding: 10px 14px;
+            text-align: left;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 13px 14px;
+            font-size: 13.5px;
+            border-bottom: 1px solid var(--gray-100);
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: var(--gray-50);
+        }
+
+        .tbl-empty {
+            text-align: center;
+            color: var(--gray-400);
+            padding: 32px 0 !important;
+        }
+
+        /* ── BADGE / STATUS ── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+
+        .badge::before {
+            content: '';
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .badge-success {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .badge-danger {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .badge-warning {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .badge-info {
+            background: var(--info-light);
+            color: var(--info);
+        }
+
+        .badge-gray {
+            background: var(--gray-100);
+            color: var(--gray-500);
+        }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--gray-700);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--gray-600);
+            border: 1px solid var(--gray-200);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-100);
+            border-color: var(--gray-300);
+        }
+
+        .btn-danger {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #ffe0e0;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            justify-content: center;
+        }
+
+        .btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* ── FORM ── */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            font-family: inherit;
+            outline: none;
+            transition: var(--transition);
+            background: var(--white);
+        }
+
+        .form-control:focus {
+            border-color: var(--black);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, .06);
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-hint {
+            font-size: 11.5px;
+            color: var(--gray-400);
+            margin-top: 4px;
+        }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .45);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .2s;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: var(--radius);
+            width: 560px;
+            max-width: 95vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            transform: scale(.95) translateY(10px);
+            transition: transform .2s;
+        }
+
+        .modal-overlay.open .modal {
+            transform: none;
+        }
+
+        .modal-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: var(--gray-100);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--gray-500);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: var(--gray-200);
+            color: var(--black);
+        }
+
+        .modal-body {
+            padding: 20px 24px;
+        }
+
+        .modal-footer {
+            padding: 14px 24px;
+            border-top: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .modal-lg {
+            width: 720px;
+        }
+
+        /* ── SEARCH / FILTER BAR ── */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-input-wrap svg {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            width: 15px;
+            height: 15px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 34px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            font-family: inherit;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--black);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, .06);
+        }
+
+        /* ── MINI CHART (CSS only) ── */
+        .sparkline {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 40px;
+        }
+
+        .spark-bar {
+            flex: 1;
+            background: var(--gray-200);
+            border-radius: 2px;
+            transition: var(--transition);
+        }
+
+        .spark-bar:hover {
+            background: var(--black);
+        }
+
+        .dark .spark-bar {
+            background: rgba(255, 255, 255, .2);
+        }
+
+        .dark .spark-bar:hover {
+            background: rgba(255, 255, 255, .6);
+        }
+
+        /* ── PROGRESS ── */
+        .progress {
+            height: 6px;
+            background: var(--gray-100);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--black);
+            border-radius: 99px;
+        }
+
+        /* ── AVATAR ── */
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gray-600);
+            flex-shrink: 0;
+        }
+
+        /* ── TABS (inner) ── */
+        .inner-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .inner-tab {
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            color: var(--gray-400);
+            transition: var(--transition);
+        }
+
+        .inner-tab.active {
+            color: var(--black);
+            border-bottom-color: var(--black);
+        }
+
+        .inner-tab:hover {
+            color: var(--gray-700);
+        }
+
+        /* ── TOAST ── */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            background: var(--black);
+            color: var(--white);
+            padding: 12px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp .25s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 320px;
+        }
+
+        .toast.success {
+            background: var(--success);
+        }
+
+        .toast.error {
+            background: var(--danger);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        /* ── CHART AREA ── */
+        .chart-area {
+            position: relative;
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            padding: 8px 0 0;
+        }
+
+        .chart-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .chart-bar {
+            width: 100%;
+            background: var(--gray-200);
+            border-radius: 4px 4px 0 0;
+            transition: height .4s ease;
+            cursor: pointer;
+        }
+
+        .chart-bar:hover {
+            background: var(--black);
+        }
+
+        .chart-bar.active {
+            background: var(--black);
+        }
+
+        .chart-label {
+            font-size: 10px;
+            color: var(--gray-400);
+            white-space: nowrap;
+        }
+
+        .chart-x-axis {
+            display: flex;
+            gap: 6px;
+            padding: 0;
+        }
+
+        .chart-x-label {
+            flex: 1;
+            text-align: center;
+            font-size: 10px;
+            color: var(--gray-400);
+        }
+
+        /* ── PRODUCT THUMB ── */
+        .product-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            background: var(--gray-100);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 18px;
+        }
+
+        /* ── TOGGLE ── */
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 38px;
+            height: 22px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: var(--gray-200);
+            border-radius: 22px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            left: 3px;
+            top: 3px;
+            width: 16px;
+            height: 16px;
+            background: var(--white);
+            border-radius: 50%;
+            transition: var(--transition);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+        }
+
+        input:checked+.toggle-slider {
+            background: var(--black);
+        }
+
+        input:checked+.toggle-slider::before {
+            transform: translateX(16px);
+        }
+
+        /* ── MEMBER ROLE ── */
+        .role-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .role-admin {
+            background: #111;
+            color: #fff;
+        }
+
+        .role-vip {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .role-normal {
+            background: var(--gray-100);
+            color: var(--gray-500);
+        }
+
+        .role-block {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        /* ── COUPON / PROMO ── */
+        .coupon-card {
+            border: 1.5px dashed var(--gray-300);
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .coupon-discount {
+            font-size: 24px;
+            font-weight: 800;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .coupon-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .coupon-cond {
+            font-size: 11.5px;
+            color: var(--gray-400);
+        }
+
+        /* ── REVIEW ── */
+        .star-rating {
+            color: #f6ad55;
+            letter-spacing: 1px;
+        }
+
+        .review-row {
+            padding: 14px 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .review-row:last-child {
+            border-bottom: none;
+        }
+
+        /* ── PAGINATION ── */
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+
+        .page-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--gray-200);
+            background: var(--white);
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--gray-500);
+            transition: var(--transition);
+        }
+
+        .page-btn:hover {
+            background: var(--gray-100);
+        }
+
+        .page-btn.active {
+            background: var(--black);
+            color: var(--white);
+            border-color: var(--black);
+        }
+
+        /* ── INVENTORY INDICATOR ── */
+        .stock-low {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .stock-ok {
+            color: var(--success);
+        }
+
+        /* ── DATE RANGE ── */
+        .date-range {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .date-range input {
+            padding: 7px 10px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            font-size: 12.5px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .date-range input:focus {
+            border-color: var(--black);
+        }
+
+        /* ── SUMMARY ROW ── */
+        .summary-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            padding: 12px 14px;
+            background: var(--gray-50);
+            border-top: 1px solid var(--gray-100);
+            font-size: 13px;
+        }
+
+        .summary-row span {
+            font-weight: 700;
+        }
+
+        /* ── QUICK ACTIONS ── */
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .quick-card {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .quick-card:hover {
+            background: var(--black);
+            color: var(--white);
+            border-color: var(--black);
+        }
+
+        .quick-card:hover .quick-icon {
+            background: rgba(255, 255, 255, .15);
+        }
+
+        .quick-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+        }
+
+        .quick-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* ── ACTIVITY FEED ── */
+        .activity-item {
+            display: flex;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray-100);
+            align-items: flex-start;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gray-300);
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+
+        .activity-dot.green {
+            background: var(--success);
+        }
+
+        .activity-dot.red {
+            background: var(--danger);
+        }
+
+        .activity-dot.blue {
+            background: var(--info);
+        }
+
+        .activity-dot.yellow {
+            background: #f6ad55;
+        }
+
+        .activity-text {
+            font-size: 13px;
+            flex: 1;
+        }
+
+        .activity-time {
+            font-size: 11.5px;
+            color: var(--gray-400);
+            white-space: nowrap;
+        }
+
+        /* ── CHECKBOX ── */
+        input[type=checkbox] {
+            accent-color: var(--black);
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+        }
+
+        /* ── DIVIDER ── */
+        .divider {
+            height: 1px;
+            background: var(--gray-100);
+            margin: 16px 0;
+        }
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-200);
+            border-radius: 99px;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .quick-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                padding: 20px 16px;
+            }
+
+            .two-col,
+            .three-col {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-tab span {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOP NAV -->
+    <nav class="top-nav">
+        <div class="nav-logo">
+            <span class="brand">VARO</span>
+            <span class="badge">ADMIN</span>
+        </div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showPage('dashboard',this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                </svg>
+                <span>대시보드</span>
+            </button>
+            <button class="nav-tab" onclick="showPage('products',this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                </svg>
+                <span>상품 관리</span>
+            </button>
+            <button class="nav-tab" onclick="showPage('orders',this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                </svg>
+                <span>주문 관리</span>
+            </button>
+            <button class="nav-tab" onclick="showPage('members',this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                <span>회원 관리</span>
+            </button>
+            <button class="nav-tab" onclick="showPage('coupons',this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="1" y="4" width="22" height="16" rx="2" />
+                    <line x1="1" y1="10" x2="23" y2="10" />
+                </svg>
+                <span>쿠폰/이벤트</span>
+            </button>
+            <button class="nav-tab" onclick="showPage('reviews',this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                <span>리뷰 관리</span>
+            </button>
+            <button class="nav-tab" onclick="showPage('analytics',this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="20" x2="18" y2="10" />
+                    <line x1="12" y1="20" x2="12" y2="4" />
+                    <line x1="6" y1="20" x2="6" y2="14" />
+                </svg>
+                <span>통계/분석</span>
+            </button>
+            <button class="nav-tab" onclick="showPage('settings',this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3" />
+                    <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+                <span>설정</span>
+            </button>
+        </div>
+        <div class="nav-right">
+            <div class="nav-notif">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+                <span class="notif-dot"></span>
+            </div>
+            <button class="nav-btn" onclick="window.open('#')">쇼핑몰 보기</button>
+            <span style="font-size:13px;font-weight:600;color:var(--gray-700)">관리자</span>
+            <button class="nav-btn" onclick="showToast('로그아웃 되었습니다.','success')">로그아웃</button>
+        </div>
+    </nav>
+
+    <div class="layout">
+        <div class="main-content">
+
+            <!-- ══════════════════════ DASHBOARD ══════════════════════ -->
+            <div id="page-dashboard" class="page active">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">대시보드</div>
+                        <div class="section-sub">2025년 04월 기준 · 실시간 현황</div>
+                    </div>
+                    <div class="header-actions">
+                        <div class="date-range">
+                            <input type="date" value="2025-04-01">
+                            <span style="color:var(--gray-400)">~</span>
+                            <input type="date" value="2025-04-23">
+                        </div>
+                        <button class="btn btn-outline" onclick="showToast('데이터를 내보냈습니다.')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            내보내기
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI CARDS -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">전체 상품</div>
+                        <div class="stat-value">247</div>
+                        <div class="stat-change up">▲ 12개 이번 달 신규</div>
+                        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                            </svg></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">이번 달 주문</div>
+                        <div class="stat-value">1,284</div>
+                        <div class="stat-change up">▲ 18.3% 전월 대비</div>
+                        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                            </svg></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">전체 회원</div>
+                        <div class="stat-value">3,891</div>
+                        <div class="stat-change up">▲ 156명 신규 가입</div>
+                        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                            </svg></div>
+                    </div>
+                    <div class="stat-card dark">
+                        <div class="stat-label">이번 달 매출</div>
+                        <div class="stat-value">₩48,720,000</div>
+                        <div class="stat-change up">▲ 23.5% 전월 대비</div>
+                        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor">
+                                <line x1="12" y1="1" x2="12" y2="23" />
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                            </svg></div>
+                    </div>
+                </div>
+
+                <!-- SECONDARY KPI -->
+                <div class="stats-grid" style="grid-template-columns: repeat(4,1fr); margin-bottom:24px;">
+                    <div class="stat-card">
+                        <div class="stat-label">처리 대기 주문</div>
+                        <div class="stat-value" style="color:var(--warning)">23</div>
+                        <div class="stat-change" style="color:var(--warning)">즉시 처리 필요</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">재고 부족 상품</div>
+                        <div class="stat-value" style="color:var(--danger)">8</div>
+                        <div class="stat-change down">재입고 필요</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">미답변 문의</div>
+                        <div class="stat-value" style="color:var(--info)">12</div>
+                        <div class="stat-change" style="color:var(--info)">48시간 이내 답변 필요</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">평균 주문 금액</div>
+                        <div class="stat-value">₩37,900</div>
+                        <div class="stat-change up">▲ ₩2,300 상승</div>
+                    </div>
+                </div>
+
+                <div class="three-col">
+                    <!-- SALES CHART -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">월별 매출 현황</span>
+                            <div class="inner-tabs" style="margin:0; border:none;">
+                                <span class="inner-tab active" style="padding:4px 10px; font-size:12px;">매출</span>
+                                <span class="inner-tab" style="padding:4px 10px; font-size:12px;">주문수</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div
+                                style="font-size:11px; color:var(--gray-400); margin-bottom:8px; display:flex; gap:16px;">
+                                <span>최고: <b style="color:var(--black)">4월 ₩48.7M</b></span>
+                                <span>목표 달성률: <b style="color:var(--success)">97.4%</b></span>
+                            </div>
+                            <div class="chart-area" id="salesChart">
+                                <!-- bars rendered by JS -->
+                            </div>
+                            <div class="chart-x-axis" id="chartXAxis"></div>
+                        </div>
+                    </div>
+
+                    <!-- QUICK STATS -->
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">카테고리별 매출 비중</span></div>
+                        <div class="card-body">
+                            <div id="categoryStats"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="two-col">
+                    <!-- RECENT ORDERS -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">최근 주문</span>
+                            <a class="card-link"
+                                onclick="showPage('orders',document.querySelectorAll('.nav-tab')[2])">전체 보기 →</a>
+                        </div>
+                        <div class="tbl-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>주문번호</th>
+                                        <th>주문자</th>
+                                        <th>금액</th>
+                                        <th>상태</th>
+                                        <th>일시</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboardOrders"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ACTIVITY + QUICK ACTIONS -->
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <div class="card">
+                            <div class="card-header"><span class="card-title">빠른 실행</span></div>
+                            <div class="card-body">
+                                <div class="quick-grid">
+                                    <div class="quick-card" onclick="openModal('modal-add-product')">
+                                        <div class="quick-icon"><svg width="18" height="18" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2">
+                                                <line x1="12" y1="5" x2="12" y2="19" />
+                                                <line x1="5" y1="12" x2="19" y2="12" />
+                                            </svg></div>
+                                        <div class="quick-label">상품 등록</div>
+                                    </div>
+                                    <div class="quick-card"
+                                        onclick="showPage('orders',document.querySelectorAll('.nav-tab')[2])">
+                                        <div class="quick-icon"><svg width="18" height="18" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                            </svg></div>
+                                        <div class="quick-label">주문 처리</div>
+                                    </div>
+                                    <div class="quick-card" onclick="openModal('modal-add-coupon')">
+                                        <div class="quick-icon"><svg width="18" height="18" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="1" y="4" width="22" height="16" rx="2" />
+                                                <line x1="1" y1="10" x2="23" y2="10" />
+                                            </svg></div>
+                                        <div class="quick-label">쿠폰 발급</div>
+                                    </div>
+                                    <div class="quick-card" onclick="showToast('공지 등록 페이지로 이동')">
+                                        <div class="quick-icon"><svg width="18" height="18" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                            </svg></div>
+                                        <div class="quick-label">공지 등록</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><span class="card-title">최근 활동</span></div>
+                            <div class="card-body" style="padding-top:8px; padding-bottom:8px;">
+                                <div id="activityFeed"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══════════════════════ PRODUCTS ══════════════════════ -->
+            <div id="page-products" class="page">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">상품 관리</div>
+                        <div class="section-sub">총 <span id="productCount">0</span>개 상품</div>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-outline" onclick="showToast('엑셀로 내보내기 완료')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            엑셀 내보내기
+                        </button>
+                        <button class="btn btn-primary" onclick="openModal('modal-add-product')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            상품 등록
+                        </button>
+                    </div>
+                </div>
+                <div class="filter-bar">
+                    <div class="search-input-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        <input class="search-input" placeholder="상품명, SKU 검색..." oninput="filterProducts(this.value)">
+                    </div>
+                    <select class="form-control" style="width:140px;" onchange="filterByCategory(this.value)">
+                        <option value="">전체 카테고리</option>
+                        <option>상의</option>
+                        <option>하의</option>
+                        <option>아우터</option>
+                        <option>신발</option>
+                        <option>악세서리</option>
+                    </select>
+                    <select class="form-control" style="width:130px;">
+                        <option>전체 상태</option>
+                        <option>판매중</option>
+                        <option>품절</option>
+                        <option>숨김</option>
+                    </select>
+                    <select class="form-control" style="width:130px;">
+                        <option>최신순</option>
+                        <option>판매량순</option>
+                        <option>가격높은순</option>
+                        <option>가격낮은순</option>
+                    </select>
+                </div>
+                <div class="card">
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" onclick="toggleAllCheck(this,'prod-check')"></th>
+                                    <th>상품</th>
+                                    <th>SKU</th>
+                                    <th>카테고리</th>
+                                    <th>판매가</th>
+                                    <th>재고</th>
+                                    <th>판매수</th>
+                                    <th>상태</th>
+                                    <th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productTable"></tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="productPagination"></div>
+                </div>
+            </div>
+
+            <!-- ══════════════════════ ORDERS ══════════════════════ -->
+            <div id="page-orders" class="page">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">주문 관리</div>
+                        <div class="section-sub">총 <span id="orderCount">0</span>건 주문</div>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-outline" onclick="showToast('주문 데이터 내보내기 완료')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            엑셀 내보내기
+                        </button>
+                    </div>
+                </div>
+                <!-- order status tabs -->
+                <div class="inner-tabs">
+                    <span class="inner-tab active" onclick="filterOrders('all',this)">전체 (<span
+                            id="cnt-all">0</span>)</span>
+                    <span class="inner-tab" onclick="filterOrders('결제완료',this)">결제완료 (<span
+                            id="cnt-결제완료">0</span>)</span>
+                    <span class="inner-tab" onclick="filterOrders('배송준비',this)">배송준비 (<span
+                            id="cnt-배송준비">0</span>)</span>
+                    <span class="inner-tab" onclick="filterOrders('배송중',this)">배송중 (<span id="cnt-배송중">0</span>)</span>
+                    <span class="inner-tab" onclick="filterOrders('배송완료',this)">배송완료 (<span
+                            id="cnt-배송완료">0</span>)</span>
+                    <span class="inner-tab" onclick="filterOrders('취소/반품',this)">취소/반품 (<span
+                            id="cnt-취소/반품">0</span>)</span>
+                </div>
+                <div class="filter-bar">
+                    <div class="search-input-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        <input class="search-input" placeholder="주문번호, 주문자명, 연락처 검색...">
+                    </div>
+                    <div class="date-range">
+                        <input type="date" value="2025-04-01">
+                        <span style="color:var(--gray-400)">~</span>
+                        <input type="date" value="2025-04-23">
+                    </div>
+                    <button class="btn btn-outline btn-sm">조회</button>
+                </div>
+                <div class="card">
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" onclick="toggleAllCheck(this,'order-check')"></th>
+                                    <th>주문번호</th>
+                                    <th>주문자</th>
+                                    <th>상품명</th>
+                                    <th>금액</th>
+                                    <th>결제방법</th>
+                                    <th>주문상태</th>
+                                    <th>주문일시</th>
+                                    <th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderTable"></tbody>
+                        </table>
+                    </div>
+                    <div id="orderSummary" class="summary-row"></div>
+                    <div class="pagination" id="orderPagination"></div>
+                </div>
+            </div>
+
+            <!-- ══════════════════════ MEMBERS ══════════════════════ -->
+            <div id="page-members" class="page">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">회원 관리</div>
+                        <div class="section-sub">총 <span id="memberCount">0</span>명 회원</div>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-outline" onclick="showToast('회원 데이터 내보내기 완료')">내보내기</button>
+                        <button class="btn btn-primary" onclick="openModal('modal-add-member')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            회원 등록
+                        </button>
+                    </div>
+                </div>
+                <div class="filter-bar">
+                    <div class="search-input-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        <input class="search-input" placeholder="이름, 이메일, 연락처 검색...">
+                    </div>
+                    <select class="form-control" style="width:130px;">
+                        <option>전체 등급</option>
+                        <option>VIP</option>
+                        <option>일반</option>
+                        <option>정지</option>
+                    </select>
+                    <select class="form-control" style="width:130px;">
+                        <option>가입일순</option>
+                        <option>구매금액순</option>
+                        <option>구매횟수순</option>
+                    </select>
+                </div>
+                <div class="card">
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" onclick="toggleAllCheck(this,'mem-check')"></th>
+                                    <th>회원</th>
+                                    <th>이메일</th>
+                                    <th>연락처</th>
+                                    <th>등급</th>
+                                    <th>누적 구매</th>
+                                    <th>가입일</th>
+                                    <th>최근 접속</th>
+                                    <th>상태</th>
+                                    <th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="memberTable"></tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="memberPagination"></div>
+                </div>
+            </div>
+
+            <!-- ══════════════════════ COUPONS ══════════════════════ -->
+            <div id="page-coupons" class="page">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">쿠폰 / 이벤트</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="openModal('modal-add-coupon')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        쿠폰 생성
+                    </button>
+                </div>
+                <div class="inner-tabs">
+                    <span class="inner-tab active">진행 중 쿠폰</span>
+                    <span class="inner-tab">만료된 쿠폰</span>
+                    <span class="inner-tab">발급 내역</span>
+                </div>
+                <div id="couponGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px;"></div>
+            </div>
+
+            <!-- ══════════════════════ REVIEWS ══════════════════════ -->
+            <div id="page-reviews" class="page">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">리뷰 관리</div>
+                    </div>
+                    <div class="header-actions">
+                        <select class="form-control" style="width:130px;">
+                            <option>전체</option>
+                            <option>답변대기</option>
+                            <option>답변완료</option>
+                            <option>숨김처리</option>
+                        </select>
+                        <select class="form-control" style="width:130px;">
+                            <option>최신순</option>
+                            <option>별점낮은순</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="two-col" style="margin-bottom:0;">
+                    <div class="stats-grid" style="grid-template-columns:1fr 1fr 1fr; margin-bottom:0; gap:12px;">
+                        <div class="stat-card">
+                            <div class="stat-label">전체 리뷰</div>
+                            <div class="stat-value">1,247</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">평균 별점</div>
+                            <div class="stat-value">4.6 ★</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">답변 대기</div>
+                            <div class="stat-value" style="color:var(--warning)">38</div>
+                        </div>
+                    </div>
+                    <div></div>
+                </div>
+                <br>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">리뷰 목록</span></div>
+                    <div class="card-body" id="reviewList"></div>
+                </div>
+            </div>
+
+            <!-- ══════════════════════ ANALYTICS ══════════════════════ -->
+            <div id="page-analytics" class="page">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">통계 / 분석</div>
+                    </div>
+                    <div class="date-range">
+                        <select class="form-control" style="width:130px;">
+                            <option>이번 달</option>
+                            <option>지난 달</option>
+                            <option>최근 3개월</option>
+                            <option>올해</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">방문자 수</div>
+                        <div class="stat-value">24,891</div>
+                        <div class="stat-change up">▲ 12.4%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">전환율</div>
+                        <div class="stat-value">5.16%</div>
+                        <div class="stat-change up">▲ 0.8%p</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">장바구니 이탈률</div>
+                        <div class="stat-value">62.3%</div>
+                        <div class="stat-change down">▼ 3.1%p 개선</div>
+                    </div>
+                    <div class="stat-card dark">
+                        <div class="stat-label">총 매출 (누적)</div>
+                        <div class="stat-value">₩487.2M</div>
+                        <div class="stat-change up">▲ 연간 목표 81.2%</div>
+                    </div>
+                </div>
+                <div class="two-col">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">시간대별 주문 분포</span></div>
+                        <div class="card-body">
+                            <div id="hourlyChart" style="display:flex; align-items:flex-end; gap:4px; height:160px;">
+                            </div>
+                            <div style="display:flex; gap:4px; margin-top:4px;" id="hourlyLabel"></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">인기 상품 TOP 5</span></div>
+                        <div class="card-body" id="topProducts"></div>
+                    </div>
+                </div>
+                <div class="two-col">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">유입 경로 분석</span></div>
+                        <div class="card-body" id="trafficSource"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">재구매율 분석</span></div>
+                        <div class="card-body">
+                            <div style="display:flex; align-items:center; gap:20px; margin-bottom:16px;">
+                                <div style="font-size:48px; font-weight:800; font-family:'Inter';">38%</div>
+                                <div>
+                                    <div style="font-size:13px; font-weight:600; margin-bottom:4px;">재구매 고객</div>
+                                    <div style="font-size:12px; color:var(--gray-400);">업계 평균 대비 +8%p 높음</div>
+                                </div>
+                            </div>
+                            <div class="progress" style="height:10px; margin-bottom:8px;">
+                                <div class="progress-bar" style="width:38%"></div>
+                            </div>
+                            <div
+                                style="display:flex; justify-content:space-between; font-size:12px; color:var(--gray-400);">
+                                <span>신규 62%</span><span>재구매 38%</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══════════════════════ SETTINGS ══════════════════════ -->
+            <div id="page-settings" class="page">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">설정</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="showToast('설정이 저장되었습니다.','success')">저장</button>
+                </div>
+                <div class="two-col">
+                    <div>
+                        <div class="card" style="margin-bottom:16px;">
+                            <div class="card-header"><span class="card-title">쇼핑몰 기본 정보</span></div>
+                            <div class="card-body">
+                                <div class="form-group"><label class="form-label">쇼핑몰 이름</label><input
+                                        class="form-control" value="VARO"></div>
+                                <div class="form-group"><label class="form-label">대표 이메일</label><input
+                                        class="form-control" value="admin@varo.kr"></div>
+                                <div class="form-group"><label class="form-label">고객센터 번호</label><input
+                                        class="form-control" value="1588-0000"></div>
+                                <div class="form-group"><label class="form-label">운영 시간</label><input
+                                        class="form-control" value="평일 09:00 ~ 18:00 (주말/공휴일 휴무)"></div>
+                                <div class="form-group"><label class="form-label">사업자 번호</label><input
+                                        class="form-control" value="123-45-67890"></div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><span class="card-title">배송 설정</span></div>
+                            <div class="card-body">
+                                <div class="form-group"><label class="form-label">기본 배송비</label><input
+                                        class="form-control" value="3,000"></div>
+                                <div class="form-group"><label class="form-label">무료배송 기준금액</label><input
+                                        class="form-control" value="50,000"></div>
+                                <div class="form-group"><label class="form-label">도서산간 추가 배송비</label><input
+                                        class="form-control" value="5,000"></div>
+                                <div class="form-group"><label class="form-label">택배사</label><select
+                                        class="form-control">
+                                        <option>CJ대한통운</option>
+                                        <option>한진택배</option>
+                                        <option>롯데택배</option>
+                                        <option>우체국</option>
+                                    </select></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="card" style="margin-bottom:16px;">
+                            <div class="card-header"><span class="card-title">알림 설정</span></div>
+                            <div class="card-body">
+                                <div id="notiSettings"></div>
+                            </div>
+                        </div>
+                        <div class="card" style="margin-bottom:16px;">
+                            <div class="card-header"><span class="card-title">결제 수단 관리</span></div>
+                            <div class="card-body">
+                                <div id="paymentSettings"></div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><span class="card-title">관리자 계정</span></div>
+                            <div class="card-body">
+                                <div class="form-group"><label class="form-label">관리자 이름</label><input
+                                        class="form-control" value="관리자"></div>
+                                <div class="form-group"><label class="form-label">이메일</label><input class="form-control"
+                                        value="admin@varo.kr"></div>
+                                <div class="form-group"><label class="form-label">현재 비밀번호</label><input
+                                        class="form-control" type="password" placeholder="현재 비밀번호 입력"></div>
+                                <div class="form-group"><label class="form-label">새 비밀번호</label><input
+                                        class="form-control" type="password" placeholder="새 비밀번호 입력"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- main-content -->
+    </div><!-- layout -->
+
+    <!-- ══════════════════════ MODALS ══════════════════════ -->
+
+    <!-- ADD PRODUCT -->
+    <div class="modal-overlay" id="modal-add-product">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <span class="modal-title" id="productModalTitle">상품 등록</span>
+                <button class="modal-close" onclick="closeModal('modal-add-product')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group" style="grid-column:1/-1"><label class="form-label">상품명 *</label><input
+                            class="form-control" id="pName" placeholder="상품명 입력"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">카테고리 *</label>
+                        <select class="form-control" id="pCategory">
+                            <option value="">선택</option>
+                            <option>상의</option>
+                            <option>하의</option>
+                            <option>아우터</option>
+                            <option>신발</option>
+                            <option>악세서리</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">SKU</label><input class="form-control" id="pSku"
+                            placeholder="자동 생성"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">정가 *</label><input class="form-control"
+                            id="pOrigPrice" placeholder="0" type="number"></div>
+                    <div class="form-group"><label class="form-label">판매가 *</label><input class="form-control"
+                            id="pPrice" placeholder="0" type="number"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">재고 수량 *</label><input class="form-control"
+                            id="pStock" placeholder="0" type="number"></div>
+                    <div class="form-group"><label class="form-label">상태</label>
+                        <select class="form-control" id="pStatus">
+                            <option>판매중</option>
+                            <option>준비중</option>
+                            <option>숨김</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group"><label class="form-label">상품 설명</label><textarea class="form-control" id="pDesc"
+                        placeholder="상품 설명을 입력하세요"></textarea></div>
+                <div class="form-group"><label class="form-label">태그 (쉼표 구분)</label><input class="form-control"
+                        id="pTags" placeholder="예: 봄신상, 베스트, 할인"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('modal-add-product')">취소</button>
+                <button class="btn btn-primary" onclick="saveProduct()">등록하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ORDER DETAIL -->
+    <div class="modal-overlay" id="modal-order-detail">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <span class="modal-title">주문 상세</span>
+                <button class="modal-close" onclick="closeModal('modal-order-detail')">✕</button>
+            </div>
+            <div class="modal-body" id="orderDetailBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('modal-order-detail')">닫기</button>
+                <button class="btn btn-primary"
+                    onclick="showToast('운송장이 등록되었습니다.','success'); closeModal('modal-order-detail')">운송장 등록</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD MEMBER -->
+    <div class="modal-overlay" id="modal-add-member">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">회원 등록</span>
+                <button class="modal-close" onclick="closeModal('modal-add-member')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group"><label class="form-label">이름 *</label><input class="form-control" id="mName">
+                </div>
+                <div class="form-group"><label class="form-label">이메일 *</label><input class="form-control" id="mEmail"
+                        type="email"></div>
+                <div class="form-group"><label class="form-label">연락처</label><input class="form-control" id="mPhone"
+                        placeholder="010-0000-0000"></div>
+                <div class="form-group"><label class="form-label">등급</label><select class="form-control" id="mRole">
+                        <option>일반</option>
+                        <option>VIP</option>
+                    </select></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('modal-add-member')">취소</button>
+                <button class="btn btn-primary" onclick="saveMember()">등록</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD COUPON -->
+    <div class="modal-overlay" id="modal-add-coupon">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">쿠폰 생성</span>
+                <button class="modal-close" onclick="closeModal('modal-add-coupon')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group"><label class="form-label">쿠폰명 *</label><input class="form-control" id="cName">
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">할인 유형</label><select class="form-control"
+                            id="cType">
+                            <option>정액 할인</option>
+                            <option>정률 할인</option>
+                        </select></div>
+                    <div class="form-group"><label class="form-label">할인 금액/율 *</label><input class="form-control"
+                            id="cDiscount" placeholder="예: 5000 또는 10(%)"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">최소 주문금액</label><input class="form-control"
+                            id="cMinOrder" placeholder="0"></div>
+                    <div class="form-group"><label class="form-label">만료일</label><input class="form-control"
+                            id="cExpiry" type="date"></div>
+                </div>
+                <div class="form-group"><label class="form-label">발급 대상</label><select class="form-control"
+                        id="cTarget">
+                        <option>전체 회원</option>
+                        <option>VIP 회원</option>
+                        <option>신규 회원</option>
+                        <option>선택 회원</option>
+                    </select></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('modal-add-coupon')">취소</button>
+                <button class="btn btn-primary" onclick="saveCoupon()">생성</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REVIEW REPLY -->
+    <div class="modal-overlay" id="modal-review-reply">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">리뷰 답변</span>
+                <button class="modal-close" onclick="closeModal('modal-review-reply')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="reviewDetailBody" style="margin-bottom:16px;"></div>
+                <div class="form-group"><label class="form-label">답변 내용</label><textarea class="form-control"
+                        id="replyText" style="min-height:100px;" placeholder="고객에게 보여질 답변을 입력하세요..."></textarea></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('modal-review-reply')">취소</button>
+                <button class="btn btn-primary" onclick="saveReply()">답변 등록</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ════════════════════════════════════════════════════════
+        // DATA STORE
+        // ════════════════════════════════════════════════════════
+        const DATA = {
+            products: [
+                { id: 1, name: '오버핏 코튼 티셔츠', sku: 'VR-TOP-001', category: '상의', price: 29000, origPrice: 39000, stock: 145, sold: 892, status: '판매중', emoji: '👕' },
+                { id: 2, name: '슬림 데님 팬츠', sku: 'VR-BOT-001', category: '하의', price: 59000, origPrice: 79000, stock: 67, sold: 534, status: '판매중', emoji: '👖' },
+                { id: 3, name: '크롭 후드 집업', sku: 'VR-OUT-001', category: '아우터', price: 89000, origPrice: 119000, stock: 32, sold: 421, status: '판매중', emoji: '🧥' },
+                { id: 4, name: '캔버스 스니커즈', sku: 'VR-SHO-001', category: '신발', price: 69000, origPrice: 89000, stock: 0, sold: 312, status: '품절', emoji: '👟' },
+                { id: 5, name: '버킷햇', sku: 'VR-ACC-001', category: '악세서리', price: 25000, origPrice: 32000, stock: 8, sold: 278, status: '판매중', emoji: '🎩' },
+                { id: 6, name: '린넨 셔츠', sku: 'VR-TOP-002', category: '상의', price: 45000, origPrice: 59000, stock: 88, sold: 167, status: '판매중', emoji: '👔' },
+                { id: 7, name: '와이드 트라우저', sku: 'VR-BOT-002', category: '하의', price: 72000, origPrice: 89000, stock: 3, sold: 145, status: '판매중', emoji: '👖' },
+                { id: 8, name: '나일론 윈드브레이커', sku: 'VR-OUT-002', category: '아우터', price: 129000, origPrice: 159000, stock: 21, sold: 98, status: '판매중', emoji: '🧥' },
+                { id: 9, name: '슬링백 힐', sku: 'VR-SHO-002', category: '신발', price: 85000, origPrice: 105000, stock: 14, sold: 87, status: '판매중', emoji: '👠' },
+                { id: 10, name: '미니 크로스백', sku: 'VR-ACC-002', category: '악세서리', price: 55000, origPrice: 72000, stock: 0, sold: 203, status: '숨김', emoji: '👜' },
+                { id: 11, name: '스트라이프 니트', sku: 'VR-TOP-003', category: '상의', price: 65000, origPrice: 82000, stock: 56, sold: 134, status: '판매중', emoji: '🧣' },
+                { id: 12, name: '조거 팬츠', sku: 'VR-BOT-003', category: '하의', price: 48000, origPrice: 62000, stock: 77, sold: 221, status: '판매중', emoji: '👖' },
+            ],
+            orders: [
+                { id: 'ORD-202504-0284', customer: '김민준', email: 'mj@email.com', phone: '010-1234-5678', product: '오버핏 코튼 티셔츠 외 2개', amount: 87000, payment: '카드', status: '결제완료', date: '2025-04-23 14:22' },
+                { id: 'ORD-202504-0283', customer: '이서연', email: 'sy@email.com', phone: '010-2345-6789', product: '슬림 데님 팬츠', amount: 59000, payment: '카카오페이', status: '배송준비', date: '2025-04-23 13:10' },
+                { id: 'ORD-202504-0282', customer: '박지훈', email: 'jh@email.com', phone: '010-3456-7890', product: '크롭 후드 집업', amount: 89000, payment: '카드', status: '배송중', date: '2025-04-23 11:45' },
+                { id: 'ORD-202504-0281', customer: '최수아', email: 'sa@email.com', phone: '010-4567-8901', product: '버킷햇 외 1개', amount: 50000, payment: '네이버페이', status: '배송완료', date: '2025-04-22 16:30' },
+                { id: 'ORD-202504-0280', customer: '정태양', email: 'ty@email.com', phone: '010-5678-9012', product: '린넨 셔츠', amount: 45000, payment: '카드', status: '배송완료', date: '2025-04-22 10:12' },
+                { id: 'ORD-202504-0279', customer: '강하늘', email: 'hn@email.com', phone: '010-6789-0123', product: '캔버스 스니커즈', amount: 69000, payment: '카드', status: '취소/반품', date: '2025-04-21 09:00' },
+                { id: 'ORD-202504-0278', customer: '윤도현', email: 'dh@email.com', phone: '010-7890-1234', product: '나일론 윈드브레이커', amount: 129000, payment: '계좌이체', status: '결제완료', date: '2025-04-21 15:40' },
+                { id: 'ORD-202504-0277', customer: '임채린', email: 'cr@email.com', phone: '010-8901-2345', product: '와이드 트라우저 외 1개', amount: 120000, payment: '카카오페이', status: '배송준비', date: '2025-04-20 18:22' },
+                { id: 'ORD-202504-0276', customer: '한지우', email: 'jw@email.com', phone: '010-9012-3456', product: '스트라이프 니트', amount: 65000, payment: '카드', status: '배송중', date: '2025-04-20 12:55' },
+                { id: 'ORD-202504-0275', customer: '오민서', email: 'ms@email.com', phone: '010-0123-4567', product: '조거 팬츠 외 2개', amount: 96000, payment: '네이버페이', status: '배송완료', date: '2025-04-19 14:00' },
+            ],
+            members: [
+                { id: 1, name: '김민준', email: 'mj@email.com', phone: '010-1234-5678', role: 'VIP', purchase: 487000, joinDate: '2024-01-15', lastLogin: '2025-04-23', status: '정상' },
+                { id: 2, name: '이서연', email: 'sy@email.com', phone: '010-2345-6789', role: 'VIP', purchase: 312000, joinDate: '2024-02-20', lastLogin: '2025-04-22', status: '정상' },
+                { id: 3, name: '박지훈', email: 'jh@email.com', phone: '010-3456-7890', role: '일반', purchase: 178000, joinDate: '2024-03-05', lastLogin: '2025-04-21', status: '정상' },
+                { id: 4, name: '최수아', email: 'sa@email.com', phone: '010-4567-8901', role: '일반', purchase: 95000, joinDate: '2024-04-12', lastLogin: '2025-04-20', status: '정상' },
+                { id: 5, name: '정태양', email: 'ty@email.com', phone: '010-5678-9012', role: '일반', purchase: 44000, joinDate: '2024-05-01', lastLogin: '2025-04-18', status: '정상' },
+                { id: 6, name: '강하늘', email: 'hn@email.com', phone: '010-6789-0123', role: '일반', purchase: 69000, joinDate: '2024-06-14', lastLogin: '2025-04-15', status: '정지' },
+                { id: 7, name: '윤도현', email: 'dh@email.com', phone: '010-7890-1234', role: 'VIP', purchase: 524000, joinDate: '2023-11-10', lastLogin: '2025-04-23', status: '정상' },
+                { id: 8, name: '임채린', email: 'cr@email.com', phone: '010-8901-2345', role: '일반', purchase: 120000, joinDate: '2025-01-08', lastLogin: '2025-04-22', status: '정상' },
+            ],
+            coupons: [
+                { id: 1, name: '신규가입 웰컴 쿠폰', type: '정액', discount: 3000, minOrder: 30000, target: '신규 회원', expiry: '2025-06-30', used: 342, total: 1200, status: '진행중' },
+                { id: 2, name: '봄맞이 SALE 10%', type: '정률', discount: 10, minOrder: 50000, target: '전체 회원', expiry: '2025-04-30', used: 891, total: 5000, status: '진행중' },
+                { id: 3, name: 'VIP 전용 5,000원 할인', type: '정액', discount: 5000, minOrder: 70000, target: 'VIP 회원', expiry: '2025-12-31', used: 67, total: 500, status: '진행중' },
+                { id: 4, name: '생일 축하 20%', type: '정률', discount: 20, minOrder: 0, target: '생일 회원', expiry: '2025-12-31', used: 45, total: 999, status: '진행중' },
+                { id: 5, name: '리뷰 작성 감사 쿠폰', type: '정액', discount: 2000, minOrder: 20000, target: '리뷰 작성자', expiry: '2025-05-31', used: 234, total: 9999, status: '진행중' },
+            ],
+            reviews: [
+                { id: 1, product: '오버핏 코튼 티셔츠', customer: '김민준', rating: 5, content: '사이즈도 딱 맞고 소재가 너무 좋아요! 재구매 의사 있습니다.', date: '2025-04-22', replied: true, reply: '소중한 리뷰 감사드립니다 😊' },
+                { id: 2, product: '슬림 데님 팬츠', customer: '이서연', rating: 4, content: '핏이 예쁜데 허리가 조금 작아요. 한 사이즈 업 추천합니다.', date: '2025-04-21', replied: false },
+                { id: 3, product: '크롭 후드 집업', customer: '박지훈', rating: 3, content: '색상이 사진이랑 조금 다른 것 같아요.', date: '2025-04-20', replied: false },
+                { id: 4, product: '버킷햇', customer: '최수아', rating: 5, content: '가성비 최고! 친구한테도 추천했어요.', date: '2025-04-19', replied: true, reply: '추천해 주셔서 정말 감사합니다!' },
+                { id: 5, product: '린넨 셔츠', customer: '정태양', rating: 2, content: '배송이 너무 늦었어요. 품질은 괜찮네요.', date: '2025-04-18', replied: false },
+            ]
+        };
+
+        // ════════════════════════════════════════════════════════
+        // HELPERS
+        // ════════════════════════════════════════════════════════
+        const fmt = n => n.toLocaleString('ko-KR');
+        const fmtW = n => '₩' + n.toLocaleString('ko-KR');
+
+        function statusBadge(s) {
+            const map = {
+                '판매중': 'badge-success', '품절': 'badge-danger', '숨김': 'badge-gray', '준비중': 'badge-warning',
+                '결제완료': 'badge-info', '배송준비': 'badge-warning', '배송중': 'badge-info', '배송완료': 'badge-success', '취소/반품': 'badge-danger',
+                '정상': 'badge-success', '정지': 'badge-danger', 'VIP': 'badge-warning', '일반': 'badge-gray',
+                '진행중': 'badge-success', '만료': 'badge-gray'
+            };
+            return `<span class="badge ${map[s] || 'badge-gray'}">${s}</span>`;
+        }
+
+        function showToast(msg, type = '') {
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = `toast${type ? ' ' + type : ''}`;
+            t.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>${msg}`;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('open');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open');
+        }
+        // close on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(m => {
+            m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+        });
+
+        function showPage(id, tabEl) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + id).classList.add('active');
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            if (tabEl) tabEl.classList.add('active');
+        }
+
+        function toggleAllCheck(master, cls) {
+            document.querySelectorAll('.' + cls).forEach(cb => cb.checked = master.checked);
+        }
+
+        // ════════════════════════════════════════════════════════
+        // DASHBOARD RENDER
+        // ════════════════════════════════════════════════════════
+        const salesData = [28.4, 31.2, 26.8, 35.1, 38.7, 42.3, 39.9, 44.2, 41.0, 45.8, 43.1, 48.7];
+        const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+
+        function renderSalesChart() {
+            const chart = document.getElementById('salesChart');
+            const xAxis = document.getElementById('chartXAxis');
+            const max = Math.max(...salesData);
+            chart.innerHTML = salesData.map((v, i) => `
+    <div class="chart-col">
+      <div class="chart-bar${i === 11 ? ' active' : ''}" style="height:${(v / max) * 100}%;" title="${months[i]}: ₩${v}M"></div>
+    </div>`).join('');
+            xAxis.innerHTML = `<div class="chart-x-axis">${months.map(m => `<div class="chart-x-label">${m}</div>`).join('')}</div>`;
+        }
+
+        const categories = [
+            { name: '상의', pct: 34, color: '#111' },
+            { name: '하의', pct: 26, color: '#444' },
+            { name: '아우터', pct: 18, color: '#777' },
+            { name: '신발', pct: 14, color: '#aaa' },
+            { name: '악세서리', pct: 8, color: '#ccc' },
+        ];
+        function renderCategoryStats() {
+            const el = document.getElementById('categoryStats');
+            el.innerHTML = categories.map(c => `
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:500;margin-bottom:5px;">
+        <span>${c.name}</span><span style="font-family:'Inter'">${c.pct}%</span>
+      </div>
+      <div class="progress"><div class="progress-bar" style="width:${c.pct}%;background:${c.color}"></div></div>
+    </div>`).join('');
+        }
+
+        function renderDashboardOrders() {
+            const tbody = document.getElementById('dashboardOrders');
+            tbody.innerHTML = DATA.orders.slice(0, 5).map(o => `
+    <tr>
+      <td style="font-size:12px;color:var(--gray-500);font-family:'Inter'">${o.id}</td>
+      <td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar">${o.customer[0]}</div>${o.customer}</div></td>
+      <td style="font-family:'Inter';font-weight:600">${fmtW(o.amount)}</td>
+      <td>${statusBadge(o.status)}</td>
+      <td style="font-size:12px;color:var(--gray-400)">${o.date.split(' ')[1]}</td>
+    </tr>`).join('');
+        }
+
+        const activities = [
+            { dot: 'green', text: '김민준님이 주문을 완료했습니다 — ₩87,000', time: '14:22' },
+            { dot: 'blue', text: '신규 회원 이채원님이 가입했습니다', time: '13:45' },
+            { dot: 'yellow', text: '슬림 데님 팬츠 재고가 10개 미만입니다', time: '12:30' },
+            { dot: 'red', text: '강하늘님이 주문을 취소 요청했습니다', time: '11:15' },
+            { dot: 'green', text: '봄맞이 SALE 쿠폰이 891건 사용되었습니다', time: '10:00' },
+        ];
+        function renderActivity() {
+            document.getElementById('activityFeed').innerHTML = activities.map(a => `
+    <div class="activity-item">
+      <div class="activity-dot ${a.dot}"></div>
+      <div class="activity-text">${a.text}</div>
+      <div class="activity-time">${a.time}</div>
+    </div>`).join('');
+        }
+
+        // ════════════════════════════════════════════════════════
+        // PRODUCTS
+        // ════════════════════════════════════════════════════════
+        let productFilter = '';
+        function renderProducts(list) {
+            list = list || DATA.products;
+            document.getElementById('productCount').textContent = fmt(list.length);
+            const tbody = document.getElementById('productTable');
+            tbody.innerHTML = list.map(p => `
+    <tr>
+      <td><input type="checkbox" class="prod-check"></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="product-thumb">${p.emoji}</div>
+          <div><div style="font-weight:600">${p.name}</div><div style="font-size:11.5px;color:var(--gray-400)">${p.tags || ''}</div></div>
+        </div>
+      </td>
+      <td style="font-size:12px;color:var(--gray-400);font-family:'Inter'">${p.sku}</td>
+      <td>${p.category}</td>
+      <td>
+        <div style="font-weight:600;font-family:'Inter'">${fmtW(p.price)}</div>
+        ${p.origPrice > p.price ? `<div style="font-size:11.5px;color:var(--gray-400);text-decoration:line-through">${fmtW(p.origPrice)}</div>` : ''}
+      </td>
+      <td class="${p.stock === 0 ? 'stock-low' : p.stock < 10 ? 'stock-low' : 'stock-ok'}">${p.stock === 0 ? '품절' : p.stock + '개'}</td>
+      <td style="font-family:'Inter'">${fmt(p.sold)}</td>
+      <td>${statusBadge(p.status)}</td>
+      <td>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-outline btn-sm btn-icon" title="수정" onclick="editProduct(${p.id})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn btn-danger btn-sm btn-icon" title="삭제" onclick="deleteProduct(${p.id})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>`).join('');
+        }
+
+        function filterProducts(q) {
+            const filtered = DATA.products.filter(p => p.name.includes(q) || p.sku.includes(q));
+            renderProducts(filtered);
+        }
+        function filterByCategory(cat) {
+            const filtered = cat ? DATA.products.filter(p => p.category === cat) : DATA.products;
+            renderProducts(filtered);
+        }
+
+        function saveProduct() {
+            const name = document.getElementById('pName').value;
+            if (!name) { showToast('상품명을 입력하세요.', 'error'); return; }
+            const price = parseInt(document.getElementById('pPrice').value) || 0;
+            const origPrice = parseInt(document.getElementById('pOrigPrice').value) || price;
+            const stock = parseInt(document.getElementById('pStock').value) || 0;
+            const category = document.getElementById('pCategory').value || '기타';
+            const status = document.getElementById('pStatus').value;
+            const sku = document.getElementById('pSku').value || `VR-NEW-${String(DATA.products.length + 1).padStart(3, '0')}`;
+            DATA.products.unshift({ id: Date.now(), name, sku, category, price, origPrice, stock, sold: 0, status, emoji: '📦' });
+            renderProducts();
+            closeModal('modal-add-product');
+            showToast(`"${name}" 상품이 등록되었습니다.`, 'success');
+            // clear form
+            ['pName', 'pSku', 'pOrigPrice', 'pPrice', 'pStock', 'pDesc', 'pTags'].forEach(id => document.getElementById(id).value = '');
+        }
+
+        function editProduct(id) {
+            const p = DATA.products.find(x => x.id === id);
+            if (!p) return;
+            document.getElementById('productModalTitle').textContent = '상품 수정';
+            document.getElementById('pName').value = p.name;
+            document.getElementById('pSku').value = p.sku;
+            document.getElementById('pCategory').value = p.category;
+            document.getElementById('pPrice').value = p.price;
+            document.getElementById('pOrigPrice').value = p.origPrice;
+            document.getElementById('pStock').value = p.stock;
+            document.getElementById('pStatus').value = p.status;
+            openModal('modal-add-product');
+        }
+
+        function deleteProduct(id) {
+            const idx = DATA.products.findIndex(x => x.id === id);
+            if (idx > -1) {
+                const name = DATA.products[idx].name;
+                DATA.products.splice(idx, 1);
+                renderProducts();
+                showToast(`"${name}" 상품이 삭제되었습니다.`);
+            }
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ORDERS
+        // ════════════════════════════════════════════════════════
+        let orderStatusFilter = 'all';
+        function renderOrders(statusFilter) {
+            statusFilter = statusFilter || orderStatusFilter;
+            const list = statusFilter === 'all' ? DATA.orders : DATA.orders.filter(o => o.status === statusFilter);
+            document.getElementById('orderCount').textContent = fmt(DATA.orders.length);
+            // update counts
+            ['결제완료', '배송준비', '배송중', '배송완료', '취소/반품'].forEach(s => {
+                const el = document.getElementById('cnt-' + s);
+                if (el) el.textContent = DATA.orders.filter(o => o.status === s).length;
+            });
+            document.getElementById('cnt-all').textContent = DATA.orders.length;
+
+            const tbody = document.getElementById('orderTable');
+            tbody.innerHTML = list.map(o => `
+    <tr>
+      <td><input type="checkbox" class="order-check"></td>
+      <td style="font-size:12px;font-family:'Inter';font-weight:600;color:var(--gray-700)">${o.id}</td>
+      <td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar">${o.customer[0]}</div><div><div style="font-weight:500">${o.customer}</div><div style="font-size:11.5px;color:var(--gray-400)">${o.phone}</div></div></div></td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${o.product}</td>
+      <td style="font-weight:700;font-family:'Inter'">${fmtW(o.amount)}</td>
+      <td><span style="font-size:12px;color:var(--gray-500)">${o.payment}</span></td>
+      <td>${statusBadge(o.status)}</td>
+      <td style="font-size:12px;color:var(--gray-400)">${o.date}</td>
+      <td>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-outline btn-sm" onclick="viewOrder('${o.id}')">상세</button>
+          ${o.status === '결제완료' ? `<button class="btn btn-primary btn-sm" onclick="updateOrderStatus('${o.id}','배송준비')">준비</button>` : ''}
+          ${o.status === '배송준비' ? `<button class="btn btn-primary btn-sm" onclick="updateOrderStatus('${o.id}','배송중')">발송</button>` : ''}
+        </div>
+      </td>
+    </tr>`).join('') || `<tr><td colspan="9" class="tbl-empty">해당 상태의 주문이 없습니다.</td></tr>`;
+
+            const total = list.reduce((s, o) => s + o.amount, 0);
+            document.getElementById('orderSummary').innerHTML = `조회된 주문: <b>${list.length}건</b>&nbsp;&nbsp;합계 금액: <b>${fmtW(total)}</b>`;
+        }
+
+        function filterOrders(status, tabEl) {
+            orderStatusFilter = status;
+            document.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+            if (tabEl) tabEl.classList.add('active');
+            renderOrders(status);
+        }
+
+        function viewOrder(id) {
+            const o = DATA.orders.find(x => x.id === id);
+            if (!o) return;
+            document.getElementById('orderDetailBody').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div class="card" style="box-shadow:none;border:1px solid var(--gray-100);">
+        <div class="card-body">
+          <div class="stat-label" style="margin-bottom:8px;">주문 정보</div>
+          <div style="font-size:13px;line-height:1.8;">
+            <b>주문번호</b>: ${o.id}<br>
+            <b>주문일시</b>: ${o.date}<br>
+            <b>결제방법</b>: ${o.payment}<br>
+            <b>주문상태</b>: ${statusBadge(o.status)}
+          </div>
+        </div>
+      </div>
+      <div class="card" style="box-shadow:none;border:1px solid var(--gray-100);">
+        <div class="card-body">
+          <div class="stat-label" style="margin-bottom:8px;">배송 정보</div>
+          <div style="font-size:13px;line-height:1.8;">
+            <b>수령인</b>: ${o.customer}<br>
+            <b>연락처</b>: ${o.phone}<br>
+            <b>배송지</b>: 서울특별시 강남구 테헤란로 123<br>
+            <b>운송장</b>: <span style="color:var(--gray-400)">미입력</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="box-shadow:none;border:1px solid var(--gray-100);">
+      <div class="card-body">
+        <div class="stat-label" style="margin-bottom:8px;">주문 상품</div>
+        <div style="font-size:13px;">${o.product} — <b>${fmtW(o.amount)}</b></div>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <label class="form-label">상태 변경</label>
+      <select class="form-control" onchange="updateOrderStatus('${o.id}',this.value)">
+        ${['결제완료', '배송준비', '배송중', '배송완료', '취소/반품'].map(s => `<option${o.status === s ? ' selected' : ''}>${s}</option>`).join('')}
+      </select>
+    </div>`;
+            openModal('modal-order-detail');
+        }
+
+        function updateOrderStatus(id, newStatus) {
+            const o = DATA.orders.find(x => x.id === id);
+            if (o) { o.status = newStatus; renderOrders(); showToast(`주문 상태가 "${newStatus}"로 변경되었습니다.`, 'success'); }
+        }
+
+        // ════════════════════════════════════════════════════════
+        // MEMBERS
+        // ════════════════════════════════════════════════════════
+        function renderMembers() {
+            document.getElementById('memberCount').textContent = fmt(DATA.members.length);
+            document.getElementById('memberTable').innerHTML = DATA.members.map(m => `
+    <tr>
+      <td><input type="checkbox" class="mem-check"></td>
+      <td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar">${m.name[0]}</div><div style="font-weight:500">${m.name}</div></div></td>
+      <td style="font-size:13px;color:var(--gray-500)">${m.email}</td>
+      <td style="font-size:13px;color:var(--gray-500)">${m.phone}</td>
+      <td><span class="role-tag ${m.role === 'VIP' ? 'role-vip' : 'role-normal'}">${m.role}</span></td>
+      <td style="font-weight:600;font-family:'Inter'">${fmtW(m.purchase)}</td>
+      <td style="font-size:12px;color:var(--gray-400)">${m.joinDate}</td>
+      <td style="font-size:12px;color:var(--gray-400)">${m.lastLogin}</td>
+      <td>${m.status === '정지' ? statusBadge('정지') : statusBadge('정상')}</td>
+      <td>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-outline btn-sm" onclick="showToast('${m.name}님 상세 정보')">상세</button>
+          <button class="btn btn-outline btn-sm" onclick="toggleMemberStatus(${m.id})">${m.status === '정지' ? '활성화' : '정지'}</button>
+        </div>
+      </td>
+    </tr>`).join('');
+        }
+
+        function toggleMemberStatus(id) {
+            const m = DATA.members.find(x => x.id === id);
+            if (m) { m.status = m.status === '정지' ? '정상' : '정지'; renderMembers(); showToast(`${m.name}님 계정이 ${m.status} 처리되었습니다.`); }
+        }
+
+        function saveMember() {
+            const name = document.getElementById('mName').value;
+            const email = document.getElementById('mEmail').value;
+            if (!name || !email) { showToast('이름과 이메일을 입력하세요.', 'error'); return; }
+            DATA.members.unshift({ id: Date.now(), name, email, phone: document.getElementById('mPhone').value, role: document.getElementById('mRole').value, purchase: 0, joinDate: new Date().toISOString().split('T')[0], lastLogin: '-', status: '정상' });
+            renderMembers();
+            closeModal('modal-add-member');
+            showToast(`${name}님이 등록되었습니다.`, 'success');
+        }
+
+        // ════════════════════════════════════════════════════════
+        // COUPONS
+        // ════════════════════════════════════════════════════════
+        function renderCoupons() {
+            document.getElementById('couponGrid').innerHTML = DATA.coupons.map(c => `
+    <div class="card">
+      <div class="card-body">
+        <div class="coupon-card" style="margin-bottom:12px;">
+          <div>
+            <div class="coupon-discount">${c.type === '정액' ? fmtW(c.discount) : c.discount + '%'} <span style="font-size:16px;font-weight:500">할인</span></div>
+            <div class="coupon-name">${c.name}</div>
+            <div class="coupon-cond">최소 ${fmtW(c.minOrder)} 이상 · ${c.target}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px;color:var(--gray-400);">만료일</div>
+            <div style="font-size:13px;font-weight:600;">${c.expiry}</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-400);margin-bottom:8px;">
+          <span>사용: <b style="color:var(--black)">${fmt(c.used)}</b></span>
+          <span>발급: <b>${fmt(c.total)}</b></span>
+          <span>사용률: <b>${Math.round(c.used / c.total * 100)}%</b></span>
+        </div>
+        <div class="progress"><div class="progress-bar" style="width:${Math.round(c.used / c.total * 100)}%"></div></div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn btn-outline btn-sm" style="flex:1" onclick="showToast('쿠폰 수정')">수정</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCoupon(${c.id})">삭제</button>
+        </div>
+      </div>
+    </div>`).join('');
+        }
+
+        function deleteCoupon(id) {
+            const idx = DATA.coupons.findIndex(x => x.id === id);
+            if (idx > -1) { DATA.coupons.splice(idx, 1); renderCoupons(); showToast('쿠폰이 삭제되었습니다.'); }
+        }
+
+        function saveCoupon() {
+            const name = document.getElementById('cName').value;
+            if (!name) { showToast('쿠폰명을 입력하세요.', 'error'); return; }
+            const discount = parseInt(document.getElementById('cDiscount').value) || 0;
+            const type = document.getElementById('cType').value === '정액 할인' ? '정액' : '정률';
+            DATA.coupons.unshift({ id: Date.now(), name, type, discount, minOrder: parseInt(document.getElementById('cMinOrder').value) || 0, target: document.getElementById('cTarget').value, expiry: document.getElementById('cExpiry').value || '2025-12-31', used: 0, total: 9999, status: '진행중' });
+            renderCoupons();
+            closeModal('modal-add-coupon');
+            showToast(`"${name}" 쿠폰이 생성되었습니다.`, 'success');
+        }
+
+        // ════════════════════════════════════════════════════════
+        // REVIEWS
+        // ════════════════════════════════════════════════════════
+        function renderReviews() {
+            document.getElementById('reviewList').innerHTML = DATA.reviews.map(r => `
+    <div class="review-row">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+          <div class="avatar">${r.customer[0]}</div>
+          <div>
+            <div style="font-weight:600;font-size:13px;">${r.customer}</div>
+            <div style="font-size:11.5px;color:var(--gray-400)">${r.product}</div>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div class="star-rating">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+          <div style="font-size:11.5px;color:var(--gray-400)">${r.date}</div>
+        </div>
+      </div>
+      <div style="margin:10px 0;font-size:13.5px;line-height:1.6">${r.content}</div>
+      ${r.replied ? `<div style="background:var(--gray-50);border-left:3px solid var(--black);padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:var(--gray-600);">↳ ${r.reply}</div>` : ''}
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn btn-outline btn-sm" onclick="replyReview(${r.id})">${r.replied ? '답변 수정' : '답변 작성'}</button>
+        <button class="btn btn-outline btn-sm" onclick="showToast('리뷰가 숨김 처리되었습니다.')">숨김</button>
+        <button class="btn btn-danger btn-sm" onclick="showToast('리뷰가 삭제되었습니다.')">삭제</button>
+      </div>
+    </div>`).join('');
+        }
+
+        function replyReview(id) {
+            const r = DATA.reviews.find(x => x.id === id);
+            if (!r) return;
+            document.getElementById('reviewDetailBody').innerHTML = `
+    <div style="background:var(--gray-50);padding:12px;border-radius:8px;font-size:13px;">
+      <b>${r.customer}</b> · ${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}<br>
+      <span style="color:var(--gray-600)">${r.content}</span>
+    </div>`;
+            document.getElementById('replyText').value = r.reply || '';
+            openModal('modal-review-reply');
+            window._replyId = id;
+        }
+
+        function saveReply() {
+            const r = DATA.reviews.find(x => x.id === window._replyId);
+            const text = document.getElementById('replyText').value;
+            if (!text) { showToast('답변 내용을 입력하세요.', 'error'); return; }
+            if (r) { r.replied = true; r.reply = text; renderReviews(); }
+            closeModal('modal-review-reply');
+            showToast('답변이 등록되었습니다.', 'success');
+        }
+
+        // ════════════════════════════════════════════════════════
+        // ANALYTICS
+        // ════════════════════════════════════════════════════════
+        function renderAnalytics() {
+            // hourly
+            const hours = Array.from({ length: 24 }, (_, i) => i);
+            const hourData = [2, 1, 1, 0, 0, 1, 3, 8, 14, 18, 22, 19, 25, 21, 17, 20, 28, 32, 38, 41, 35, 29, 22, 14];
+            const maxH = Math.max(...hourData);
+            document.getElementById('hourlyChart').innerHTML = hours.map((h, i) => `
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+      <div style="width:100%;background:${i >= 18 && i <= 21 ? 'var(--black)' : 'var(--gray-200)'};border-radius:3px 3px 0 0;height:${(hourData[i] / maxH) * 140}px;" title="${h}시: ${hourData[i]}건"></div>
+    </div>`).join('');
+            document.getElementById('hourlyLabel').innerHTML = [0, 6, 12, 18, 23].map(h => `<span style="font-size:10px;color:var(--gray-400);flex:${h === 0 ? 1 : h === 6 ? 6 : h === 12 ? 6 : h === 18 ? 5 : 5}">${h}시</span>`).join('');
+
+            // top products
+            const top = [...DATA.products].sort((a, b) => b.sold - a.sold).slice(0, 5);
+            const maxSold = top[0].sold;
+            document.getElementById('topProducts').innerHTML = top.map((p, i) => `
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:500;margin-bottom:5px;">
+        <span><b style="color:var(--gray-400);font-size:11px;margin-right:6px;">${i + 1}</b>${p.name}</span>
+        <span style="font-family:'Inter'">${fmt(p.sold)}개</span>
+      </div>
+      <div class="progress"><div class="progress-bar" style="width:${(p.sold / maxSold) * 100}%;background:${i === 0 ? '#111' : i === 1 ? '#444' : i === 2 ? '#777' : '#aaa'}"></div></div>
+    </div>`).join('');
+
+            // traffic
+            const traffic = [
+                { src: '직접 유입', pct: 38 }, { src: '검색 (네이버)', pct: 28 }, { src: 'SNS (인스타)', pct: 18 },
+                { src: '카카오 채널', pct: 10 }, { src: '기타', pct: 6 }
+            ];
+            document.getElementById('trafficSource').innerHTML = traffic.map(t => `
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:500;margin-bottom:5px;">
+        <span>${t.src}</span><span style="font-family:'Inter'">${t.pct}%</span>
+      </div>
+      <div class="progress"><div class="progress-bar" style="width:${t.pct}%"></div></div>
+    </div>`).join('');
+        }
+
+        // ════════════════════════════════════════════════════════
+        // SETTINGS TOGGLES
+        // ════════════════════════════════════════════════════════
+        function renderSettings() {
+            const notiItems = [
+                ['신규 주문 알림', 'noti1', true], ['재고 부족 알림 (10개 미만)', 'noti2', true],
+                ['회원 가입 알림', 'noti3', false], ['리뷰 등록 알림', 'noti4', true],
+                ['주문 취소/반품 알림', 'noti5', true],
+            ];
+            document.getElementById('notiSettings').innerHTML = notiItems.map(([label, id, checked]) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+      <span style="font-size:13.5px;">${label}</span>
+      <label class="toggle"><input type="checkbox"${checked ? ' checked' : ''}><span class="toggle-slider"></span></label>
+    </div>`).join('');
+
+            const payItems = [['신용카드', 'pay1', true], ['카카오페이', 'pay2', true], ['네이버페이', 'pay3', true], ['계좌이체', 'pay4', true], ['무통장입금', 'pay5', false]];
+            document.getElementById('paymentSettings').innerHTML = payItems.map(([label, id, checked]) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+      <span style="font-size:13.5px;">${label}</span>
+      <label class="toggle"><input type="checkbox"${checked ? ' checked' : ''}><span class="toggle-slider"></span></label>
+    </div>`).join('');
+        }
+
+        // ════════════════════════════════════════════════════════
+        // INIT
+        // ════════════════════════════════════════════════════════
+        renderSalesChart();
+        renderCategoryStats();
+        renderDashboardOrders();
+        renderActivity();
+        renderProducts();
+        renderOrders();
+        renderMembers();
+        renderCoupons();
+        renderReviews();
+        renderAnalytics();
+        renderSettings();
+    </script>
+</body>
+
+</html>

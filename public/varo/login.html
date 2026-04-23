@@ -83,7 +83,6 @@
           <div class="form-group" id="passwordGroup">
             <div class="form-label-row">
               <label class="form-label" for="loginPassword">비밀번호</label>
-              <a href="#" class="form-label-link">비밀번호 찾기</a>
             </div>
             <div class="form-input-wrap">
               <input type="password" class="form-input" id="loginPassword" name="password" placeholder="비밀번호 입력"
@@ -111,6 +110,11 @@
               <span class="toggle-slider"></span>
               <span class="toggle-label">로그인 상태 유지</span>
             </label>
+            <div class="auth-helper-links">
+              <a href="javascript:void(0)" class="auth-helper-link" onclick="openFindAccount('id')">아이디 찾기</a>
+              <span class="auth-helper-sep"></span>
+              <a href="javascript:void(0)" class="auth-helper-link" onclick="openFindAccount('pw')">비밀번호 찾기</a>
+            </div>
           </div>
 
           <button type="submit" class="btn btn--primary btn--full" id="loginSubmit">
@@ -138,6 +142,66 @@
   <script type="module" src="./js/utils.js"></script>
   <script type="module" src="./js/main.js"></script>
   <script src="./js/mega-menu.js"></script>
+  <script src="./js/find-account.js"></script>
+
+  <!-- Find Account Modal -->
+  <div id="findAccountModal" class="modal-overlay u-hidden" role="dialog" aria-modal="true">
+    <div class="modal-content find-modal">
+      <button type="button" class="modal-close" onclick="closeFindAccount()" aria-label="닫기">&times;</button>
+
+      <div id="findTabNav" class="find-tabs">
+        <button type="button" class="find-tab active" data-tab="id" onclick="switchFindTab('id')">아이디 찾기</button>
+        <button type="button" class="find-tab" data-tab="pw" onclick="switchFindTab('pw')">비밀번호 찾기</button>
+      </div>
+
+      <div class="find-body">
+        <!-- Find ID Section -->
+        <div id="findIdSection" class="find-section">
+          <p class="find-desc">가입하실 때 입력하신 이름과 이메일을 입력해 주세요.</p>
+          <div class="form-group u-mb-20">
+            <input type="text" id="findIdName" class="form-input" placeholder="이름">
+          </div>
+          <div class="form-group u-mb-30">
+            <input type="email" id="findIdEmail" class="form-input" placeholder="이메일 주소">
+          </div>
+          <button type="button" class="btn btn--primary btn--full" onclick="handleFindId()">아이디 찾기</button>
+          <div id="findIdResult" class="find-result u-hidden"></div>
+        </div>
+
+        <!-- Find PW Section -->
+        <div id="findPwSection" class="find-section u-hidden">
+          <p class="find-desc">가입하신 이메일 주소로 인증번호를 발송해 드립니다.</p>
+
+          <div id="pwStage1">
+            <div class="form-group u-mb-30">
+              <input type="email" id="findPwEmail" class="form-input" placeholder="이메일 주소">
+            </div>
+            <button type="button" class="btn btn--primary btn--full" onclick="handleRequestCode()">인증번호 요청</button>
+          </div>
+
+          <div id="pwStage2" class="u-hidden">
+            <div class="form-group u-mb-30">
+              <div class="input-with-timer">
+                <input type="text" id="findPwCode" class="form-input" placeholder="인증번호 6자리">
+                <span id="authTimer" class="auth-timer">05:00</span>
+              </div>
+            </div>
+            <button type="button" class="btn btn--primary btn--full" onclick="handleVerifyCode()">인증번호 확인</button>
+          </div>
+
+          <div id="pwStage3" class="u-hidden">
+            <div class="form-group u-mb-15">
+              <input type="password" id="newPassword" class="form-input" placeholder="새 비밀번호">
+            </div>
+            <div class="form-group u-mb-30">
+              <input type="password" id="newPasswordConfirm" class="form-input" placeholder="새 비밀번호 확인">
+            </div>
+            <button type="button" class="btn btn--primary btn--full" onclick="handleResetPassword()">비밀번호 변경</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </body>
 

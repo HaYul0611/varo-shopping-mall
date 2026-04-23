@@ -833,11 +833,16 @@
   border: 1px solid #DDD;
   border-radius: 4px;
   font-size: 14px;
-  resize: vertical;
+  resize: none;
+  /* 리사이즈 아이콘 제거 */
   min-height: 120px;
+  max-height: 500px;
+  overflow-y: hidden;
+  /* 스크롤바 숨김 */
   margin-bottom: 15px;
   box-sizing: border-box;
   font-family: inherit;
+  transition: height 0.1s ease;
 }
 
 .qna-write-footer {
@@ -921,6 +926,9 @@
   border: 1px solid #DDD;
   border-radius: 4px;
   font-size: 12.5px;
+  resize: none;
+  min-height: 40px;
+  overflow-y: hidden;
 }
 
 .btn--reply-submit {

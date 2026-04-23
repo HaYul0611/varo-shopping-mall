@@ -312,78 +312,25 @@ const PRODUCTS = [
    히어로 슬라이드 (3분할 레이아웃 적용)
 ══════════════════════════════════════════════ */
 const HERO_SLIDES = [
-  {
-    id: 'H_JAN', tag: '01 JANUARY',
-    panels: ['https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=1200&h=800&fit=crop&q=85'] // 3분할 합본 대용 이미지
-  },
-  {
-    id: 'H_FEB', tag: '02 FEBRUARY',
-    panels: [
-      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=800&h=1200&fit=crop&q=85',
-      'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&h=1200&fit=crop&q=85',
-      'https://images.unsplash.com/photo-1549062572-544a64fb0c56?w=800&h=1200&fit=crop&q=85'
-    ]
-  },
-  {
-    id: 'H_MAR', tag: '03 MARCH',
-    panels: ['./assets/lookbook/mar_spring.png'] // 3분할 합본 (캠퍼스룩)
-  },
-  {
-    id: 'H_APR', tag: '04 APRIL',
-    panels: ['./assets/lookbook/apr_guest.png'] // 3분할 합본 (하객룩)
-  },
-  {
-    id: 'H_MAY', tag: '05 MAY',
-    panels: [
-      'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=1200&fit=crop&q=85',
-      'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&h=1200&fit=crop&q=85',
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=1200&fit=crop&q=85'
-    ]
-  },
-  {
-    id: 'H_JUN', tag: '06 JUNE',
-    panels: [
-      'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&h=1200&fit=crop&q=85',
-      'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&h=1200&fit=crop&q=85',
-      'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=800&h=1200&fit=crop&q=85'
-    ]
-  },
-  {
-    id: 'H_JUL', tag: '07 JULY',
-    panels: ['./assets/lookbook/jul_summer.png'] // 3분할 합본 (린넨 폴로)
-  },
-  {
-    id: 'H_AUG', tag: '08 AUGUST',
-    panels: ['./assets/lookbook/aug_summer.png'] // 3분할 합본 (썸머 캐주얼)
-  },
+  { id: 'H_JAN', tag: '01 JANUARY', panels: ['./assets/lookbook/lookbook_1.png'] },
+  { id: 'H_FEB', tag: '02 FEBRUARY', panels: ['./assets/lookbook/lookbook_2.png'] },
+  { id: 'H_MAR', tag: '03 MARCH', panels: ['./assets/lookbook/lookbook_3.png'] },
+  { id: 'H_APR', tag: '04 APRIL', panels: ['./assets/lookbook/lookbook_4.png'] },
+  { id: 'H_MAY', tag: '05 MAY', panels: ['./assets/lookbook/lookbook_5.png'] },
+  { id: 'H_JUN', tag: '06 JUNE', panels: ['./assets/lookbook/lookbook_6.png'] },
+  { id: 'H_JUL', tag: '07 JULY', panels: ['./assets/lookbook/lookbook_7.png'] },
+  { id: 'H_AUG', tag: '08 AUGUST', panels: ['./assets/lookbook/lookbook_8.png'] },
   {
     id: 'H_SEP', tag: '09 SEPTEMBER',
     panels: [
-      'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=800&h=1200&fit=crop&q=85',
-      'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=800&h=1200&fit=crop&q=85',
-      'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&h=1200&fit=crop&q=85'
+      'https://hanggi4043.cafe24.com/bin%20main/4.16%20%ED%94%BC%EC%94%A8/%EC%A0%9C%EC%9E%91-%EC%85%94%EC%B8%A0%20%ED%94%BC%EC%94%A8.jpg',
+      'https://hanggi4043.cafe24.com/bin%20main/4.16%20%ED%94%BC%EC%94%A8/%ED%94%BC%EA%B7%B8%EB%A8%BC%ED%8A%B8-%EB%A7%A8%ED%88%AC%EB%A7%A8%20%ED%94%BC%EC%94%A8.jpg',
+      'https://hanggi4043.cafe24.com/bin%20main/4.16%20%ED%94%BC%EC%94%A8/%EB%8D%B0%EB%84%98-%EC%9E%90%EC%BC%93%20%ED%94%BC%EC%94%A8.jpg'
     ]
   },
-  {
-    id: 'H_OCT', tag: '10 OCTOBER',
-    panels: [
-      'https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?w=800&h=1200&fit=crop&q=85',
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=1200&fit=crop&q=85',
-      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=800&h=1200&fit=crop&q=85'
-    ]
-  },
-  {
-    id: 'H_NOV', tag: '11 NOVEMBER',
-    panels: [
-      'https://images.unsplash.com/photo-1549062572-544a64fb0c56?w=800&h=1200&fit=crop&q=85',
-      'https://images.unsplash.com/photo-1519315901367-f34ff9154487?w=800&h=1200&fit=crop&q=85',
-      'https://images.unsplash.com/photo-1507679799797-b90bd27e86da?w=800&h=1200&fit=crop&q=85'
-    ]
-  },
-  {
-    id: 'H_DEC', tag: '12 DECEMBER',
-    panels: ['./assets/lookbook/dec_winter.png'] // 3분할 합본 (헤비 패딩)
-  },
+  { id: 'H_OCT', tag: '10 OCTOBER', panels: ['./assets/lookbook/lookbook_10.png'] },
+  { id: 'H_NOV', tag: '11 NOVEMBER', panels: ['./assets/lookbook/lookbook_11.png'] },
+  { id: 'H_DEC', tag: '12 DECEMBER', panels: ['./assets/lookbook/lookbook_12.png'] },
 ];
 
 const COMMUNITY_POSTS = [

@@ -135,7 +135,8 @@
                 <p style="font-size: 13px; color: #888; margin-bottom: 10px;">누적 구매 금액</p>
                 <p style="font-size: 24px; font-weight: 800; color: #1c1a16;" id="myPageTotalOrderAmount">0원</p>
                 <p id="nextGradeGuide" style="margin-top: 10px; font-size: 12px; color: #666;">다음 등급(SILVER)까지
-                  <strong>100,000원</strong> 남았습니다.</p>
+                  <strong>100,000원</strong> 남았습니다.
+                </p>
               </div>
             </div>
 
@@ -152,6 +153,40 @@
                 <a href="./community.html?tab=membership"
                   style="font-size: 12px; color: #888; text-decoration: underline;">멤버십 전체 혜택 자세히 보기</a>
               </div>
+            </div>
+          </section>
+
+          <!-- 관리자 전용 섹션들 -->
+          <section class="mypage-section" id="section-activity" style="display: none;">
+            <h2 class="mypage-section__title">내 활동 로그</h2>
+            <div class="empty-row" style="padding: 40px 0; text-align: center; color: #888;">최근 처리한 운영 활동 내역이 없습니다. (준비
+              중)</div>
+          </section>
+
+          <section class="mypage-section" id="section-bookmarks" style="display: none;">
+            <h2 class="mypage-section__title">업무 즐겨찾기</h2>
+            <div class="admin-bookmark-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+              <a href="./admin.html"
+                style="background: #f8f9fa; border: 1px solid #eee; padding: 20px; border-radius: 8px; text-decoration: none; color: #333; transition: all 0.2s;">
+                <strong style="display: block; font-size: 14px; margin-bottom: 5px; color: #1B2B4B;">통합 대시보드 →</strong>
+                <span style="font-size: 12px; color: #888;">전체 운영 현황 및 매출 지표 확인</span>
+              </a>
+              <a href="./community.html?tab=qna"
+                style="background: #f8f9fa; border: 1px solid #eee; padding: 20px; border-radius: 8px; text-decoration: none; color: #333; transition: all 0.2s;">
+                <strong style="display: block; font-size: 14px; margin-bottom: 5px; color: #1B2B4B;">CS 문의 관리 →</strong>
+                <span style="font-size: 12px; color: #888;">고객 문의 답변 및 게시글 관리</span>
+              </a>
+            </div>
+          </section>
+
+          <section class="mypage-section" id="section-notes" style="display: none;">
+            <h2 class="mypage-section__title">업무 메모 (개인)</h2>
+            <textarea id="adminMemoArea" placeholder="운영 시 참고할 개인적인 업무 메모를 남기세요 (브라우저에 저장됩니다)."
+              style="width: 100%; height: 200px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; line-height: 1.6; resize: none; border-left: 4px solid #1B2B4B;"></textarea>
+            <div style="text-align: right; margin-top: 10px;">
+              <button type="button" id="btnSaveMemo"
+                style="padding: 10px 24px; background: #1B2B4B; color: #fff; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; font-weight: 600;">메모
+                저장</button>
             </div>
           </section>
 

@@ -50,8 +50,14 @@ const API = (() => {
     const id = segments[1];
     const storageKey = `varo_${entity}`;
 
-    // 초기 데이터 로딩 (전용 MOCK 데이터 사용 권장하나 여기서는 스토리지 기반)
-    let items = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    // 초기 데이터 로딩: 내장 데이터(VARO_DATA)와 LocalStorage 병합
+    let items = JSON.parse(localStorage.getItem(storageKey) || 'null');
+    if (items === null) {
+      if (entity === 'categories' && typeof VARO_DATA !== 'undefined') items = VARO_DATA.CATEGORIES;
+      else if (entity === 'banners' && typeof VARO_DATA !== 'undefined') items = VARO_DATA.HERO_SLIDES;
+      else items = [];
+      localStorage.setItem(storageKey, JSON.stringify(items));
+    }
 
     // Auth Mock (가장 먼저 처리하여 하단 POST 블록과 충돌 방지)
     if (path.includes('/auth/login')) {

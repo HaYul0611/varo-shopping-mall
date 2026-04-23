@@ -1,4 +1,4 @@
-﻿/* ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
+/* ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═
    1. 메인 ?�라?�더 (?�일 ?�??배너 ?��???
    룩플???�보(Editorial) ?�낌???�해 ?�일 ?�널�?최적??
 ?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═?�═ */
@@ -71,9 +71,17 @@
 
 .main-slider__slide {
   flex: 0 0 8.3333%;
-  height: 65vh;
-  min-height: 480px;
+  height: auto;
+  aspect-ratio: 1700 / 650;
+  min-height: 400px;
   position: relative;
+}
+
+@media (max-width: 1024px) {
+  .main-slider__slide {
+    height: 50vh;
+    aspect-ratio: auto;
+  }
 }
 
 .main-slider__panel {
@@ -88,6 +96,8 @@
 
 .main-slider__panel--full img {
   width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
   flex: none !important;
 }
 
@@ -623,5 +633,12 @@
 
 
 /* Ǫ��, ����� ���� �ּ�ȭ */
-.site-footer { margin-top: 0 !important; padding-top: 20px !important; }
-#main-content { margin-bottom: 0 !important; padding-bottom: 0 !important; }
+.site-footer {
+  margin-top: 0 !important;
+  padding-top: 20px !important;
+}
+
+#main-content {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}

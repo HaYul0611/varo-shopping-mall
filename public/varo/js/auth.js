@@ -42,7 +42,29 @@ const Auth = (() => {
   const restoreRememberState = () => {
     const rememberMe = localStorage.getItem('varo_remember_me') === 'true';
     const emailInput = document.getElementById('loginEmail');
-    if (rememberMe && emailInput) emailInput.value = localStorage.getItem('varo_remembered_email') || '';
+    const rememberToggle = document.getElementById('loginRemember');
+
+    if (rememberToggle) {
+      // 1. 초기 복원 시 애니메이션(잔상) 방지를 위해 클래스 추가
+      const container = rememberToggle.closest('.toggle-switch');
+      if (container) container.classList.add('no-transition');
+
+      rememberToggle.checked = rememberMe;
+
+      // 2. 상태 설정 후 애니메이션을 다시 활성화 (다음 틱에서 제거)
+      setTimeout(() => {
+        if (container) container.classList.remove('no-transition');
+      }, 50);
+
+      // 토글 클릭 즉시 상태 저장 (제출 전에도 유지되도록)
+      rememberToggle.addEventListener('change', (e) => {
+        localStorage.setItem('varo_remember_me', e.target.checked ? 'true' : 'false');
+      });
+    }
+
+    if (rememberMe && emailInput) {
+      emailInput.value = localStorage.getItem('varo_remembered_email') || '';
+    }
   };
 
   const bindCommonEvents = () => {
@@ -78,8 +100,12 @@ const Auth = (() => {
       if (window.API?.auth) {
         const res = await window.API.auth.login(email, pw);
         if (res.success) {
-          if (document.getElementById('loginRemember')?.checked) {
+          const isRemembered = document.getElementById('loginRemember')?.checked;
+          localStorage.setItem('varo_remember_me', isRemembered ? 'true' : 'false');
+          if (isRemembered) {
             localStorage.setItem('varo_remembered_email', email);
+          } else {
+            localStorage.removeItem('varo_remembered_email');
           }
           location.href = './index.html';
         } else {

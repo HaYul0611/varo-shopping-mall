@@ -61,6 +61,14 @@ const App = (() => {
           ? `<div class="user-avatar-mini"><img src="${user.avatar}" alt="${user.name}"></div>`
           : `<div class="user-avatar-mini"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>`;
 
+        const isAdmin = user.role === 'ADMIN' || user.grade === 'ADMIN';
+        const adminBtnHtml = isAdmin
+          ? `<a href="./admin.html" class="header-admin-btn">관리자 모드</a><span class="header-top__sep"></span>`
+          : '';
+        const orderInquiryHtml = isAdmin
+          ? ''
+          : `<a href="./cart.html">주문조회</a><span class="header-top__sep"></span>`;
+
         utilNav.innerHTML = `
           <div class="user-info-group">
             ${avatarHtml}
@@ -68,9 +76,9 @@ const App = (() => {
             <span class="header-top__badge ${gradeClass}">${displayGrade}</span>
           </div>
           <span class="header-top__sep"></span>
-          <a href="./cart.html">주문조회</a>
-          <span class="header-top__sep"></span>
-          <a href="${(user.role === 'ADMIN' || user.grade === 'ADMIN') ? './admin.html' : './mypage.html'}">마이페이지</a>
+          ${adminBtnHtml}
+          ${orderInquiryHtml}
+          <a href="./mypage.html">마이페이지</a>
           <span class="header-top__sep"></span>
           <a href="#" id="logoutBtn">로그아웃</a>
         `;
@@ -257,17 +265,16 @@ const startApp = () => {
     header.insertAdjacentHTML('beforeend', navHTML);
     nav = document.getElementById('varoCategoryNav');
     if (window.MegaMenu) setTimeout(() => { window.MegaMenu.init(); }, 100);
-  }
 
-  if (nav) {
-    nav.style.setProperty('display', 'block', 'important');
-    nav.style.setProperty('visibility', 'visible', 'important');
-    nav.style.setProperty('opacity', '1', 'important');
-    nav.style.setProperty('height', 'auto', 'important');
-    nav.style.setProperty('min-height', '50px', 'important');
-    nav.style.setProperty('width', '100%', 'important');
-    nav.style.setProperty('z-index', '100', 'important');
-    nav.style.setProperty('background', '#fff', 'important');
+    if (nav) {
+      nav.style.setProperty('visibility', 'visible', 'important');
+      nav.style.setProperty('opacity', '1', 'important');
+      nav.style.setProperty('height', 'auto', 'important');
+      nav.style.setProperty('min-height', '50px', 'important');
+      nav.style.setProperty('width', '100%', 'important');
+      nav.style.setProperty('z-index', '100', 'important');
+      nav.style.setProperty('background', '#fff', 'important');
+    }
   }
 
   // 로그인 여부에 따른 프로필 아이콘 링크 변경

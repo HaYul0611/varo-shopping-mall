@@ -117,8 +117,12 @@
 
 /* ── 토글 스위치 (로그인 유지 등) ────────────────── */
 .auth-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin: 20px 0 24px;
 }
+
 
 .toggle-switch {
   display: flex;
@@ -162,6 +166,13 @@
   /* Naver-like Green */
 }
 
+/* ── 애니메이션 방지 클래스 (새로고침 시 잔상 제거용) ── */
+.no-transition,
+.no-transition .toggle-slider,
+.no-transition .toggle-slider:before {
+  transition: none !important;
+}
+
 .toggle-switch input:checked+.toggle-slider:before {
   transform: translateX(20px);
 }
@@ -175,4 +186,160 @@
 
 .toggle-switch:hover .toggle-label {
   color: #111827;
+}
+
+/* ── Find ID/PW Modal & Helper Links ──────────────── */
+.auth-helper-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.auth-helper-link {
+  color: #888;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.auth-helper-link:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.auth-helper-sep {
+  width: 1px;
+  height: 10px;
+  background: #eee;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content.find-modal {
+  background: #fff;
+  width: 90%;
+  max-width: 400px;
+  padding: 40px;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #ccc;
+  cursor: pointer;
+}
+
+.find-tabs {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 24px;
+}
+
+.find-tab {
+  flex: 1;
+  padding: 12px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #999;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.find-tab.active {
+  color: #0d0d0d;
+  border-bottom-color: #0d0d0d;
+}
+
+.find-desc {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.find-result {
+  margin-top: 30px;
+  padding: 24px;
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  border: 1px solid #eee;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 500;
+  color: #333;
+  box-shadow: 10px 10px 20px #e6e6e6, -10px -10px 20px #ffffff;
+  animation: fadeInDown 0.4s ease-out;
+}
+
+.find-result strong {
+  color: var(--color-accent);
+  font-weight: 700;
+  display: block;
+  font-size: 18px;
+  margin-top: 8px;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.input-with-timer {
+  position: relative;
+}
+
+.auth-timer {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #D96B3C;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.u-hidden {
+  display: none !important;
+}
+
+/* Utilities */
+.u-mb-15 {
+  margin-bottom: 15px !important;
+}
+
+.u-mb-20 {
+  margin-bottom: 20px !important;
+}
+
+.u-mb-30 {
+  margin-bottom: 30px !important;
 }

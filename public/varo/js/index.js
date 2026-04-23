@@ -17,6 +17,7 @@ const IndexPage = (() => {
     const prev = container.querySelector('#sliderPrev');
     const next = container.querySelector('#sliderNext');
     const dotsArray = Array.from(container.querySelectorAll('.month-item'));
+
     const slidesData = window.VARO_DATA?.HERO_SLIDES || [];
 
     if (!track || !dotsArray.length || !slidesData.length) return;
@@ -46,13 +47,8 @@ const IndexPage = (() => {
 
     const goTo = (idx) => {
       current = (idx + slidesData.length) % slidesData.length;
-
-      // 트랙 실제 이동 (슬라이딩 효과)
       track.style.transform = `translateX(-${current * (100 / slidesData.length)}%)`;
-
-      // 네비게이션 도트 즉시 업데이트
       dotsArray.forEach((dot, i) => dot.classList.toggle('month-item--active', i === current));
-
       resetAuto();
     };
 
@@ -61,7 +57,6 @@ const IndexPage = (() => {
       autoTimer = setInterval(() => goTo(current + 1), window.VARO_CONFIG?.HERO_AUTOPLAY_MS ?? 4000);
     };
 
-    // 이벤트 리스너
     dotsArray.forEach((dot, i) => {
       dot.addEventListener('click', () => goTo(i));
     });
@@ -77,7 +72,6 @@ const IndexPage = (() => {
       if (Math.abs(diff) > 50) goTo(current + (diff > 0 ? 1 : -1));
     }, { passive: true });
 
-    // 초기 상태 실행
     goTo(0);
   };
 

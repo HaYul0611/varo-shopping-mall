@@ -7,6 +7,47 @@
  */
 document.addEventListener('DOMContentLoaded', () => {
 
+    const applyAdminLayout = () => {
+        const user = JSON.parse(localStorage.getItem('varo_user') || '{}');
+        const isAdmin = user.role === 'ADMIN' || user.grade === 'ADMIN';
+        if (!isAdmin) return;
+
+        // 사이드바 메뉴 변경
+        const navLinks = document.querySelectorAll('.mypage-nav__link');
+        navLinks.forEach(link => {
+            const target = link.getAttribute('data-target');
+            if (target === 'section-order') {
+                link.textContent = '내 활동 로그';
+                link.setAttribute('data-target', 'section-activity');
+            } else if (target === 'section-wishlist') {
+                link.textContent = '업무 즐겨찾기';
+                link.setAttribute('data-target', 'section-bookmarks');
+            } else if (target === 'section-inquiry') {
+                link.textContent = '업무 메모';
+                link.setAttribute('data-target', 'section-notes');
+            } else if (target === 'section-membership') {
+                link.parentElement.style.display = 'none';
+            }
+        });
+
+        // 관리자용 탭 리매핑 (URL 파라미터 대응)
+        const searchParams = new URLSearchParams(window.location.search);
+        const tabParam = searchParams.get('tab');
+
+        let targetTab = 'section-activity'; // 기본값
+        if (tabParam === 'order') targetTab = 'section-activity';
+        else if (tabParam === 'wishlist') targetTab = 'section-bookmarks';
+        else if (tabParam === 'inquiry') targetTab = 'section-notes';
+        else if (tabParam) targetTab = `section-${tabParam}`;
+
+        // activateTab 함수가 정의된 이후에 호출되도록 지연 실행
+        setTimeout(() => {
+            if (typeof activateTab === 'function') {
+                activateTab(targetTab);
+            }
+        }, 50);
+    };
+
     const updateProfileUI = () => {
         const user = JSON.parse(localStorage.getItem('varo_user') || '{}');
         const userNameLabel = document.getElementById('userNameLabel');
@@ -64,6 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 초기 표시
     updateProfileUI();
+    // applyAdminLayout(); // 하단으로 이동
+    // initAdminMemo();    // 하단으로 이동
 
     // 비밀번호 가시성 토글
     document.querySelectorAll('.pw-toggle-btn').forEach(btn => {
@@ -157,8 +200,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const sections = document.querySelectorAll('.mypage-section');
 
     const activateTab = (targetId) => {
-        navLinks.forEach(l => l.classList.remove('is-active'));
-        sections.forEach(s => {
+        // 매번 최신 상태의 요소들을 가져옵니다 (관리자 레이아웃 변경 대응)
+        const currentNavLinks = document.querySelectorAll('.mypage-nav__link[data-target]');
+        const currentSections = document.querySelectorAll('.mypage-section');
+
+        currentNavLinks.forEach(l => l.classList.remove('is-active'));
+        currentSections.forEach(s => {
             s.classList.remove('is-active');
             s.style.display = 'none';
         });
@@ -175,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (targetId === 'section-wishlist') renderWishlist();
             if (targetId === 'section-inquiry') renderUserInquiries();
             if (targetId === 'section-membership') renderMembershipInfo();
+            if (targetId === 'section-activity') renderAdminActivity();
         }
     };
 
@@ -216,6 +264,28 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             nextGradeEl.textContent = '최고 등급인 DIA 등급을 유지하고 계십니다.';
         }
+    };
+
+    const initAdminMemo = () => {
+        const memoArea = document.getElementById('adminMemoArea');
+        const saveBtn = document.getElementById('btnSaveMemo');
+        if (!memoArea || !saveBtn) return;
+
+        // 저장된 메모 불러오기
+        memoArea.value = localStorage.getItem('varo_admin_memo') || '';
+
+        // 메모 저장 이벤트
+        saveBtn.addEventListener('click', () => {
+            localStorage.setItem('varo_admin_memo', memoArea.value);
+            if (window.Utils?.showToast) window.Utils.showToast('업무 메모가 저장되었습니다 ✍️', 'success');
+        });
+    };
+
+    const renderAdminActivity = () => {
+        const container = document.getElementById('section-activity');
+        if (!container) return;
+
+        // 실제 데이터가 없으므로 정적인 안내 문구만 유지
     };
 
     navLinks.forEach(link => {
@@ -539,5 +609,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // 최종 초기화 (모든 함수 정의 후)
+    applyAdminLayout();
+    initAdminMemo();
 });
 

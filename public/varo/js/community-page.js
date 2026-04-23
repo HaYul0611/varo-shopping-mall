@@ -90,7 +90,9 @@ const CommunityPageV2 = (() => {
   /* ── Q&A (문의하기) 시스템 ──────────────────────────── */
   const state = {
     isAdminMode: false,
-    qnaData: []
+    qnaData: [],
+    editingReplyId: null, // 현재 수정 중인 댓글 ID
+    unlockedPostIds: []   // 이번 세션에서 잠금 해제된 비밀글 IDs
   };
 
   const loadQNA = () => {
@@ -147,7 +149,9 @@ const CommunityPageV2 = (() => {
 
     list.innerHTML = state.qnaData.map(q => {
       const isAuthor = user.email && q.authorEmail === user.email;
-      const canSee = !q.isSecret || isAuthor || state.isAdminMode;
+      const isAdmin = user.role === 'ADMIN' || user.grade === 'ADMIN';
+      const isUnlocked = state.unlockedPostIds.includes(q.id);
+      const canSee = !q.isSecret || isAuthor || isAdmin || isUnlocked;
 
       let contentHtml = '';
       if (canSee) {
@@ -163,15 +167,42 @@ const CommunityPageV2 = (() => {
           </div>
           ${q.replies.length > 0 ? `
             <div class="qna-replies">
-              ${q.replies.map(r => `
-                <div class="qna-reply-item">
+              ${q.replies.map(r => {
+          const isReplyAuthor = user.name && r.author === user.name;
+          const isAdmin = user.role === 'ADMIN' || user.grade === 'ADMIN';
+          const canManage = isAdmin || isReplyAuthor;
+          const isEditing = state.editingReplyId === r.id;
+
+          return `
+                <div class="qna-reply-item" id="reply-${r.id}">
                   <div class="qna-reply-header">
-                    <span class="qna-reply-user">${r.author}</span>
-                    <span class="qna-reply-date">${r.date}</span>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                      <span class="qna-reply-user">${r.author}</span>
+                      ${r.isAdmin ? '<span class="admin-mark" style="font-size:9px; background:#1C1A16; color:#FFF; padding:1px 4px; border-radius:2px;">ADMIN</span>' : ''}
+                      <span class="qna-reply-date">${r.date}</span>
+                    </div>
+                    ${canManage && !isEditing ? `
+                      <div class="qna-reply-actions" style="display:flex; gap:6px;">
+                        <button type="button" class="btn-text-action" onclick="CommunityPageV2.startEditReply(${r.id})" style="font-size:11px; color:#888; background:none; border:none; cursor:pointer;">수정</button>
+                        <button type="button" class="btn-text-action" onclick="CommunityPageV2.deleteReply(${q.id}, ${r.id})" style="font-size:11px; color:#FF4D4F; background:none; border:none; cursor:pointer;">삭제</button>
+                      </div>
+                    ` : ''}
                   </div>
-                  <div class="qna-reply-body">${r.content}</div>
+                  
+                  ${isEditing ? `
+                    <div class="qna-reply-edit-wrap" style="margin-top:8px;">
+                      <textarea id="editReplyInput-${r.id}" class="qna-reply-input" style="width:100%; min-height:60px; padding:8px; font-size:13px;">${r.content}</textarea>
+                      <div style="display:flex; gap:5px; margin-top:5px; justify-content:flex-end;">
+                        <button type="button" class="btn btn--outline btn--xs" onclick="CommunityPageV2.cancelEditReply()" style="padding:4px 8px; font-size:11px;">취소</button>
+                        <button type="button" class="btn btn--primary btn--xs" onclick="CommunityPageV2.saveEditedReply(${q.id}, ${r.id})" style="padding:4px 8px; font-size:11px;">저장</button>
+                      </div>
+                    </div>
+                  ` : `
+                    <div class="qna-reply-body">${r.content}</div>
+                  `}
                 </div>
-              `).join('')}
+                `;
+        }).join('')}
             </div>
           ` : ''}
           <div class="qna-reply-write">
@@ -181,13 +212,13 @@ const CommunityPageV2 = (() => {
         `;
       } else {
         contentHtml = `
-          <div class="qna-q-row" style="opacity:0.6;">
-            <span class="qna-badge qna-badge--q" style="background:#CCC;">Q</span>
+          <div class="qna-q-row qna-q-row--locked" style="cursor:pointer;" onclick="CommunityPageV2.handleSecretClick(${q.id})">
+            <span class="qna-badge qna-badge--q" style="background:#EEE; color:#AAA;">Q</span>
             <div class="qna-q-content">
-              <p class="qna-subject">🔒 비밀글입니다.</p>
+              <p class="qna-subject" style="color:#888;">🔒 비밀글입니다. <span style="font-size:11px; font-weight:400;">(클릭하여 비밀번호 입력)</span></p>
               <p class="qna-meta"><span class="qna-author">${q.author}</span> · ${q.date}</p>
             </div>
-            <span class="qna-status qna-status--pending">비밀글</span>
+            <span class="qna-status qna-status--pending" style="background:#F5F5F5; color:#999;">비밀글</span>
           </div>
         `;
       }
@@ -201,7 +232,9 @@ const CommunityPageV2 = (() => {
     if (!input || !input.value.trim()) return;
 
     const user = JSON.parse(localStorage.getItem('varo_user') || '{}');
-    if (!user.name && !state.isAdminMode) {
+    const isAdmin = user.role === 'ADMIN' || user.grade === 'ADMIN';
+
+    if (!user.name && !isAdmin) {
       alert('로그인이 필요한 기능입니다.');
       location.href = './login.html';
       return;
@@ -212,10 +245,10 @@ const CommunityPageV2 = (() => {
 
     const newReply = {
       id: Date.now(),
-      author: state.isAdminMode ? 'VARO (관리자)' : user.name,
+      author: isAdmin ? 'VARO (관리자)' : user.name,
       content: input.value.trim(),
       date: new Date().toLocaleDateString('ko-KR').replace(/ /g, '').slice(0, -1),
-      isAdmin: state.isAdminMode
+      isAdmin: isAdmin
     };
 
     state.qnaData[qIdx].replies.push(newReply);
@@ -223,6 +256,52 @@ const CommunityPageV2 = (() => {
     saveQNA();
     renderQNA();
     if (typeof Utils !== 'undefined') Utils.showToast('댓글이 등록되었습니다.', 'success');
+  };
+
+  /* ── 댓글 수정/삭제 로직 ────────────────────────── */
+  const startEditReply = (rId) => {
+    state.editingReplyId = rId;
+    renderQNA();
+  };
+
+  const cancelEditReply = () => {
+    state.editingReplyId = null;
+    renderQNA();
+  };
+
+  const saveEditedReply = (qId, rId) => {
+    const input = document.getElementById(`editReplyInput-${rId}`);
+    if (!input || !input.value.trim()) return;
+
+    const qIdx = state.qnaData.findIndex(q => q.id === qId);
+    if (qIdx === -1) return;
+
+    const rIdx = state.qnaData[qIdx].replies.findIndex(r => r.id === rId);
+    if (rIdx === -1) return;
+
+    state.qnaData[qIdx].replies[rIdx].content = input.value.trim();
+    state.editingReplyId = null;
+    saveQNA();
+    renderQNA();
+    if (typeof Utils !== 'undefined') Utils.showToast('댓글이 수정되었습니다.', 'success');
+  };
+
+  const deleteReply = (qId, rId) => {
+    if (!confirm('정말 이 댓글을 삭제하시겠습니까?')) return;
+
+    const qIdx = state.qnaData.findIndex(q => q.id === qId);
+    if (qIdx === -1) return;
+
+    state.qnaData[qIdx].replies = state.qnaData[qIdx].replies.filter(r => r.id !== rId);
+
+    // 답변이 하나도 없으면 '답변대기'로 전환
+    if (state.qnaData[qIdx].replies.length === 0) {
+      state.qnaData[qIdx].status = 'pending';
+    }
+
+    saveQNA();
+    renderQNA();
+    if (typeof Utils !== 'undefined') Utils.showToast('댓글이 삭제되었습니다.', 'error');
   };
 
   const initAdminMode = () => {
@@ -260,10 +339,17 @@ const CommunityPageV2 = (() => {
       const subject = document.getElementById('qnaSubject').value.trim();
       const content = document.getElementById('qnaContent').value.trim();
       const isSecret = document.getElementById('qnaIsSecret').checked;
+      const password = document.getElementById('qnaPassword').value.trim();
       const user = JSON.parse(localStorage.getItem('varo_user') || '{}');
 
       if (!subject || !content) {
         alert('제목과 내용을 모두 입력해 주세요.');
+        return;
+      }
+
+      if (isSecret && !password) {
+        alert('비밀글 설정을 위해 비밀번호 4자리를 입력해 주세요.');
+        document.getElementById('qnaPassword').focus();
         return;
       }
 
@@ -275,6 +361,7 @@ const CommunityPageV2 = (() => {
         content: content,
         date: new Date().toLocaleDateString('ko-KR').replace(/ /g, '').slice(0, -1),
         isSecret: isSecret,
+        password: password, // 비밀번호 저장
         status: 'pending',
         replies: []
       };
@@ -299,6 +386,41 @@ const CommunityPageV2 = (() => {
         renderQNA();
       }
     });
+
+    // 비밀글 체크박스 토글 핸들러
+    const qnaIsSecret = document.getElementById('qnaIsSecret');
+    const qnaPasswordWrap = document.getElementById('qnaPasswordWrap');
+    if (qnaIsSecret && qnaPasswordWrap) {
+      qnaIsSecret.addEventListener('change', () => {
+        qnaPasswordWrap.style.display = qnaIsSecret.checked ? 'flex' : 'none';
+      });
+    }
+
+    // 텍스트 영역 자동 확장 (Auto-expand)
+    const textareas = document.querySelectorAll('textarea.form-textarea, textarea.qna-reply-input');
+    textareas.forEach(ta => {
+      ta.addEventListener('input', () => autoExpand(ta));
+    });
+  };
+
+  const autoExpand = (el) => {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  };
+
+  const handleSecretClick = (qId) => {
+    const q = state.qnaData.find(item => item.id === qId);
+    if (!q) return;
+
+    const inputPw = prompt('비밀번호 4자리를 입력해주세요.');
+    if (!inputPw) return;
+
+    if (inputPw === q.password) {
+      state.unlockedPostIds.push(qId);
+      renderQNA();
+    } else {
+      alert('비밀번호가 일치하지 않습니다.');
+    }
   };
 
   /* ── 멤버십 CTA 제어 ────────────────────────────── */
@@ -341,7 +463,7 @@ const CommunityPageV2 = (() => {
     updateMembershipCTA(); // CTA 버튼 상태 업데이트
   };
 
-  return { init, handleReplySubmit };
+  return { init, handleReplySubmit, startEditReply, cancelEditReply, saveEditedReply, deleteReply, handleSecretClick };
 })();
 
 document.addEventListener('DOMContentLoaded', CommunityPageV2.init);

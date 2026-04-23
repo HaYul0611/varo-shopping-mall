@@ -122,22 +122,38 @@
 
 .header-top__util a {
   font-size: 11px;
-  color: #666;
+  color: #888;
   text-decoration: none;
-  padding: 0 10px;
   transition: color 0.15s;
-  letter-spacing: -0.01em;
 }
 
 .header-top__util a:hover {
-  color: #D96B3C;
+  color: #1c1a16;
+}
+
+.header-admin-btn {
+  background: #1B2B4B;
+  color: #fff !important;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 10px !important;
+  transition: all 0.2s;
+}
+
+.header-admin-btn:hover {
+  background: #2a3f6b;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .header-top__sep {
   width: 1px;
   height: 10px;
-  background: #DDD;
+  background: #ccc;
   display: inline-block;
+  margin: 0 12px;
+  vertical-align: middle;
 }
 
 /* ══════════════════════════════════════════════════════
