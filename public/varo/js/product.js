@@ -147,7 +147,7 @@ const ProductDetail = (() => {
         </div>
 
         <div class="product-info__cta">
-          <button class="product-wish-btn ${window.App?.Wishlist.has(product.id) ? 'is-active' : ''}" id="mainWishBtn" aria-label="위시리스트 추가">
+          <button class="product-wish-btn ${window.App?.Wishlist?.has?.(product.id) ? 'is-active' : ''}" id="mainWishBtn" aria-label="위시리스트 추가">
             ${Utils.icon('heart')}
           </button>
           
@@ -248,7 +248,7 @@ const ProductDetail = (() => {
     // 위시리스트 토글 (메인 버튼)
     document.getElementById('mainWishBtn')?.addEventListener('click', (e) => {
       const btn = e.currentTarget;
-      const isActive = window.App?.Wishlist.toggle(state.product.id);
+      const isActive = window.App?.Wishlist?.toggle ? window.App.Wishlist.toggle(state.product.id) : false;
       btn.classList.toggle('is-active', isActive);
       const icon = btn.querySelector('svg');
       if (icon) icon.style.fill = isActive ? 'var(--color-accent)' : 'none';
@@ -321,8 +321,8 @@ const ProductDetail = (() => {
         <div class="product-card__img-wrap">
           <img src="${p.mainImg}" alt="${p.name}" class="product-card__img product-card__img--main" loading="lazy">
           <img src="${p.subImg}" alt="${p.name}" class="product-card__img product-card__img--sub" loading="lazy">
-          <button class="product-card__wish ${window.App?.Wishlist.has(p.id) ? 'product-card__wish--active' : ''}" 
-                  data-id="${p.id}" onclick="event.stopPropagation(); window.App?.Wishlist.toggle('${p.id}')">
+          <button class="product-card__wish ${window.App?.Wishlist?.has?.(p.id) ? 'product-card__wish--active' : ''}" 
+                  data-id="${p.id}" onclick="event.stopPropagation(); window.App?.Wishlist?.toggle?.('${p.id}')">
             ${Utils.icon('heart')}
           </button>
         </div>

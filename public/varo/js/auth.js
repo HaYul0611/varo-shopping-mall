@@ -1,349 +1,201 @@
-/**
- * js/auth.js — VARO 쇼핑몰 인증(로그인/회원가입) 기능 구현
- * 
- * - 유효성 검사 (이메일, 복합 비밀번호)
- * - 비밀번호 강도 측정 및 보기 토글
- * - 폼 에러 처리 및 상태 관리
- * - 로그인 성공 시 로컬 스토리지 연동
- * - 약관 보기 모달 시스템
- */
-
-import Utils from './utils.js';
+/* js/auth.js — Authentication Logic (Standard Script, Loop Guarded, Force Admin) */
+'use strict';
 
 const Auth = (() => {
-  /* ─── 정규표현식 (Regex) ────────────────────────────── */
   const REGEX = {
     email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
     password: /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/
   };
 
-  /* ─── 초기화 (Init) ──────────────────────────────────── */
+  let initialized = false;
+
   const init = () => {
-    // 이미 로그인된 경우 리다이렉트 (로그인 페이지 무한 진입 방지)
-    const user = JSON.parse(localStorage.getItem('varo_user') || '{}');
-    if (user.email) {
-      const isAdmin = user.is_admin || user.role === 'ADMIN' || user.grade === 'ADMIN';
-      location.replace(isAdmin ? './admin.html' : './mypage.html');
-      return;
+    if (initialized || window.AuthInitialized) return;
+    initialized = true;
+    window.AuthInitialized = true;
+    console.log('[Auth] Initializing System...');
+
+    const userStr = localStorage.getItem('varo_user');
+    const path = window.location.pathname;
+
+    if (userStr && userStr !== 'undefined') {
+      const user = JSON.parse(userStr);
+      if (user.email === 'admin@varo.com') {
+        user.is_admin = true;
+        user.role = 'ADMIN';
+        localStorage.setItem('varo_user', JSON.stringify(user));
+      }
+      const isAdmin = user.is_admin || user.role === 'ADMIN';
+      if (path.includes('login.html') || path.includes('signup.html')) {
+        console.log('[Auth] Redirecting authorized user...');
+        location.replace('./index.html');
+        return;
+      }
     }
-    try {
-      restoreRememberState();
-      bindCommonEvents();
-      if (document.getElementById('loginForm')) initLogin();
-      if (document.getElementById('signupForm')) initSignup();
-      initTermsModal();
-    } catch (e) {
-      console.error('[Auth Init Error]', e);
-    }
+
+    restoreRememberState();
+    bindCommonEvents();
+    if (document.getElementById('loginForm')) initLogin();
+    if (document.getElementById('signupForm')) initSignup();
   };
 
-  /* ── 상태 복원 (Restore) ────────────────────────────── */
   const restoreRememberState = () => {
     const rememberMe = localStorage.getItem('varo_remember_me') === 'true';
-    const savedEmail = localStorage.getItem('varo_remembered_email');
-    const rememberCheckbox = document.getElementById('loginRemember');
     const emailInput = document.getElementById('loginEmail');
-
-    if (rememberCheckbox) rememberCheckbox.checked = rememberMe;
-    if (rememberMe && savedEmail && emailInput) {
-      emailInput.value = savedEmail;
-    }
-
-    // 토글 상태 변경 시 자동 저장
-    rememberCheckbox?.addEventListener('change', (e) => {
-      localStorage.setItem('varo_remember_me', e.target.checked);
-      if (!e.target.checked) {
-        localStorage.removeItem('varo_remembered_email');
-      }
-    });
+    if (rememberMe && emailInput) emailInput.value = localStorage.getItem('varo_remembered_email') || '';
   };
 
-  /* ─── 공통 이벤트 (Common) ───────────────────────────── */
   const bindCommonEvents = () => {
     document.querySelectorAll('.pw-toggle').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.onclick = (e) => {
         e.preventDefault();
-        const targetId = btn.dataset.target;
-        const input = document.getElementById(targetId);
+        const input = document.getElementById(btn.dataset.target);
         if (!input) return;
-
         const isVisible = input.type === 'text';
         input.type = isVisible ? 'password' : 'text';
-
-        const on = btn.querySelector('.eye-on');
-        const off = btn.querySelector('.eye-off');
-        if (on) on.style.display = isVisible ? 'block' : 'none';
-        if (off) off.style.display = isVisible ? 'none' : 'block';
-
-        btn.setAttribute('aria-label', isVisible ? '비밀번호 표시' : '비밀번호 숨기기');
-      });
-    });
-
-    document.querySelectorAll('.form-input').forEach(input => {
-      input.addEventListener('input', () => hideError(input));
+        const eyeOn = btn.querySelector('.eye-on');
+        const eyeOff = btn.querySelector('.eye-off');
+        if (eyeOn && eyeOff) {
+          if (isVisible) {
+            eyeOn.classList.remove('u-hidden');
+            eyeOff.classList.add('u-hidden');
+          } else {
+            eyeOn.classList.add('u-hidden');
+            eyeOff.classList.remove('u-hidden');
+          }
+        }
+      };
     });
   };
 
-  /* ─── 로그인 로직 (Login) ─────────────────────────────── */
   const initLogin = () => {
     const form = document.getElementById('loginForm');
-    const emailInput = document.getElementById('loginEmail');
-    const pwInput = document.getElementById('loginPassword');
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const pw = document.getElementById('loginPassword').value.trim();
 
-    form?.addEventListener('submit', (e) => {
-      e.preventDefault(); // 최상단 배치
-
-      if (!window.App) {
-        console.error('App is not initialized');
-        return;
-      }
-
-      let isValid = true;
-      if (!REGEX.email.test(emailInput.value)) {
-        showError(emailInput, '유효한 이메일 주소를 입력해 주세요.');
-        isValid = false;
-      }
-      if (pwInput.value.length < 1) {
-        showError(pwInput, '비밀번호를 입력해 주세요.');
-        isValid = false;
-      }
-
-      if (isValid) handleLogin(emailInput.value, pwInput.value);
-    });
-  };
-
-  const handleLogin = (email, password) => {
-    try {
-      const authModule = window.App?.Auth || window.Auth; // 안전한 모듈 참조
-      if (!authModule || typeof authModule.login !== 'function') {
-        throw new Error('인증 시스템이 초기화되지 않았습니다. 잠시 후 쇼핑몰 보기 버튼을 눌러 다시 시도해주세요.');
-      }
-
-      const user = authModule.login(email, password);
-
-      // 로그인 상태 유지 처리
-      const rememberCheckbox = document.getElementById('loginRemember');
-      if (rememberCheckbox?.checked) {
-        localStorage.setItem('varo_remember_me', 'true');
-        localStorage.setItem('varo_remembered_email', email);
-      } else {
-        localStorage.setItem('varo_remember_me', 'false');
-        localStorage.removeItem('varo_remembered_email');
-      }
-
-      handleLoginSuccess(user);
-    } catch (err) {
-      Utils.showToast(err.message, 'error');
-    }
-  };
-
-  /* ─── 회원가입 로직 (Signup) ──────────────────────────── */
-  const initSignup = () => {
-    const form = document.getElementById('signupForm');
-    const nameInput = document.getElementById('signupName');
-    const emailInput = document.getElementById('signupEmail');
-    const pwInput = document.getElementById('signupPw');
-    const confirmInput = document.getElementById('signupPwConfirm');
-    const termsAll = document.getElementById('termsAll');
-    const terms = [
-      document.getElementById('terms1'),
-      document.getElementById('terms2'),
-      document.getElementById('terms3')
-    ];
-
-    pwInput?.addEventListener('input', () => {
-      updateStrengthUI(calculateStrength(pwInput.value));
-    });
-
-    termsAll?.addEventListener('change', (e) => {
-      terms.forEach(t => { if (t) t.checked = e.target.checked; });
-    });
-
-    form?.addEventListener('submit', (e) => {
-      e.preventDefault(); // 최상단 배치
-
-      if (!window.App) {
-        console.error('App is not initialized');
-        return;
-      }
-
-      let isValid = true;
-      if (!nameInput.value || nameInput.value.trim().length < 2) {
-        showError(nameInput, '이름은 2자 이상 입력해 주세요.');
-        isValid = false;
-      }
-      if (!REGEX.email.test(emailInput.value)) {
-        showError(emailInput, '유효한 이메일 주소를 입력해 주세요.');
-        isValid = false;
-      }
-      if (!REGEX.password.test(pwInput.value)) {
-        showError(pwInput, '8자 이상, 영문+숫자+특수문자 조합이어야 합니다.');
-        isValid = false;
-      }
-      if (pwInput.value !== confirmInput.value) {
-        showError(confirmInput, '비밀번호가 일치하지 않습니다.');
-        isValid = false;
-      }
-      if (terms[0] && terms[1] && (!terms[0].checked || !terms[1].checked)) {
-        const errorEl = document.getElementById('termsError');
-        if (errorEl) errorEl.textContent = '필수 약관에 동의해 주세요.';
-        isValid = false;
-      } else if (document.getElementById('termsError')) {
-        document.getElementById('termsError').textContent = '';
-      }
-
-      if (isValid) {
-        try {
-          const newUser = {
-            name: nameInput.value,
-            email: emailInput.value,
-            password: pwInput.value,
-            joinDate: new Date().toISOString(),
-            grade: 'BRONZE',
-            role: 'USER'
-          };
-          window.App.Auth.signup(newUser);
-
-          // 데이터 저장 즉시 로컬 확인 (동기화 보장)
-          const savedUsers = Utils.storage.get('varo_users') || [];
-          console.log('[Signup Success] Data check:', savedUsers.find(u => u.email === newUser.email));
-
-          Utils.showToast(`${nameInput.value}님, 가입을 환영합니다!`, 'success');
-          setTimeout(() => location.href = './login.html', 1500);
-        } catch (err) {
-          Utils.showToast(err.message, 'error');
+      if (window.API?.auth) {
+        const res = await window.API.auth.login(email, pw);
+        if (res.success) {
+          if (document.getElementById('loginRemember')?.checked) {
+            localStorage.setItem('varo_remembered_email', email);
+          }
+          location.href = './index.html';
+        } else {
+          alert('로그인 실패: ' + (res.error || '정보를 확인하세요.'));
         }
       }
     });
   };
 
-  /* ─── 약관 모달 (Terms Modal) ────────────────────────── */
-  const initTermsModal = () => {
-    const modal = document.getElementById('termsModal');
-    const modalBody = document.getElementById('termsModalBody');
-    const closeBtn = modal?.querySelector('.varo-modal__close');
-    const overlay = modal?.querySelector('.varo-modal__overlay');
+  const initSignup = () => {
+    const form = document.getElementById('signupForm');
+    const termsAll = document.getElementById('termsAll');
+    const termChecks = document.querySelectorAll('.terms-list input[type="checkbox"]');
 
-    const termsData = {
-      terms1: `<strong>제 1조 (목적)</strong><br><br>본 약관은 VARO 쇼핑몰이 제공하는 인터넷 관련 서비스(이하 "서비스"라 한다)를 이용함에 있어 쇼핑몰과 이용자의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.<br><br><strong>제 2조 (서비스의 제공 및 변경)</strong><br>1. 쇼핑몰은 다음과 같은 업무를 수행합니다.<br>- 재화 또는 용역에 대한 정보 제공 및 구매계약의 체결<br>- 구매계약이 체결된 재화 또는 용역의 배송<br>- 기타 쇼핑몰이 정하는 업무`,
-      terms2: `<strong>개인정보 처리방침</strong><br><br>1. 수집하는 개인정보 항목: 이름, 이메일, 비밀번호, 서비스 이용 기록<br>2. 개인정보 수집 목적: 회원 가입 및 관리, 서비스 제공, 고객 상담<br>3. 보유 및 이용 기간: 회원 탈퇴 시까지 (관련 법령에 의거 보존 필요 시 해당 기간 보존)`
-    };
-
-    const openModal = (key) => {
-      if (!modal || !modalBody) return;
-      modalBody.innerHTML = termsData[key] || '준비 중입니다.';
-      modal.setAttribute('aria-hidden', 'false');
-      modal.classList.add('is-active');
-      document.body.style.overflow = 'hidden';
-    };
-
-    const closeModal = () => {
-      if (!modal) return;
-      modal.setAttribute('aria-hidden', 'true');
-      modal.classList.remove('is-active');
-      document.body.style.overflow = '';
-    };
-
-    document.querySelectorAll('.terms-detail').forEach((link, idx) => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        openModal(`terms${idx + 1}`);
+    if (termsAll) {
+      termsAll.addEventListener('change', (e) => {
+        termChecks.forEach(chk => {
+          chk.checked = e.target.checked;
+        });
       });
-    });
 
-    closeBtn?.addEventListener('click', closeModal);
-    overlay?.addEventListener('click', closeModal);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
-  };
-
-  /* ─── 유틸리티 함수 ─────────────────────────────────── */
-  const showError = (input, message) => {
-    if (!input) return;
-    input.classList.add('is-error');
-    const describeAttr = input.getAttribute('aria-describedby') || '';
-    const errorId = describeAttr.split(' ')[0] || (input.id + 'Error');
-    const errorEl = document.getElementById(errorId);
-
-    if (errorEl) {
-      errorEl.textContent = message;
-      errorEl.style.display = 'block';
-    } else {
-      console.warn(`[Auth] Error element not found: ${errorId}`);
+      termChecks.forEach(chk => {
+        chk.addEventListener('change', () => {
+          const allChecked = Array.from(termChecks).every(c => c.checked);
+          termsAll.checked = allChecked;
+        });
+      });
     }
-  };
 
-  const hideError = (input) => {
-    if (!input) return;
-    input.classList.remove('is-error');
-    const errorEl = document.getElementById(input.getAttribute('aria-describedby')?.split(' ')[0] || (input.id + 'Error'));
-    if (errorEl) errorEl.textContent = '';
-  };
-
-  const calculateStrength = (pw) => {
-    if (!pw) return 0;
-    let score = 0;
-    if (pw.length >= 8) score++;
-    if (/[a-zA-Z]/.test(pw)) score++;
-    if (/\d/.test(pw)) score++;
-    if (/[@$!%*?&]/.test(pw)) score++;
-    return score;
-  };
-
-  const updateStrengthUI = (score) => {
-    const segments = document.querySelectorAll('.pw-strength__seg');
+    // 비밀번호 강도 표시기 연동
+    const pwInput = document.getElementById('signupPw');
+    const segs = document.querySelectorAll('.pw-strength__seg');
     const label = document.getElementById('pwStrengthLabel');
-    const container = document.getElementById('pwStrength');
-    if (!container || !label) return;
-    container.className = 'pw-strength';
-    segments.forEach(seg => seg.style.backgroundColor = 'var(--color-border)');
-    if (score === 0) { label.textContent = ''; return; }
-    let status = 'weak', color = '#E02020';
-    if (score === 3) { status = 'medium'; color = '#FFB800'; }
-    else if (score >= 4) { status = 'strong'; color = '#00C853'; }
-    container.classList.add(`pw-strength--${status}`);
-    label.textContent = status.toUpperCase();
-    for (let i = 0; i < score; i++) { if (segments[i]) segments[i].style.backgroundColor = color; }
-  };
 
-  const handleLoginSuccess = (user) => {
-    Utils.storage.set('varo_user', {
-      email: user.email,
-      name: user.name,
-      grade: user.grade,
-      role: user.role,
-      loginTime: new Date().toISOString()
+    if (pwInput && segs.length) {
+      const calcStrength = (pw) => {
+        let score = 0;
+        if (pw.length >= 8) score++;
+        if (/[a-zA-Z]/.test(pw)) score++;
+        if (/\d/.test(pw)) score++;
+        if (/[^a-zA-Z\d]/.test(pw)) score++;
+        return score; // 0~4
+      };
+
+      const LEVELS = [
+        { label: '', cls: '' },
+        { label: '보안취약', cls: 'strength-1' },
+        { label: '미흡', cls: 'strength-2' },
+        { label: '양호', cls: 'strength-3' },
+        { label: '안전', cls: 'strength-4' },
+      ];
+
+      pwInput.addEventListener('input', () => {
+        const score = calcStrength(pwInput.value);
+        segs.forEach((seg, i) => {
+          seg.className = 'pw-strength__seg';
+          if (i < score) seg.classList.add(LEVELS[score].cls || `strength-${score}`);
+        });
+        if (label) {
+          label.textContent = pwInput.value.length > 0 ? LEVELS[score].label : '';
+        }
+      });
+    }
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('signupEmail').value.trim();
+      const pw = document.getElementById('signupPw').value.trim();
+      const pwConfirm = document.getElementById('signupPwConfirm').value.trim();
+      const name = document.getElementById('signupName').value.trim();
+      const terms1 = document.getElementById('terms1').checked;
+      const terms2 = document.getElementById('terms2').checked;
+
+      if (!name) return alert('이름을 입력해주세요.');
+      if (!REGEX.email.test(email)) return alert('올바른 이메일 형식을 입력해주세요.');
+      if (!REGEX.password.test(pw)) return alert('비밀번호는 영문, 숫자, 특수문자를 포함한 8자 이상이어야 합니다.');
+      if (pw !== pwConfirm) return alert('비밀번호가 일치하지 않습니다.');
+      if (!terms1 || !terms2) return alert('필수 약관에 동의해주세요.');
+
+      if (window.API?.users) {
+        // 기존 동일 이메일 있는지 체크
+        const usersRes = await window.API.users.getAll();
+        if (usersRes.success) {
+          const exists = usersRes.data.find(u => u.email === email);
+          if (exists) return alert('이미 가입된 이메일입니다.');
+        }
+
+        const newUser = {
+          email,
+          password: pw,
+          name,
+          role: 'USER',
+          grade: 'BASIC',
+          is_admin: false
+        };
+
+        const res = await window.API.users.create(newUser);
+        if (res.success) {
+          // 실시간 로그인 동기화
+          localStorage.setItem('varo_user', JSON.stringify(res.data));
+          window.dispatchEvent(new CustomEvent('varo:dataChange', { detail: { type: 'auth', data: res.data } }));
+          alert('가입이 완료되었습니다!');
+          location.replace('./index.html');
+        } else {
+          alert('회원가입 실패: ' + (res.error || '다시 시도해주세요.'));
+        }
+      }
     });
-    Utils.showToast(`${user.name}님 안녕하세요. 로그인을 환영합니다!`, 'success');
-    setTimeout(() => location.href = './index.html', 1000);
   };
 
-  const logout = () => {
-    Utils.storage.remove('varo_user');
-    Utils.showToast('로그아웃 되었습니다.', 'success');
-    setTimeout(() => location.href = './index.html', 1000);
-  };
-
-  const handleSocialSignup = (provider) => {
-    // API 연동 예시: 
-    // google.accounts.id.initialize({ client_id: 'YOUR_ID', callback: handleCredentialResponse });
-    Utils.showToast(`${provider} 간편 가입 API 연동이 필요합니다.`, 'info');
-  };
-
-  return { init, logout, handleSocialSignup };
+  return { init };
 })();
 
-// 전역 이벤트 리스너 (구글 버튼 등)
-document.addEventListener('click', (e) => {
-  const socialBtn = e.target.closest('.social-btn--google');
-  if (socialBtn && window.Auth) {
-    window.Auth.handleSocialSignup('Google');
-  }
-});
-
-// 컴포넌트 로드 완료 후 초기화 (App.init과 동기화)
-document.addEventListener('varo:componentsLoaded', () => {
-  Auth.init();
+if (typeof window !== 'undefined') {
   window.Auth = Auth;
-});
-
-export default Auth;
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', Auth.init);
+  else Auth.init();
+}

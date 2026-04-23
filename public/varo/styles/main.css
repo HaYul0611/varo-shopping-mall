@@ -1,4 +1,4 @@
-/* 경로: styles/main.css */
+﻿/* 경로: styles/main.css */
 /* VARO 2026 — 공통 레이아웃, 헤더, 푸터, 버튼, 카드, 토스트 */
 
 /* ── 컨테이너 ─────────────────────────────────────── */
@@ -1521,3 +1521,71 @@ img[loading="lazy"] {
 .u-w-0 {
   width: 0%;
 }
+
+/* ========== Global AD Ticker Bar ========== */
+.footer-ad-bar {
+  background: #000;
+  color: #fff;
+  overflow: hidden;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0 !important;
+}
+
+.ad-ticker-wrapper {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ad-ticker-list {
+  display: inline-block;
+  white-space: nowrap;
+  animation: ticker 120s linear infinite;
+  padding-left: 100%;
+}
+
+.ad-ticker-item {
+  color: #fff;
+  text-decoration: none;
+  font-size: 13px;
+  margin-right: 40px;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  position: relative;
+}
+
+.ad-ticker-item::after {
+  content: '-';
+  position: absolute;
+  right: -24px;
+  color: #555;
+}
+
+.ad-ticker-item:last-child::after {
+  content: '';
+}
+
+.ad-ticker-item:hover {
+  text-decoration: none;
+}
+
+.footer-ad-bar:hover .ad-ticker-list {
+  animation-play-state: paused;
+}
+
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+.site-footer {
+  margin-top: 0 !important;
+}
+
+/* 헤더 아바타 스타일 */
+.header-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; vertical-align: middle; border: 1px solid rgba(0,0,0,0.05); }
+.user-info-group { display: flex !important; align-items: center !important; gap: 8px !important; }
+.profile-avatar-link { display: inline-flex; align-items: center; justify-content: center; overflow: hidden; width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ebebeb; }
+.profile-avatar-link img { width: 100%; height: 100%; object-fit: cover; }

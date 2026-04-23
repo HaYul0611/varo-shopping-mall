@@ -6,33 +6,15 @@ const ComponentLoader = (() => {
   const loadComponent = async (placeholderId, url) => {
     const placeholder = document.getElementById(placeholderId);
     if (!placeholder) return;
-
-    // 1. 스켈레톤 UI 주입 (로딩 중 시각적 효과)
     placeholder.innerHTML = `<div class="skeleton-box"></div>`;
-
-    const tryLoad = async () => {
-      try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const html = await response.text();
-        placeholder.outerHTML = html;
-      } catch (error) {
-        console.error(`[ComponentLoader] Error loading ${url}:`, error);
-        // 2. 에러 폴백 UI 제공
-        placeholder.innerHTML = `
-          <div class="component-error">
-            <p>구성 요소를 불러오지 못했습니다.</p>
-            <button onclick="ComponentLoader.retry('${placeholderId}', '${url}')">다시 시도</button>
-          </div>
-        `;
-      }
-    };
-
-    await tryLoad();
-  };
-
-  const retry = (id, url) => {
-    loadComponent(id, url);
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const html = await response.text();
+      placeholder.outerHTML = html;
+    } catch (error) {
+      console.error(`[ComponentLoader] Error loading ${url}:`, error);
+    }
   };
 
   const init = async () => {
@@ -42,20 +24,15 @@ const ComponentLoader = (() => {
 
     const timestamp = Date.now();
     const getFinalUrl = (url) => {
-      // 캐시 버스터를 더 유니크하게 (v=[timestamp]-[random])
       const uniqueSuffix = `v=${timestamp}-${Math.floor(Math.random() * 1000)}`;
-      const cacheBusted = url.includes('?') ? `${url}&${uniqueSuffix}` : `${url}?${uniqueSuffix}`;
-      return cacheBusted;
+      return url.includes('?') ? `${url}&${uniqueSuffix}` : `${url}?${uniqueSuffix}`;
     };
 
     const getResourcePath = (path) => {
-      // '/'로 시작하면 절대 경로로 사용
-      if (path.startsWith('/')) return path;
-      // 현재 위치가 /public/varo/ 내부인지 확인하여 경로 조정 (지능형 폴백)
-      const isSubDir = window.location.pathname.includes('/public/varo/');
-      if (!isSubDir && path.startsWith('./includes/')) {
-        return `./public/varo/${path.slice(2)}`;
-      }
+      // 이미 절대 경로이거나 외부 URL이면 그대로 반환
+      if (path.startsWith('http') || path.startsWith('/')) return path;
+      // 현재 페이지 경로가 /public/varo/를 포함하면 상대 경로 그대로 사용
+      // (index.html에서 ./includes/header.html 호출 시)
       return path;
     };
 
@@ -63,14 +40,13 @@ const ComponentLoader = (() => {
     if (footerP) await loadComponent('footer-placeholder', getFinalUrl(getResourcePath(footerP.dataset.path || './includes/footer.html')));
     if (overlayP) await loadComponent('overlay-placeholder', getFinalUrl(getResourcePath(overlayP.dataset.path || './includes/overlays.html')));
 
-    // 로드 완료 이벤트 발생 (main.js 등에서 수신)
+    window.varoComponentsLoaded = true;
     document.dispatchEvent(new CustomEvent('varo:componentsLoaded'));
   };
 
-  return { init, retry };
+  return { init };
 })();
 
-// DOM 콘텐츠 로드 후 시작
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', ComponentLoader.init);
 } else {

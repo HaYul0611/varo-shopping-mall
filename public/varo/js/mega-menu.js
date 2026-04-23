@@ -270,16 +270,7 @@ const MegaMenu = (() => {
       item.addEventListener('mouseleave', () => hidePanel());
     });
 
-    // 커뮤니티 탭도 연결
-    const commItem = document.querySelector('.category-nav__item a[href*="community.html"]');
-    if (commItem) {
-      const li = commItem.closest('.category-nav__item');
-      if (li) {
-        li.classList.add('has-comm');
-        li.addEventListener('mouseenter', () => showPanel('community', li));
-        li.addEventListener('mouseleave', () => hidePanel());
-      }
-    }
+    // 커뮤니티 탭 충돌 방지를 위해 기존 메가메뉴(has-comm) 바인딩을 제거하고 일반 sub-menu 형태로 작동하도록 수정함
 
     // 패널 위에 마우스가 있을 때 닫기 방지
     document.addEventListener('mouseover', (e) => {

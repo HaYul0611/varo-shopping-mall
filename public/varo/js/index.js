@@ -87,7 +87,7 @@ const IndexPage = (() => {
   const buildCard = (product, darkBg = false) => {
     const fmt = n => n.toLocaleString('ko-KR') + '원';
     const disc = (p, s) => Math.round((1 - s / p) * 100);
-    const isWish = typeof App !== 'undefined' ? App.Wishlist.has(product.id) : false;
+    const isWish = window.App?.Wishlist?.has ? window.App.Wishlist.has(product.id) : false;
     const card = document.createElement('article');
     card.className = 'product-card';
 
@@ -138,8 +138,8 @@ const IndexPage = (() => {
     wishBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
     wishBtn.addEventListener('click', e => {
       e.stopPropagation();
-      if (typeof App !== 'undefined') {
-        const active = App.Wishlist.toggle(product.id);
+      if (window.App?.Wishlist?.toggle) {
+        const active = window.App.Wishlist.toggle(product.id);
         wishBtn.classList.toggle('product-card__wish--active', active);
       }
     });

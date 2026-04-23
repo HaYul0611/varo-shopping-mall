@@ -63,14 +63,21 @@
 }
 
 .user-avatar-mini {
-  width: 18px;
-  height: 18px;
-  background: #E8E8E8;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
+  background: #E8E8E8;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.user-avatar-mini img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .header-top__badge {
@@ -82,6 +89,35 @@
   border-radius: 3px;
   text-transform: uppercase;
   margin-left: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-top__badge.is-bronze {
+  background: #A87C6C;
+}
+
+.header-top__badge.is-silver {
+  background: #A0A0A0;
+}
+
+.header-top__badge.is-gold {
+  background: #D4AF37;
+}
+
+.header-top__badge.is-dia {
+  background: #00D1FF;
+  color: #111;
+}
+
+.header-top__badge.is-manager {
+  background: #D1D1FF;
+  color: #111;
+}
+
+.header-top__badge.is-admin {
+  background: #1B2B4B;
 }
 
 .header-top__util a {
@@ -254,10 +290,15 @@
    3. 카테고리 탭 네비게이션 바
 ══════════════════════════════════════════════════════ */
 .category-nav {
+  display: block !important;
+  visibility: visible !important;
   background: #FFFFFF;
   border-bottom: 1px solid #EBEBEB;
   position: relative;
-  z-index: 50;
+  z-index: 150 !important;
+  opacity: 1 !important;
+  height: auto !important;
+  min-height: 50px !important;
 }
 
 .category-nav__list {
@@ -267,7 +308,7 @@
   margin: 0 auto;
   padding: 0 24px;
   overflow: visible !important;
-  
+
   gap: 0;
   list-style: none;
 }
@@ -415,6 +456,15 @@
 /* ══════════════════════════════════════════════════════
    7. 반응형
 ══════════════════════════════════════════════════════ */
+@media (min-width: 1024px) {
+  .category-nav {
+    display: block !important;
+    z-index: 150 !important;
+    background: #fff !important;
+    position: relative;
+  }
+}
+
 @media (max-width: 1023px) {
   .category-nav {
     display: none;
@@ -443,10 +493,8 @@
 }
 
 /* ══════════════════════════════════════════════════════
-  pointer-events: none;
-  z-index: 200;
-}
-
+   9. 메가 패널 오버레이
+══════════════════════════════════════════════════════ */
 .mega-panel-overlay {
   position: fixed;
   top: 0;

@@ -31,7 +31,7 @@ const VARO_CONFIG = {
     { id: 'bronze', label: 'BRONZE', min: 0, max: 99999, discount: 0, points: 1, color: '#A87C6C' },
     { id: 'silver', label: 'SILVER', min: 100000, max: 299999, discount: 5, points: 3, color: '#A0A0A0' },
     { id: 'gold', label: 'GOLD', min: 300000, max: 999999, discount: 10, points: 5, color: '#D4AF37' },
-    { id: 'dia', label: 'DIAMOND', min: 1000000, max: 2999999, discount: 15, points: 7, color: '#00D1FF' },
+    { id: 'dia', label: 'DIA', min: 1000000, max: 2999999, discount: 15, points: 7, color: '#00D1FF' },
     { id: 'manager', label: 'MANAGER', min: 3000000, max: 9999999, discount: 20, points: 10, color: '#D1D1FF' },
     { id: 'admin', label: 'ADMIN', min: 10000000, max: Infinity, discount: 0, points: 0, color: '#1B2B4B' },
   ],

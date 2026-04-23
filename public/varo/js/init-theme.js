@@ -6,7 +6,9 @@
   const themes = {
     applyUserGrade: () => {
       try {
-        const user = JSON.parse(localStorage.getItem('varo_user') || 'null');
+        const raw = localStorage.getItem('varo_user');
+        if (!raw || raw === 'undefined') return;
+        const user = JSON.parse(raw);
         if (user && user.grade) {
           document.documentElement.classList.add('is-' + user.grade.toLowerCase());
         }

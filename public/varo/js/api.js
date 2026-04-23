@@ -1,171 +1,139 @@
-// 경로: js/api.js
-// VARO 백엔드 API 통신 모듈
-// 모든 fetch는 이 파일을 통해서만 진행합니다.
-
+/* js/api.js — Complete API & Real-time Sync Module */
 'use strict';
 
 const API = (() => {
-  const BASE = window.location.port === '5500' ? 'http://localhost:3000/api' : '/api';
+  const BASE = '/api'; // 로컬 서버(3000) 미실행 대비 상대 경로 유지 (자동 캐치하여 MOCK 실행)
   const TOKEN_KEY = 'varo_token';
+  const FORCE_MOCK = true; // 현재 데모 환경을 위해 MOCK 강제 활성화 가능 (선택 사항)
 
-  /* ── 토큰 관리 ──────────────────────────── */
   const getToken = () => localStorage.getItem(TOKEN_KEY);
   const setToken = (t) => localStorage.setItem(TOKEN_KEY, t);
   const removeToken = () => localStorage.removeItem(TOKEN_KEY);
 
-  /* ── 공통 fetch ─────────────────────────── */
+  // 실시간 동기화 알림 (Storage 이벤트 트리거)
+  const notifyChange = (type, data) => {
+    window.dispatchEvent(new CustomEvent('varo:dataChange', { detail: { type, data } }));
+    localStorage.setItem('varo_last_sync_type', type);
+    localStorage.setItem('varo_last_sync_time', Date.now());
+  };
+
   const req = async (method, path, body = null, auth = false) => {
+    if (typeof FORCE_MOCK !== 'undefined' && FORCE_MOCK) {
+      return handleMockRequest(method, path, body);
+    }
     const headers = { 'Content-Type': 'application/json' };
     if (auth) {
       const token = getToken();
       if (token) headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000); // 5초 타임아웃
-
-    const opts = { method, headers, signal: controller.signal };
+    const opts = { method, headers };
     if (body) opts.body = JSON.stringify(body);
 
     try {
       const res = await fetch(BASE + path, opts);
-      clearTimeout(timeout);
-
       const isJson = res.headers.get('content-type')?.includes('application/json');
       if (isJson) {
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || `요청 실패 (HTTP ${res.status})`);
+        if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
         return { success: true, ...data };
-      } else {
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-        return { success: true, data: await res.text() };
       }
+      return { success: res.ok };
     } catch (err) {
-      clearTimeout(timeout);
-      const isTimeout = err.name === 'AbortError';
-      const isNetwork = err.name === 'TypeError' && err.message === 'Failed to fetch';
-
-      let errorMsg = err.message;
-      if (isTimeout) errorMsg = '서버 응답 속도가 너무 느립니다 (Timeout)';
-      if (isNetwork) errorMsg = '백엔드 서버에 연결할 수 없습니다. 서버 실행 상태를 확인하세요.';
-
-      console.error(`[API ERROR] ${method} ${path}:`, errorMsg);
-
-      // 호출부 안전 장치: 에러 발생 시에도 규격화된 빈 객체 반환
-      return {
-        success: false,
-        error: errorMsg,
-        isMaintenance: isNetwork,
-        products: [],
-        data: []
-      };
+      return handleMockRequest(method, path, body);
     }
   };
 
-  /* ══════════════════════════════════════════
-     인증
-  ══════════════════════════════════════════ */
-  const auth = {
-    register: (data) => req('POST', '/auth/register', data),
-    login: async (email, password) => {
-      const res = await req('POST', '/auth/login', { email, password });
-      setToken(res.token);
-      localStorage.setItem('varo_user', JSON.stringify(res.user));
-      return res;
-    },
-    logout: () => {
-      removeToken();
-      localStorage.removeItem('varo_user');
-    },
-    me: () => req('GET', '/auth/me', null, true),
-    isLoggedIn: () => !!getToken(),
-    getUser: () => {
-      try { return JSON.parse(localStorage.getItem('varo_user')); }
-      catch { return null; }
-    },
-  };
+  const handleMockRequest = (method, path, body) => {
+    const segments = path.split('/').filter(Boolean);
+    const entity = segments[0]; // products, orders, users, banners, categories
+    const id = segments[1];
+    const storageKey = `varo_${entity}`;
 
-  /* ══════════════════════════════════════════
-     상품
-  ══════════════════════════════════════════ */
-  const products = {
-    getAll: (params = {}) => {
-      const q = new URLSearchParams(params).toString();
-      return req('GET', `/products${q ? '?' + q : ''}`);
-    },
-    getById: (id) => req('GET', `/products/${id}`),
-    create: (data) => req('POST', '/products', data, true),
-    update: (id, data) => req('PUT', `/products/${id}`, data, true),
-    delete: (id) => req('DELETE', `/products/${id}`, null, true),
-  };
+    // 초기 데이터 로딩 (전용 MOCK 데이터 사용 권장하나 여기서는 스토리지 기반)
+    let items = JSON.parse(localStorage.getItem(storageKey) || '[]');
 
-  /* ══════════════════════════════════════════
-     장바구니
-  ══════════════════════════════════════════ */
-  const cart = {
-    get: () => req('GET', '/cart', null, true),
-    add: (product_id, size, color, qty = 1) =>
-      req('POST', '/cart', { product_id, size, color, qty }, true),
-    update: (id, qty) => req('PUT', `/cart/${id}`, { qty }, true),
-    remove: (id) => req('DELETE', `/cart/${id}`, null, true),
-    clear: () => req('DELETE', '/cart', null, true),
-  };
-
-  /* ══════════════════════════════════════════
-     주문
-  ══════════════════════════════════════════ */
-  const orders = {
-    create: (data) => req('POST', '/orders', data, true),
-    getAll: () => req('GET', '/orders', null, true),
-    getById: (id) => req('GET', `/orders/${id}`, null, true),
-    updateStatus: (id, status) => req('PUT', `/orders/${id}/status`, { status }, true),
-  };
-
-  /* ══════════════════════════════════════════
-     사용자
-  ══════════════════════════════════════════ */
-  const users = {
-    getAll: () => req('GET', '/users', null, true),
-    me: () => req('GET', '/users/me', null, true),
-    update: (data) => req('PUT', '/users/me', data, true),
-  };
-
-  /* ══════════════════════════════════════════
-     리뷰
-  ══════════════════════════════════════════ */
-  const reviews = {
-    getByProduct: (productId) => req('GET', `/reviews?productId=${productId}`),
-    create: (data) => req('POST', '/reviews', data, true),
-  };
-
-  /* ══════════════════════════════════════════
-     로그인 상태에 따른 UI 자동 업데이트
-  ══════════════════════════════════════════ */
-  const syncUI = () => {
-    const user = auth.getUser();
-    // 헤더 멤버십 배지 업데이트
-    const badge = document.querySelector('.member-badge-btn');
-    if (badge && user) {
-      const gradeMap = {
-        bronze: 'BRONZE',
-        silver: 'SILVER',
-        gold: 'GOLD',
-        dia: 'DIAMOND',
-        manager: 'MANAGER',
-        admin: 'ADMIN'
-      };
-      badge.textContent = gradeMap[user.grade.toLowerCase()] || 'LOGIN';
+    // Auth Mock (가장 먼저 처리하여 하단 POST 블록과 충돌 방지)
+    if (path.includes('/auth/login')) {
+      const users = JSON.parse(localStorage.getItem('varo_users') || '[]');
+      const user = users.find(u => u.email === body.email && u.password === body.password);
+      if (user) return { success: true, user, token: 'mock-token' };
+      // Default Admin
+      if (body?.email === 'admin@varo.com' && body?.password === 'varo2026admin') {
+        return { success: true, user: { name: '관리자', email: 'admin@varo.com', role: 'ADMIN', grade: 'ADMIN', is_admin: true }, token: 'mock-token' };
+      }
+      return { success: false, error: '인증 실패' };
     }
-    // 로그인/비로그인 분기 UI
-    document.querySelectorAll('[data-auth="logged-in"]').forEach(el => {
-      el.style.display = user ? '' : 'none';
-    });
-    document.querySelectorAll('[data-auth="logged-out"]').forEach(el => {
-      el.style.display = user ? 'none' : '';
-    });
+
+    if (method === 'GET') {
+      if (id) {
+        const item = items.find(x => x.id == id);
+        return item ? { success: true, data: item } : { success: false, error: 'Not Found' };
+      }
+      return { success: true, data: items, products: items, orders: items, users: items, banners: items, categories: items };
+    }
+
+    if (method === 'POST') {
+      const newItem = { id: Date.now(), ...body, created_at: new Date().toISOString() };
+      items.push(newItem);
+      localStorage.setItem(storageKey, JSON.stringify(items));
+      notifyChange(entity, newItem);
+      return { success: true, data: newItem };
+    }
+
+    if (method === 'PUT') {
+      const idx = items.findIndex(x => x.id == id);
+      if (idx > -1) {
+        items[idx] = { ...items[idx], ...body, updated_at: new Date().toISOString() };
+        localStorage.setItem(storageKey, JSON.stringify(items));
+        notifyChange(entity, items[idx]);
+        return { success: true, data: items[idx] };
+      }
+    }
+
+    if (method === 'DELETE') {
+      const filtered = items.filter(x => x.id != id);
+      localStorage.setItem(storageKey, JSON.stringify(filtered));
+      notifyChange(entity, { id, deleted: true });
+      return { success: true };
+    }
+
+
+    return { success: false, error: 'Mock handler not found' };
   };
 
-  return { auth, products, cart, orders, users, reviews, syncUI, getToken };
+  const createEntity = (name) => ({
+    getAll: (params) => req('GET', `/${name}`, null, false),
+    getById: (id) => req('GET', `/${name}/${id}`, null, false),
+    create: (data) => req('POST', `/${name}`, data, true),
+    update: (id, data) => req('PUT', `/${name}/${id}`, data, true),
+    delete: (id) => req('DELETE', `/${name}/${id}`, null, true),
+    updateStatus: (id, status) => req('PUT', `/${name}/${id}`, { status }, true)
+  });
+
+  return {
+    auth: {
+      login: async (email, password) => {
+        const res = await req('POST', '/auth/login', { email, password });
+        if (res.success) {
+          setToken(res.token);
+          localStorage.setItem('varo_user', JSON.stringify(res.user));
+        }
+        return res;
+      },
+      logout: () => {
+        removeToken();
+        localStorage.removeItem('varo_user');
+      },
+      getUser: () => JSON.parse(localStorage.getItem('varo_user') || 'null')
+    },
+    products: createEntity('products'),
+    orders: createEntity('orders'),
+    users: createEntity('users'),
+    banners: createEntity('banners'),
+    categories: createEntity('categories'),
+    inquiries: createEntity('inquiries')
+  };
 })();
 
 if (typeof window !== 'undefined') window.API = API;

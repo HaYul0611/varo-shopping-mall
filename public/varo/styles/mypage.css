@@ -53,11 +53,40 @@
 
 .user-info .user-grade {
   display: inline-block;
+  background: #1C1A16;
+  color: #FFF;
+  text-transform: uppercase;
   font-size: 9px;
   font-weight: 800;
   margin-top: 6px;
   padding: 3px 8px;
-  border-radius: 4px;
+  border-radius: 3px;
+}
+
+.user-info .user-grade.is-bronze {
+  background: #A87C6C;
+}
+
+.user-info .user-grade.is-silver {
+  background: #A0A0A0;
+}
+
+.user-info .user-grade.is-gold {
+  background: #D4AF37;
+}
+
+.user-info .user-grade.is-dia {
+  background: #00D1FF;
+  color: #111;
+}
+
+.user-info .user-grade.is-manager {
+  background: #D1D1FF;
+  color: #111;
+}
+
+.user-info .user-grade.is-admin {
+  background: #1B2B4B;
 }
 
 .mypage-nav__list {

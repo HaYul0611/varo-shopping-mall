@@ -139,8 +139,12 @@
 .comm-board__head--flex {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
+  align-items: flex-end;
+  /* 제목 하단 정렬에 맞춰 버튼 배치 */
+  gap: 20px;
+  border-bottom: 2px solid #1C1A16;
+  /* 제목 섹션 구분감 강화 */
+  padding-bottom: 15px;
 }
 
 .comm-board__title {
@@ -295,12 +299,13 @@
 
 /* ── Q&A ──────────────────────────────────────────── */
 .qna-list {
-  border-top: 2px solid #1C1A16;
+  /* 상단 보더는 head에서 처리했으므로 제거하거나 유지 */
 }
 
 .qna-item {
   border-bottom: 1px solid #F0F0F0;
-  padding: 16px 0;
+  padding: 24px 10px;
+  /* 좌우 여백 추가하여 덜 답답하게 조정 */
 }
 
 .qna-q-row,
@@ -644,19 +649,29 @@
   transform: translateY(-3px);
 }
 
-.tier-card--gold {
-  border-color: #BFA14A;
-  box-shadow: 0 2px 12px rgba(191, 161, 74, .15);
+.tier-card--bronze {
+  border-color: #A87C6C;
 }
 
-.tier-card--vip {
-  border-color: #D96B3C;
-  background: #FEF0E8;
+.tier-card--silver {
+  border-color: #A0A0A0;
+}
+
+.tier-card--gold {
+  border-color: #D4AF37;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, .15);
+}
+
+.tier-card--dia {
+  border-color: #00D1FF;
+  background: #F0F8FF;
 }
 
 .tier-card__icon {
-  font-size: 28px;
-  margin-bottom: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
 .tier-card__name {
@@ -666,16 +681,20 @@
   margin-bottom: 4px;
 }
 
+.tier-card--bronze .tier-card__name {
+  color: #A87C6C;
+}
+
 .tier-card--silver .tier-card__name {
-  color: #8A9AAA;
+  color: #A0A0A0;
 }
 
 .tier-card--gold .tier-card__name {
-  color: #BFA14A;
+  color: #D4AF37;
 }
 
-.tier-card--vip .tier-card__name {
-  color: #D96B3C;
+.tier-card--dia .tier-card__name {
+  color: #00D1FF;
 }
 
 .tier-card__cond {
@@ -784,3 +803,133 @@
   color: #888;
   font-weight: 500;
 }
+
+/* ── Q&A 인라인 작성 폼 ──────────────────────────── */
+.qna-write-wrap {
+  margin-bottom: 30px;
+  animation: commPanelFadeIn 0.3s forwards ease-out;
+}
+
+.qna-write-box {
+  background: #FAFAFA;
+  border: 1px solid #E8E8E8;
+  padding: 20px;
+  border-radius: 4px;
+}
+
+.qna-write-box .form-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #DDD;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+}
+
+.qna-write-box .form-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #DDD;
+  border-radius: 4px;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 120px;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.qna-write-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.qna-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #666;
+  cursor: pointer;
+}
+
+.qna-write-btns {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── 리댓글(댓글) 시스템 ──────────────────────────── */
+.qna-replies {
+  margin-top: 15px;
+  padding-left: 38px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.qna-reply-item {
+  position: relative;
+  background: #F9F9F9;
+  padding: 12px 16px;
+  border-radius: 4px;
+}
+
+.qna-reply-item::before {
+  content: '⌞';
+  position: absolute;
+  left: -20px;
+  top: 5px;
+  font-size: 18px;
+  color: #CCC;
+}
+
+.qna-reply-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.qna-reply-user {
+  font-size: 12px;
+  font-weight: 700;
+  color: #555;
+}
+
+.qna-reply-date {
+  font-size: 11px;
+  color: #AAA;
+}
+
+.qna-reply-body {
+  font-size: 13px;
+  color: #444;
+  line-height: 1.6;
+}
+
+/* 댓글 작성 영역 */
+.qna-reply-write {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.qna-reply-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #DDD;
+  border-radius: 4px;
+  font-size: 12.5px;
+}
+
+.btn--reply-submit {
+  padding: 0 16px;
+  background: #1C1A16;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* 관리자 모드 버튼 제거됨 */

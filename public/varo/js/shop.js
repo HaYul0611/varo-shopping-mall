@@ -157,7 +157,7 @@
           e.stopPropagation();
           e.preventDefault();
           const id = btn.dataset.id;
-          const isActive = window.App?.Wishlist?.toggle(id);
+          const isActive = window.App?.Wishlist?.toggle?.(id) ?? false;
           btn.classList.toggle('product-card__wish--active', !!isActive);
         });
       });
@@ -193,7 +193,7 @@
               </div>
             </div>
 
-            <button class="product-card__wish ${window.App?.Wishlist?.has(id) ? 'product-card__wish--active' : ''}" data-id="${id}">
+            <button class="product-card__wish ${window.App?.Wishlist?.has?.(id) ? 'product-card__wish--active' : ''}" data-id="${id}">
               ${Utils ? Utils.icon('heart') : '♡'}
             </button>
           </div>
