@@ -109,9 +109,40 @@ function showPage(id, tabEl) {
   if (tabEl) tabEl.classList.add('active');
 }
 
-function toggleAllCheck(master, cls) {
-  document.querySelectorAll('.' + cls).forEach(cb => cb.checked = master.checked);
+function previewImage(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const preview = document.getElementById('pImgPreview');
+      preview.innerHTML = `<img src="${e.target.result}" class="preview-img">`;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
 }
+
+// ════════════════════════════════════════════════════════
+// DATA SYNC (MySQL Logic Integrator)
+// ════════════════════════════════════════════════════════
+let API_PRODUCTS = [];
+
+async function syncAllData() {
+  try {
+    const res = await API.products.getAll();
+    if (res.success) {
+      API_PRODUCTS = res.products || res.data || [];
+      renderProducts();
+      renderAnalytics(); // 동적으로 통계 업데이트
+    }
+  } catch (e) {
+    console.error('API Sync Failed:', e);
+  }
+}
+
+// 실시간 동기화 리스너
+window.addEventListener('varo:dataChange', (e) => {
+  console.log('Real-time Data Change Detected:', e.detail);
+  syncAllData();
+});
 
 // ════════════════════════════════════════════════════════
 // DASHBOARD RENDER
@@ -181,16 +212,30 @@ function renderActivity() {
 // ════════════════════════════════════════════════════════
 let productFilter = '';
 function renderProducts(list) {
-  list = list || DATA.products;
-  document.getElementById('productCount').textContent = fmt(list.length);
+  // 하이브리드 병합: 더미 데이터 + API 데이터
+  const allList = [...(API_PRODUCTS.map(p => ({
+    id: p.id,
+    name: p.name,
+    sku: p.product_code || 'API-PROD',
+    category: p.categoryId || '기타',
+    price: p.price,
+    origPrice: p.price, // API에는 정가가 따로 없을 수 있음
+    stock: p.stock || 0,
+    sold: p.rating || 0, // rating을 시연용 sold로 활용
+    status: p.isActive ? '판매중' : '숨김',
+    img: p.mainImg || './assets/products/default.jpg'
+  }))), ...DATA.products];
+
+  const targetList = list || allList;
+  document.getElementById('productCount').textContent = fmt(targetList.length);
   const tbody = document.getElementById('productTable');
-  tbody.innerHTML = list.map(p => `
+  tbody.innerHTML = targetList.map(p => `
     <tr>
       <td><input type="checkbox" class="prod-check"></td>
       <td>
         <div style="display:flex;align-items:center;gap:12px;">
           <div class="product-thumb">
-            <img src="${p.img}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;">
+            <img src="${p.img.startsWith('http') ? p.img : (p.img.startsWith('./') ? '/varo/' + p.img.substring(2) : p.img)}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;">
           </div>
           <div style="font-weight:600">${p.name}</div>
         </div>
@@ -226,22 +271,55 @@ function filterByCategory(cat) {
   renderProducts(filtered);
 }
 
-function saveProduct() {
+async function saveProduct() {
   const name = document.getElementById('pName').value;
   if (!name) { showToast('상품명을 입력하세요.', 'error'); return; }
-  const price = parseInt(document.getElementById('pPrice').value) || 0;
-  const origPrice = parseInt(document.getElementById('pOrigPrice').value) || price;
-  const stock = parseInt(document.getElementById('pStock').value) || 0;
-  const category = document.getElementById('pCategory').value || '기타';
-  const status = document.getElementById('pStatus').value;
-  const sku = document.getElementById('pSku').value || `VR-NEW-${String(DATA.products.length + 1).padStart(3, '0')}`;
-  const defaultImg = 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=800&fit=crop&q=85';
-  DATA.products.unshift({ id: Date.now(), name, sku, category, price, origPrice, stock, sold: 0, status, img: defaultImg });
-  renderProducts();
-  closeModal('modal-add-product');
-  showToast(`"${name}" 상품이 등록되었습니다.`, 'success');
-  // clear form
-  ['pName', 'pSku', 'pOrigPrice', 'pPrice', 'pStock', 'pDesc', 'pTags'].forEach(id => document.getElementById(id).value = '');
+  const price = document.getElementById('pPrice').value || 0;
+  const stock = document.getElementById('pStock').value || 0;
+  const categoryId = document.getElementById('pCategory').value || '기타';
+  const description = document.getElementById('pDesc').value;
+  const fileInput = document.getElementById('pMainImgFile');
+
+  // FormData 생성 (파일 전송)
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('price', price);
+  formData.append('stock', stock);
+  formData.append('category_id', categoryId);
+  formData.append('description', description);
+  if (fileInput.files[0]) {
+    formData.append('main_img', fileInput.files[0]);
+  } else {
+    // 파일이 없으면 더미 URL 시뮬레이션
+    formData.append('main_img', 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=800&fit=crop&q=85');
+  }
+
+  showToast('저장 중...', 'info');
+
+  try {
+    // API.products.create는 내부적으로 fetch(POST)를 호출함
+    // FormData 전송을 위해 전역 fetch 또는 API 객체 수정 필요 (여기서는 직접 fetch 호출 시뮬레이션)
+    const token = localStorage.getItem('varo_token');
+    const res = await fetch('/api/products', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      showToast(`"${name}" 상품이 실시간 등록되었습니다.`, 'success');
+      closeModal('modal-add-product');
+      syncAllData(); // 목록 새로고침
+      // 필드 초기화
+      ['pName', 'pSku', 'pOrigPrice', 'pPrice', 'pStock', 'pDesc', 'pTags'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('pImgPreview').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg><span>클릭하여 이미지 업로드</span>`;
+    } else {
+      throw new Error(data.error);
+    }
+  } catch (err) {
+    showToast('등록 실패: ' + err.message, 'error');
+  }
 }
 
 function editProduct(id) {
@@ -626,14 +704,18 @@ function renderSettings() {
 // ════════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════════
-renderSalesChart();
-renderCategoryStats();
-renderDashboardOrders();
-renderActivity();
-renderProducts();
-renderOrders();
-renderMembers();
-renderCoupons();
-renderReviews();
-renderAnalytics();
-renderSettings();
+async function init() {
+  renderSalesChart();
+  renderCategoryStats();
+  renderDashboardOrders();
+  renderActivity();
+  await syncAllData(); // 초기 데이터 동기화
+  renderOrders();
+  renderMembers();
+  renderCoupons();
+  renderReviews();
+  renderAnalytics();
+  renderSettings();
+}
+
+init();

@@ -1,74 +1,47 @@
 # VARO — 남성 패션 커뮤니티 쇼핑몰
 
-> 남친룩·커플룩·캐주얼룩·하객룩 전문 | 20~30대 한국 남성
+> 20 ~ 30대 트렌드 세터를 위한 세련된 남성 패션 커뮤니티 쇼핑몰
 
-## 기술 스택
+---
 
-| 구분 | 기술 |
-|------|------|
-| 프론트엔드 | HTML5 · CSS3 · Vanilla JS (ES6+) |
-| 백엔드 | Node.js · Express.js |
-| 데이터베이스 | SQLite (better-sqlite3) |
-| 인증 | JWT (jsonwebtoken) + bcryptjs |
+## 🏛 프로젝트 개요
+**VARO**는 단순한 쇼핑몰을 넘어, 인스타그램 스타일의 커뮤니티 피드와 프리미엄 셀렉트 샵이 결합된 하이엔드 이커머스 플랫폼입니다. 20~30대 남성들의 세련된 스타일 제안과 소통을 기술적으로 뒷받침합니다.
 
-## 로컬 실행
+## 🛠 기술 스택
+- **Back-end**: Node.js, Express.js
+- **Database**: **MySQL (InnoDB)** - 대용량 트랜잭션 및 정황성 보장
+- **Authentication**: JWT (Stateless), BCrypt (암호화)
+- **Front-end**: Vanilla JS, CSS3 (Variables), HTML5 (Semantic)
+- **Security**: Prepared Statements, SQL Injection 방지, JWT 인증 미들웨어
 
+## 🚀 로컬 실행 방법
 ```bash
 # 1. 의존성 설치
 npm install
 
-# 2. 초기 데이터 삽입 (최초 1회)
-npm run seed
+# 2. .env 설정 (DB_PASSWORD 필수)
+# DB_HOST=localhost
+# DB_USER=root
+# DB_PASSWORD=1234
+# DB_NAME=varo
 
-# 3. 서버 시작
+# 3. 데이터베이스 스키마 및 초기 데이터 삽입
+node db/seed.js
+
+# 4. 서버 기동
 npm start
 
-# 접속: http://localhost:3000/varo/
+# 접속 URL: http://localhost:3000/varo/
 ```
 
-## 테스트 계정
+## 💎 핵심 멤버십 체계 (6단계)
+- **고객 등급**: `bronze` (기본), `silver`, `gold`, `dia` (VIP)
+- **운영진 권한**: `매니저`, `관리자`
 
-| 역할 | 이메일 | 비밀번호 |
-|------|--------|---------|
-| 일반 사용자 (GOLD) | demo@varo.com | varo2026 |
-| 관리자 | admin@varo.com | varo2026admin |
+## 📦 주요 기능
+- **통합 체크아웃**: 회원 및 비회원(비밀번호 보호) 주문 프로세스 지원.
+- **커뮤니티 피드**: 스타일링 리뷰 및 소셜 상호작용.
+- **자동 데이터 정리**: 24시간 주기로 만료된 비회원 장바구니 데이터를 정리하는 스케줄러 탑재.
 
-## 주요 기능
-
-### 사용자
-- 회원가입 / 로그인 (JWT 인증)
-- 상품 탐색 (카테고리 · 스타일테마 · 정렬 필터)
-- 장바구니 담기 → 주문 → 완료
-- 마이페이지 (멤버십 등급 · 주문내역)
-- 커뮤니티 (공지·FAQ·Q&A·리뷰·이벤트·멤버십)
-
-### 관리자 (`/varo/admin.html`)
-- 대시보드 (통계)
-- 상품 CRUD (등록·수정·삭제)
-- 주문 상태 관리
-- 회원 목록
-
-## 멤버십 등급
-
-| 등급 | 누적 구매 | 할인 | 포인트 |
-|------|-----------|------|--------|
-| BASIC | 0원~ | 0% | 1% |
-| SILVER | 10만원~ | 5% | 3% |
-| GOLD | 30만원~ | 10% | 5% |
-| VARO VIP | 100만원~ | 15% | 7% |
-
-## API 엔드포인트
-
-```
-POST /api/auth/register   — 회원가입
-POST /api/auth/login      — 로그인
-GET  /api/products        — 상품 목록 (쿼리: category, filter, style, sort)
-POST /api/products        — 상품 등록 (관리자)
-PUT  /api/products/:id    — 상품 수정 (관리자)
-DELETE /api/products/:id  — 상품 삭제 (관리자)
-GET  /api/cart            — 장바구니 조회
-POST /api/cart            — 장바구니 추가
-POST /api/orders          — 주문 생성
-GET  /api/orders          — 주문 목록
-PUT  /api/orders/:id/status — 주문 상태 변경 (관리자)
-```
+---
+© 2026 VARO Project. Sophisticated & Professional.

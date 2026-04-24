@@ -19,7 +19,7 @@
 'use strict';
 
 import GuestManager from './guestManager.js';
-import CartManager  from './cartManager.js';
+import CartManager from './cartManager.js';
 
 // ── 전역 상태 ────────────────────────────────────────────────────
 let previewData = null;
@@ -61,15 +61,15 @@ const init = async () => {
 // ── 회원 정보 로드 ───────────────────────────────────────────────
 const fetchUserInfo = async () => {
   try {
-    const res  = await GuestManager.apiFetch('/api/auth/me');
+    const res = await GuestManager.apiFetch('/api/auth/me');
     const json = await res.json();
     if (json.success) {
       const u = json.data;
-      $('#shipping-name').value  = u.name  || '';
+      $('#shipping-name').value = u.name || '';
       $('#shipping-phone').value = u.phone || '';
-      $('#membership-badge').textContent  = u.membership || 'BASIC';
-      $('#available-points').textContent  = fmt(u.points || 0);
-      $('#max-points').textContent        = fmt(Math.floor((previewData?.afterDiscount || 0) * 0.5));
+      $('#membership-badge').textContent = u.membership || 'BASIC';
+      $('#available-points').textContent = fmt(u.points || 0);
+      $('#max-points').textContent = fmt(Math.floor((previewData?.afterDiscount || 0) * 0.5));
     }
   } catch (err) {
     console.warn('[Checkout] 회원 정보 로드 실패:', err);
@@ -118,7 +118,7 @@ const renderOrderItems = (items) => {
       <div class="checkout-item__info">
         <p class="checkout-item__name">${item.product_name}</p>
         <p class="checkout-item__options">
-          ${item.size  ? `<span>사이즈: ${item.size}</span>` : ''}
+          ${item.size ? `<span>사이즈: ${item.size}</span>` : ''}
           ${item.color ? `<span>색상: ${item.color}</span>` : ''}
         </p>
         <p class="checkout-item__qty">수량: ${item.quantity}개</p>
@@ -134,11 +134,11 @@ const renderOrderItems = (items) => {
 const renderSummary = (data) => {
   const set = (id, val) => { const el = $(id); if (el) el.textContent = val; };
 
-  set('#summary-total',    `${fmt(data.totalAmount)}원`);
+  set('#summary-total', `${fmt(data.totalAmount)}원`);
   set('#summary-discount', data.discountAmount > 0 ? `-${fmt(data.discountAmount)}원` : '0원');
   set('#summary-shipping', data.shippingFee === 0 ? '무료' : `${fmt(data.shippingFee)}원`);
-  set('#summary-points',   data.pointsUsed > 0 ? `-${fmt(data.pointsUsed)}원` : '0원');
-  set('#summary-final',    `${fmt(data.finalAmount)}원`);
+  set('#summary-points', data.pointsUsed > 0 ? `-${fmt(data.pointsUsed)}원` : '0원');
+  set('#summary-final', `${fmt(data.finalAmount)}원`);
 
   if (data.discountRate > 0) {
     const badge = $('#discount-badge');
@@ -192,7 +192,7 @@ const bindEvents = () => {
     if (e.target.checked) {
       const isGuest = !GuestManager.isLoggedIn();
       if (isGuest) {
-        $('#shipping-name').value  = $('#guest-name-input').value;
+        $('#shipping-name').value = $('#guest-name-input').value;
         $('#shipping-phone').value = $('#guest-phone-input').value;
       } else {
         // 회원 정보는 이미 채워져 있음
@@ -225,7 +225,7 @@ const validateForm = () => {
   const isGuest = !GuestManager.isLoggedIn();
 
   if (isGuest) {
-    if (!$('#guest-name-input')?.value.trim())  errors.push('주문자 이름을 입력해주세요');
+    if (!$('#guest-name-input')?.value.trim()) errors.push('주문자 이름을 입력해주세요');
     if (!$('#guest-phone-input')?.value.trim()) errors.push('주문자 전화번호를 입력해주세요');
     const email = $('#guest-email-input')?.value.trim();
     if (!email) {
@@ -233,10 +233,15 @@ const validateForm = () => {
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       errors.push('이메일 형식이 올바르지 않습니다');
     }
+    if (!$('#guest-password-input')?.value.trim()) {
+      errors.push('비회원 주문 비밀번호를 설정해주세요');
+    } else if ($('#guest-password-input').value.length < 4) {
+      errors.push('비회원 주문 비밀번호는 4자 이상이어야 합니다');
+    }
   }
 
-  if (!$('#shipping-name')?.value.trim())    errors.push('받는 분 이름을 입력해주세요');
-  if (!$('#shipping-phone')?.value.trim())   errors.push('받는 분 전화번호를 입력해주세요');
+  if (!$('#shipping-name')?.value.trim()) errors.push('받는 분 이름을 입력해주세요');
+  if (!$('#shipping-phone')?.value.trim()) errors.push('받는 분 전화번호를 입력해주세요');
   if (!$('#shipping-zipcode')?.value.trim()) errors.push('배송지 주소를 검색해주세요');
 
   const paymentMethod = $('[name="payment-method"]:checked')?.value;
@@ -261,21 +266,21 @@ const handleSubmit = async () => {
   setSubmitLoading(true);
 
   const rawItems = JSON.parse(sessionStorage.getItem('varo_checkout_items') || '[]');
-  const isGuest  = !GuestManager.isLoggedIn();
+  const isGuest = !GuestManager.isLoggedIn();
 
   const payload = {
     items: rawItems.map(i => ({
       product_id: i.product_id,
-      quantity:   i.quantity,
-      size:       i.size,
-      color:      i.color,
+      quantity: i.quantity,
+      size: i.size,
+      color: i.color,
     })),
     shipping: {
-      name:    $('#shipping-name').value.trim(),
-      phone:   $('#shipping-phone').value.trim(),
+      name: $('#shipping-name').value.trim(),
+      phone: $('#shipping-phone').value.trim(),
       zipcode: $('#shipping-zipcode').value.trim(),
       address: $('#shipping-address').value.trim(),
-      detail:  $('#shipping-detail').value.trim(),
+      detail: $('#shipping-detail').value.trim(),
       request: $('#delivery-request').value.trim(),
     },
     payment: {
@@ -285,13 +290,14 @@ const handleSubmit = async () => {
   };
 
   if (isGuest) {
-    payload.guest_name  = $('#guest-name-input').value.trim();
+    payload.guest_name = $('#guest-name-input').value.trim();
     payload.guest_email = $('#guest-email-input').value.trim().toLowerCase();
     payload.guest_phone = $('#guest-phone-input').value.trim();
+    payload.guest_password = $('#guest-password-input').value.trim();
   }
 
   try {
-    const res  = await GuestManager.apiFetch('/api/checkout', {
+    const res = await GuestManager.apiFetch('/api/checkout', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
@@ -339,9 +345,9 @@ const showError = (msg) => {
 };
 
 const showOrderComplete = (data, guestEmail = null) => {
-  const mainEl     = $('#checkout-main');
+  const mainEl = $('#checkout-main');
   const completeEl = $('#checkout-complete');
-  if (mainEl)     mainEl.style.display     = 'none';
+  if (mainEl) mainEl.style.display = 'none';
   if (completeEl) completeEl.style.display = 'block';
 
   const setEl = (id, val) => { const el = $(id); if (el) el.textContent = val; };

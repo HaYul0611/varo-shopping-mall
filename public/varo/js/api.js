@@ -2,9 +2,9 @@
 'use strict';
 
 const API = (() => {
-  const BASE = '/api'; // 로컬 서버(3000) 미실행 대비 상대 경로 유지 (자동 캐치하여 MOCK 실행)
+  const BASE = '/api';
   const TOKEN_KEY = 'varo_token';
-  const FORCE_MOCK = true; // 현재 데모 환경을 위해 MOCK 강제 활성화 가능 (선택 사항)
+  const FORCE_MOCK = false; // 실제 MySQL 서버 연동을 위해 false로 변경
 
   const getToken = () => localStorage.getItem(TOKEN_KEY);
   const setToken = (t) => localStorage.setItem(TOKEN_KEY, t);

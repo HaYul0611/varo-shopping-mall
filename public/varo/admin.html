@@ -766,6 +766,21 @@
             placeholder="상품 설명을 입력하세요"></textarea></div>
         <div class="form-group"><label class="form-label">태그 (쉼표 구분)</label><input class="form-control" id="pTags"
             placeholder="예: 봄신상, 베스트, 할인"></div>
+        <div class="form-group">
+          <label class="form-label">상품 이미지 (대표) *</label>
+          <div class="upload-zone" onclick="document.getElementById('pMainImgFile').click()">
+            <input type="file" id="pMainImgFile" style="display:none" accept="image/*" onchange="previewImage(this)">
+            <div id="pImgPreview" class="preview-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
+              </svg>
+              <span>클릭하여 이미지 업로드</span>
+            </div>
+          </div>
+          <input type="hidden" id="pMainImgUrl"> <!-- 기존 하이브리드/URL 지원용 -->
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeModal('modal-add-product')">취소</button>
@@ -859,7 +874,10 @@
         </div>
         <div class="form-group"><label class="form-label">발급 대상</label><select class="form-control" id="cTarget">
             <option>전체 회원</option>
-            <option>VIP 회원</option>
+            <option>DIA 회원</option>
+            <option>GOLD 회원</option>
+            <option>SILVER 회원</option>
+            <option>BRONZE 회원</option>
             <option>신규 회원</option>
             <option>선택 회원</option>
           </select></div>
@@ -893,6 +911,7 @@
   <!-- TOAST CONTAINER -->
   <div class="toast-container" id="toastContainer"></div>
 
+  <script src="./js/api.js"></script>
   <script src="./js/admin.js"></script>
 </body>
 

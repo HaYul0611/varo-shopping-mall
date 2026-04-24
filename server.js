@@ -53,31 +53,45 @@ app.use((err, req, res, next) => {
 
 /* ── 만료 데이터 정리 로직 (비회원 장바구니/위시리스트) ── */
 const db = require('./db/database');
-const purgeExpiredGuestData = () => {
+
+const purgeExpiredGuestData = async () => {
   try {
-    const now = "datetime('now', 'localtime')";
-    db.exec(`DELETE FROM guest_carts      WHERE expires_at < ${now}`);
-    db.exec(`DELETE FROM guest_wishlists  WHERE expires_at < ${now}`);
+    const now = "CURRENT_TIMESTAMP";
+    await db.execute(`DELETE FROM guest_carts      WHERE expires_at < ${now}`);
+    await db.execute(`DELETE FROM guest_wishlists  WHERE expires_at < ${now}`);
     console.info(`[Purge] 만료 비회원 데이터 정리 완료 - ${new Date().toLocaleString()}`);
   } catch (err) {
     console.error('[Purge] 정리 실패:', err.message);
   }
 };
-// 서버 시작 시 1회 + 24시간마다 실행
-purgeExpiredGuestData();
-setInterval(purgeExpiredGuestData, 24 * 60 * 60 * 1000);
 
-/* ── 서버 시작 ───────────────────────────── */
-app.listen(PORT, () => {
-  console.log('');
-  console.log('  ██╗   ██╗ █████╗ ██████╗  ██████╗');
-  console.log('  ██║   ██║██╔══██╗██╔══██╗██╔═══██╗');
-  console.log('  ██║   ██║███████║██████╔╝██║   ██║');
-  console.log('  ╚██╗ ██╔╝██╔══██║██╔══██╗██║   ██║');
-  console.log('   ╚████╔╝ ██║  ██║██║  ██║╚██████╔╝');
-  console.log('    ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝');
-  console.log('');
-  console.log(`  🛍  VARO 서버 실행 중: http://localhost:${PORT}/varo/`);
-  console.log(`  📦  API 기본 URL: http://localhost:${PORT}/api`);
-  console.log('');
-});
+/* ── 서버 시작 (DB 초기화 후 리스닝) ───────────────────────────── */
+const startServer = async () => {
+  try {
+    console.log('[Server] MySQL 초기화 중...');
+    await db.initDB();
+
+    // 서버 시작 시 1회 + 24시간마다 실행
+    await purgeExpiredGuestData();
+    setInterval(purgeExpiredGuestData, 24 * 60 * 60 * 1000);
+
+    app.listen(PORT, () => {
+      console.log('');
+      console.log('  ██╗   ██╗ █████╗ ██████╗  ██████╗');
+      console.log('  ██║   ██║██╔══██╗██╔══██╗██╔═══██╗');
+      console.log('  ██║   ██║███████║██████╔╝██║   ██║');
+      console.log('  ╚██╗ ██╔╝██╔══██║██╔══██╗██║   ██║');
+      console.log('   ╚████╔╝ ██║  ██║██║  ██║╚██████╔╝');
+      console.log('    ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝');
+      console.log('');
+      console.log(`  [Server] VARO 서버 실행 중: http://localhost:${PORT}/varo/`);
+      console.log(`  [API]    API 기본 URL: http://localhost:${PORT}/api`);
+      console.log('');
+    });
+  } catch (err) {
+    console.error('[Server] 시작 실패:', err.message);
+    process.exit(1);
+  }
+};
+
+startServer();

@@ -1,22 +1,28 @@
 const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
+const db = require('../db/database');
 
 const SECRET = process.env.JWT_SECRET || 'varo2026_secret';
 
 // 필수 인증
-const requireAuth = (req, res, next) => {
+const requireAuth = async (req, res, next) => {
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: '인증 토큰이 없습니다.' });
-  }
+  const token = authHeader && authHeader.split(' ')[1];
 
-  const token = authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ success: false, message: '로그인이 필요한 서비스입니다.' });
+
   try {
-    const decoded = jwt.verify(token, SECRET);
-    req.user = decoded;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'varo_secret_key_2024');
+    const user = await db.execute('SELECT id, email, name, is_admin FROM users WHERE id = ?', [decoded.id]);
+
+    if (!user || user.length === 0) {
+      return res.status(401).json({ success: false, message: '유효하지 않은 계정입니다.' });
+    }
+
+    req.user = user[0];
     next();
   } catch (err) {
-    console.error('[Auth Middleware] 토큰 검증 실패:', err.message);
-    return res.status(401).json({ error: '유효하지 않은 토큰입니다.' });
+    return res.status(403).json({ success: false, message: '토큰이 만료되었거나 유효하지 않습니다.' });
   }
 };
 

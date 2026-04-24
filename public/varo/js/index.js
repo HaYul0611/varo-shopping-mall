@@ -234,17 +234,64 @@ const IndexPage = (() => {
     return card;
   };
 
-  /* ── 룩플 전용 렌더링 함수들 ───────────────────────── */
+  let LIVE_PRODUCTS = [];
 
-  // 1:8 비대칭 렌더링 (Weekly Best)
+  // 데이터 동기화 엔진
+  const syncLiveData = async () => {
+    try {
+      const res = await window.API.products.getAll();
+      if (res.success) {
+        LIVE_PRODUCTS = res.products || res.data || [];
+        renderAll();
+      }
+    } catch (e) {
+      console.warn('Live sync failed, using static data.');
+    }
+  };
+
+  // 실시간 변경 감지 리스너
+  window.addEventListener('varo:dataChange', (e) => {
+    console.log('Main Page Sync Triggered:', e.detail.type);
+    syncLiveData();
+  });
+
+  const getProducts = () => {
+    const staticProducts = window.VARO_DATA?.PRODUCTS || [];
+    // 하이브리드 병합
+    const merged = [...(LIVE_PRODUCTS.map(p => ({
+      id: p.id,
+      name: p.name,
+      mainImg: p.mainImg?.startsWith('.') ? p.mainImg.replace('./', '/varo/') : p.mainImg,
+      subImg: p.subImg?.startsWith('.') ? p.subImg.replace('./', '/varo/') : p.subImg,
+      price: p.price,
+      salePrice: p.salePrice,
+      badge: p.badge,
+      categoryId: p.categoryId,
+      isNew: p.badge === 'new',
+      description: p.description,
+      reviewCount: p.reviewCount || 0
+    }))), ...staticProducts];
+    return merged;
+  };
+
+  /* 룩플 전용 렌더링 함수들 */
   const renderWeeklyBest = (category) => {
     const grid = document.getElementById('weeklyBestGrid');
     if (!grid) return;
     grid.innerHTML = '';
 
-    const filtered = category === 'best'
-      ? PRODUCTS.filter(p => p.badge === 'best').slice(0, 9)
-      : PRODUCTS.filter(p => p.category === category).slice(0, 9);
+    const products = getProducts();
+    const { WEEKLY_BEST } = window.VARO_DATA;
+    let filtered = [];
+
+    if (category === 'best') {
+      filtered = (WEEKLY_BEST || []).map(id => products.find(p => p.id === id)).filter(Boolean);
+      // 신규 등록된 상품 중 베스트인 것들도 추가
+      const newBests = products.filter(p => p.id > 1000 && p.badge === 'best');
+      filtered = [...newBests, ...filtered].slice(0, 9);
+    } else {
+      filtered = products.filter(p => p.categoryId === category).slice(0, 9);
+    }
 
     filtered.forEach(p => {
       const card = buildCard(p);
@@ -258,7 +305,8 @@ const IndexPage = (() => {
     const grid = document.getElementById('newProductGrid');
     if (!grid) return;
     grid.innerHTML = '';
-    const filtered = PRODUCTS.filter(p => p.badge === 'new' || p.isNew).slice(0, 6);
+    const products = getProducts();
+    const filtered = products.filter(p => p.badge === 'new' || p.isNew).slice(0, 6);
     filtered.forEach(p => grid.appendChild(buildCard(p)));
   };
 
@@ -267,8 +315,15 @@ const IndexPage = (() => {
     const grid = document.getElementById('lookpleBestGrid');
     if (!grid) return;
     grid.innerHTML = '';
-    const filtered = PRODUCTS.filter(p => p.badge === 'best' || p.isSteady).slice(0, 8);
+    const products = getProducts();
+    const filtered = products.filter(p => p.badge === 'best' || p.isSteady).slice(0, 8);
     filtered.forEach(p => grid.appendChild(buildCard(p)));
+  };
+
+  const renderAll = () => {
+    renderWeeklyBest(document.querySelector('.lookple-tab-btn.is-active')?.dataset.category || 'best');
+    renderNewProduct();
+    renderLookpleBest();
   };
 
   // 탭 네비게이션 초기화
@@ -286,14 +341,15 @@ const IndexPage = (() => {
   /* ══════════════════════════════════════════
      초기화
   ══════════════════════════════════════════ */
-  const init = () => {
+  const init = async () => {
     initSlider(); // 슬라이더 초기화
     initLookpleTabs(); // 룩플 전용 탭 초기화
 
+    // 초기 데이터 동기화 (MySQL 실시간 데이터 가져오기)
+    await syncLiveData();
+
     // 초기 렌더링 수행
-    renderWeeklyBest('best');
-    renderNewProduct();
-    renderLookpleBest();
+    renderAll();
   };
 
   return { init };

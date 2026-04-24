@@ -15,11 +15,11 @@
 
 'use strict';
 
-const express    = require('express');
-const router     = express.Router();
+const express = require('express');
+const router = express.Router();
 const optionalAuth = require('../middleware/optionalAuth');
 const authMiddleware = require('../middleware/auth'); // 기존 필수 인증 미들웨어
-const db         = require('../db');                  // 기존 DB 싱글턴
+const db = require('../db/database');
 
 const FREE_SHIPPING_THRESHOLD = 50_000; // 5만원 이상 무료배송
 const SHIPPING_FEE = 3_000;
@@ -32,8 +32,8 @@ const SHIPPING_FEE = 3_000;
  * @param {string} column - 'user_id' | 'guest_id'
  * @param {number|string} id
  */
-const fetchCartItems = (table, column, id) => {
-  return db.prepare(`
+const fetchCartItems = async (table, column, id) => {
+  return await db.query(`
     SELECT
       c.id,
       c.product_id,
@@ -42,31 +42,31 @@ const fetchCartItems = (table, column, id) => {
       c.color,
       p.name        AS product_name,
       p.price       AS unit_price,
-      p.image       AS product_image,
+      p.main_img    AS product_image,
       p.stock,
       (c.quantity * p.price) AS subtotal
     FROM ${table} c
     JOIN products p ON p.id = c.product_id
     WHERE c.${column} = ?
-      ${table === 'guest_carts' ? "AND c.expires_at > datetime('now')" : ''}
+      ${table === 'guest_carts' ? "AND c.expires_at > CURRENT_TIMESTAMP" : ''}
     ORDER BY c.id ASC
-  `).all(id);
+  `, [id]);
 };
 
 const calcSummary = (items) => {
-  const totalAmount  = items.reduce((s, i) => s + i.subtotal, 0);
-  const shippingFee  = totalAmount >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
+  const totalAmount = items.reduce((s, i) => s + i.subtotal, 0);
+  const shippingFee = totalAmount >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
   return { totalAmount, shippingFee, finalAmount: totalAmount + shippingFee, itemCount: items.length };
 };
 
 // ── GET /api/cart ────────────────────────────────────────────────
-router.get('/', optionalAuth, (req, res) => {
+router.get('/', optionalAuth, async (req, res) => {
   try {
     let items;
     if (req.user) {
-      items = fetchCartItems('cart', 'user_id', req.user.id);
+      items = await fetchCartItems('cart', 'user_id', req.user.id);
     } else {
-      items = fetchCartItems('guest_carts', 'guest_id', req.guestId);
+      items = await fetchCartItems('guest_carts', 'guest_id', req.guestId);
     }
 
     return res.json({ success: true, data: { items, summary: calcSummary(items) } });
@@ -77,7 +77,7 @@ router.get('/', optionalAuth, (req, res) => {
 });
 
 // ── POST /api/cart ───────────────────────────────────────────────
-router.post('/', optionalAuth, (req, res) => {
+router.post('/', optionalAuth, async (req, res) => {
   const { product_id, quantity = 1, size, color } = req.body;
 
   if (!product_id || !Number.isInteger(Number(product_id))) {
@@ -88,45 +88,51 @@ router.post('/', optionalAuth, (req, res) => {
   }
 
   try {
-    // 상품 존재 + 재고 확인
-    const product = db.prepare('SELECT id, stock FROM products WHERE id = ?').get(product_id);
-    if (!product) return res.status(404).json({ success: false, message: '상품을 찾을 수 없습니다' });
+    const products = await db.execute('SELECT id, stock FROM products WHERE id = ?', [product_id]);
+    if (!products.length) return res.status(404).json({ success: false, message: '상품을 찾을 수 없습니다' });
+    const product = products[0];
+
     if (product.stock < quantity) {
       return res.status(409).json({ success: false, message: '재고가 부족합니다' });
     }
 
     if (req.user) {
-      // ── 회원 장바구니 ─────────────────────────────────────────
-      const existing = db.prepare(
-        'SELECT id, quantity FROM cart WHERE user_id = ? AND product_id = ? AND size IS ? AND color IS ?'
-      ).get(req.user.id, product_id, size ?? null, color ?? null);
+      const existingRows = await db.execute(
+        'SELECT id, quantity FROM cart WHERE user_id = ? AND product_id = ? AND size <=> ? AND color <=> ?',
+        [req.user.id, product_id, size ?? null, color ?? null]
+      );
 
-      if (existing) {
+      if (existingRows.length > 0) {
+        const existing = existingRows[0];
         const newQty = Math.min(existing.quantity + quantity, 99);
-        db.prepare('UPDATE cart SET quantity = ? WHERE id = ?').run(newQty, existing.id);
+        await db.execute('UPDATE cart SET quantity = ? WHERE id = ?', [newQty, existing.id]);
       } else {
-        db.prepare(
-          'INSERT INTO cart (user_id, product_id, quantity, size, color) VALUES (?, ?, ?, ?, ?)'
-        ).run(req.user.id, product_id, quantity, size ?? null, color ?? null);
+        await db.execute(
+          'INSERT INTO cart (user_id, product_id, quantity, size, color) VALUES (?, ?, ?, ?, ?)',
+          [req.user.id, product_id, quantity, size ?? null, color ?? null]
+        );
       }
     } else {
-      // ── 비회원 장바구니 ───────────────────────────────────────
-      const existing = db.prepare(
+      const existingRows = await db.execute(
         `SELECT id, quantity FROM guest_carts
-         WHERE guest_id = ? AND product_id = ? AND size IS ? AND color IS ?
-           AND expires_at > datetime('now')`
-      ).get(req.guestId, product_id, size ?? null, color ?? null);
+         WHERE guest_id = ? AND product_id = ? AND size <=> ? AND color <=> ?
+           AND expires_at > CURRENT_TIMESTAMP`,
+        [req.guestId, product_id, size ?? null, color ?? null]
+      );
 
-      if (existing) {
+      if (existingRows.length > 0) {
+        const existing = existingRows[0];
         const newQty = Math.min(existing.quantity + quantity, 99);
-        db.prepare(
-          `UPDATE guest_carts SET quantity = ?, expires_at = datetime('now', '+30 days') WHERE id = ?`
-        ).run(newQty, existing.id);
+        await db.execute(
+          `UPDATE guest_carts SET quantity = ?, expires_at = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 30 DAY) WHERE id = ?`,
+          [newQty, existing.id]
+        );
       } else {
-        db.prepare(
-          `INSERT INTO guest_carts (guest_id, product_id, quantity, size, color)
-           VALUES (?, ?, ?, ?, ?)`
-        ).run(req.guestId, product_id, quantity, size ?? null, color ?? null);
+        await db.execute(
+          `INSERT INTO guest_carts (guest_id, product_id, quantity, size, color, expires_at)
+           VALUES (?, ?, ?, ?, ?, DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 30 DAY))`,
+          [req.guestId, product_id, quantity, size ?? null, color ?? null]
+        );
       }
     }
 
@@ -138,8 +144,8 @@ router.post('/', optionalAuth, (req, res) => {
 });
 
 // ── PATCH /api/cart/:id ──────────────────────────────────────────
-router.patch('/:id', optionalAuth, (req, res) => {
-  const cartId  = Number(req.params.id);
+router.patch('/:id', optionalAuth, async (req, res) => {
+  const cartId = Number(req.params.id);
   const { quantity } = req.body;
 
   if (!Number.isInteger(cartId) || cartId < 1) {
@@ -152,16 +158,18 @@ router.patch('/:id', optionalAuth, (req, res) => {
   try {
     let result;
     if (req.user) {
-      result = db.prepare(
-        'UPDATE cart SET quantity = ? WHERE id = ? AND user_id = ?'
-      ).run(quantity, cartId, req.user.id);
+      result = await db.execute(
+        'UPDATE cart SET quantity = ? WHERE id = ? AND user_id = ?',
+        [quantity, cartId, req.user.id]
+      );
     } else {
-      result = db.prepare(
-        `UPDATE guest_carts SET quantity = ? WHERE id = ? AND guest_id = ? AND expires_at > datetime('now')`
-      ).run(quantity, cartId, req.guestId);
+      result = await db.execute(
+        `UPDATE guest_carts SET quantity = ? WHERE id = ? AND guest_id = ? AND expires_at > CURRENT_TIMESTAMP`,
+        [quantity, cartId, req.guestId]
+      );
     }
 
-    if (result.changes === 0) {
+    if (result.affectedRows === 0) {
       return res.status(404).json({ success: false, message: '항목을 찾을 수 없습니다' });
     }
     return res.json({ success: true, message: '수량이 변경되었습니다' });
@@ -172,7 +180,7 @@ router.patch('/:id', optionalAuth, (req, res) => {
 });
 
 // ── DELETE /api/cart/:id ─────────────────────────────────────────
-router.delete('/:id', optionalAuth, (req, res) => {
+router.delete('/:id', optionalAuth, async (req, res) => {
   const cartId = Number(req.params.id);
 
   if (!Number.isInteger(cartId) || cartId < 1) {
@@ -182,12 +190,12 @@ router.delete('/:id', optionalAuth, (req, res) => {
   try {
     let result;
     if (req.user) {
-      result = db.prepare('DELETE FROM cart WHERE id = ? AND user_id = ?').run(cartId, req.user.id);
+      result = await db.execute('DELETE FROM cart WHERE id = ? AND user_id = ?', [cartId, req.user.id]);
     } else {
-      result = db.prepare('DELETE FROM guest_carts WHERE id = ? AND guest_id = ?').run(cartId, req.guestId);
+      result = await db.execute('DELETE FROM guest_carts WHERE id = ? AND guest_id = ?', [cartId, req.guestId]);
     }
 
-    if (result.changes === 0) {
+    if (result.affectedRows === 0) {
       return res.status(404).json({ success: false, message: '항목을 찾을 수 없습니다' });
     }
     return res.json({ success: true, message: '삭제되었습니다' });
@@ -198,12 +206,12 @@ router.delete('/:id', optionalAuth, (req, res) => {
 });
 
 // ── DELETE /api/cart (전체 비우기) ───────────────────────────────
-router.delete('/', optionalAuth, (req, res) => {
+router.delete('/', optionalAuth, async (req, res) => {
   try {
     if (req.user) {
-      db.prepare('DELETE FROM cart WHERE user_id = ?').run(req.user.id);
+      await db.execute('DELETE FROM cart WHERE user_id = ?', [req.user.id]);
     } else {
-      db.prepare('DELETE FROM guest_carts WHERE guest_id = ?').run(req.guestId);
+      await db.execute('DELETE FROM guest_carts WHERE guest_id = ?', [req.guestId]);
     }
     return res.json({ success: true, message: '장바구니가 비워졌습니다' });
   } catch (err) {
@@ -213,7 +221,7 @@ router.delete('/', optionalAuth, (req, res) => {
 });
 
 // ── POST /api/cart/merge  (로그인 시 비회원 → 회원 병합) ─────────
-router.post('/merge', authMiddleware, (req, res) => {
+router.post('/merge', authMiddleware, async (req, res) => {
   const { guest_id } = req.body;
 
   if (!guest_id || typeof guest_id !== 'string') {
@@ -221,36 +229,35 @@ router.post('/merge', authMiddleware, (req, res) => {
   }
 
   try {
-    const mergeTransaction = db.transaction(() => {
-      const guestItems = db.prepare(
-        `SELECT * FROM guest_carts WHERE guest_id = ? AND expires_at > datetime('now')`
-      ).all(guest_id);
+    const guestItems = await db.query(
+      `SELECT * FROM guest_carts WHERE guest_id = ? AND expires_at > CURRENT_TIMESTAMP`,
+      [guest_id]
+    );
 
-      let mergedCount = 0;
-      for (const item of guestItems) {
-        const existing = db.prepare(
-          'SELECT id, quantity FROM cart WHERE user_id = ? AND product_id = ? AND size IS ? AND color IS ?'
-        ).get(req.user.id, item.product_id, item.size, item.color);
+    let mergedCount = 0;
+    for (const item of guestItems) {
+      const existingRows = await db.execute(
+        'SELECT id, quantity FROM cart WHERE user_id = ? AND product_id = ? AND size <=> ? AND color <=> ?',
+        [req.user.id, item.product_id, item.size, item.color]
+      );
 
-        if (existing) {
-          const newQty = Math.min(existing.quantity + item.quantity, 99);
-          db.prepare('UPDATE cart SET quantity = ? WHERE id = ?').run(newQty, existing.id);
-        } else {
-          db.prepare(
-            'INSERT INTO cart (user_id, product_id, quantity, size, color) VALUES (?, ?, ?, ?, ?)'
-          ).run(req.user.id, item.product_id, item.quantity, item.size, item.color);
-        }
-        mergedCount++;
+      if (existingRows.length > 0) {
+        const existing = existingRows[0];
+        const newQty = Math.min(existing.quantity + item.quantity, 99);
+        await db.execute('UPDATE cart SET quantity = ? WHERE id = ?', [newQty, existing.id]);
+      } else {
+        await db.execute(
+          'INSERT INTO cart (user_id, product_id, quantity, size, color) VALUES (?, ?, ?, ?, ?)',
+          [req.user.id, item.product_id, item.quantity, item.size, item.color]
+        );
       }
+      mergedCount++;
+    }
 
-      // 병합 완료 후 비회원 장바구니 삭제
-      db.prepare('DELETE FROM guest_carts WHERE guest_id = ?').run(guest_id);
+    // 병합 완료 후 비회원 장바구니 삭제
+    await db.execute('DELETE FROM guest_carts WHERE guest_id = ?', [guest_id]);
 
-      return mergedCount;
-    });
-
-    const count = mergeTransaction();
-    return res.json({ success: true, message: `장바구니 ${count}개 항목이 병합되었습니다`, mergedCount: count });
+    return res.json({ success: true, message: `장바구니 ${mergedCount}개 항목이 병합되었습니다`, mergedCount });
   } catch (err) {
     console.error('[Cart MERGE]', err);
     return res.status(500).json({ success: false, message: '병합 실패' });

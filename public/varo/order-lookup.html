@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>비회원 주문조회 — VARO</title>
+  <link rel="stylesheet" href="./styles/reset.css">
+  <link rel="stylesheet" href="./styles/variables.css">
+  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/header.css">
+  <link rel="stylesheet" href="./styles/components.css">
+  <link rel="stylesheet" href="./styles/auth_extra.css">
+  <style>
+    .lookup-container {
+      max-width: 500px;
+      margin: 80px auto;
+      padding: 0 20px;
+    }
+
+    .lookup-header {
+      margin-bottom: 40px;
+    }
+
+    .lookup-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--color-text);
+    }
+
+    .lookup-subtitle {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      line-height: 1.6;
+    }
+
+    .lookup-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .lookup-form-row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      align-items: center;
+    }
+
+    .lookup-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .lookup-input {
+      height: 48px;
+      padding: 0 16px;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      font-size: 14px;
+      width: 100%;
+    }
+
+    .lookup-input::placeholder {
+      color: var(--color-text-placeholder);
+    }
+
+    .lookup-submit {
+      margin-top: 20px;
+      height: 54px;
+      background: #fff;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lookup-submit:hover {
+      background: var(--color-bg-alt);
+    }
+
+    /* 결과 표시 영역 */
+    #lookup-result {
+      margin-top: 40px;
+      border-top: 1px solid var(--color-border);
+      padding-top: 30px;
+    }
+
+    .order-status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--color-bg-alt);
+      margin-bottom: 15px;
+    }
+
+    .order-summary-box {
+      background: var(--color-bg-alt);
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .order-summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+  </style>
+  <script src="./js/components.js"></script>
+</head>
+
+<body>
+  <div id="header-placeholder"></div>
+  <div id="overlay-placeholder"></div>
+
+  <main class="lookup-container">
+    <div class="lookup-header">
+      <h1 class="lookup-title">비회원 로그인</h1>
+      <p class="lookup-subtitle">비회원의 경우, 주문시의 주문번호로 주문조회가 가능합니다.</p>
+    </div>
+
+    <form id="orderLookupForm" class="lookup-form">
+      <div class="lookup-form-row">
+        <label class="lookup-label">주문자명</label>
+        <input type="text" id="ordererName" class="lookup-input" required>
+      </div>
+      <div class="lookup-form-row">
+        <label class="lookup-label">주문번호</label>
+        <input type="text" id="orderNumber" class="lookup-input" placeholder="주문번호" required>
+      </div>
+      <div class="lookup-form-row">
+        <label class="lookup-label">비회원주문 비밀번호</label>
+        <input type="password" id="orderPassword" class="lookup-input" required>
+      </div>
+
+      <button type="submit" class="lookup-submit" id="lookupBtn">조회</button>
+    </form>
+
+    <div id="lookup-result" class="u-hidden">
+      <!-- 결과 상세 내역 대입됨 -->
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/guestManager.js"></script>
+  <script type="module" src="./js/order-lookup.js"></script>
+  <script type="module" src="./js/main.js"></script>
+</body>
+
+</html>

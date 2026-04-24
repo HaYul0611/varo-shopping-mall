@@ -1,97 +1,264 @@
-// db/database.js — SQLite (node-sqlite3-wasm 기반, 빌드 도구 불필요)
-const Database = require('./compat');
-const path = require('path');
+// db/database.js — MySQL (mysql2/promise 기반)
+require('dotenv').config();
+const mysql = require('mysql2/promise');
 
-const DB_PATH = path.join(__dirname, 'varo.db');
-const db = new Database(DB_PATH);
+const pool = mysql.createPool({
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'varo',
+  port: process.env.DB_PORT || 3306,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0
+});
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    name        TEXT    NOT NULL,
-    email       TEXT    NOT NULL UNIQUE,
-    password    TEXT    NOT NULL,
-    phone       TEXT,
-    address     TEXT,
-    grade       TEXT    NOT NULL DEFAULT 'basic',
-    points      INTEGER NOT NULL DEFAULT 0,
-    total_spent INTEGER NOT NULL DEFAULT 0,
-    is_admin    INTEGER NOT NULL DEFAULT 0,
-    created_at  TEXT    NOT NULL DEFAULT (datetime('now','localtime')),
-    updated_at  TEXT    NOT NULL DEFAULT (datetime('now','localtime'))
-  );
-  CREATE TABLE IF NOT EXISTS products (
-    id            INTEGER PRIMARY KEY AUTOINCREMENT,
-    product_code  TEXT NOT NULL UNIQUE,
-    category_id   TEXT NOT NULL,
-    brand         TEXT NOT NULL DEFAULT 'VARO',
-    name          TEXT NOT NULL,
-    price         INTEGER NOT NULL,
-    sale_price    INTEGER,
-    badge         TEXT,
-    styles        TEXT NOT NULL DEFAULT '[]',
-    main_img      TEXT NOT NULL,
-    sub_img       TEXT NOT NULL,
-    images        TEXT NOT NULL DEFAULT '[]',
-    colors        TEXT NOT NULL DEFAULT '[]',
-    sizes         TEXT NOT NULL DEFAULT '[]',
-    sold_out_sizes TEXT NOT NULL DEFAULT '[]',
-    description   TEXT,
-    material      TEXT,
-    care          TEXT,
-    rating        REAL NOT NULL DEFAULT 0,
-    review_count  INTEGER NOT NULL DEFAULT 0,
-    stock         INTEGER NOT NULL DEFAULT 100,
-    is_event      INTEGER NOT NULL DEFAULT 0,
-    is_active     INTEGER NOT NULL DEFAULT 1,
-    created_at    TEXT NOT NULL DEFAULT (datetime('now','localtime')),
-    updated_at    TEXT NOT NULL DEFAULT (datetime('now','localtime'))
-  );
-  CREATE TABLE IF NOT EXISTS cart (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id     INTEGER NOT NULL,
-    product_id  INTEGER NOT NULL,
-    size        TEXT NOT NULL,
-    color       TEXT NOT NULL DEFAULT '',
-    qty         INTEGER NOT NULL DEFAULT 1,
-    created_at  TEXT NOT NULL DEFAULT (datetime('now','localtime')),
-    UNIQUE(user_id, product_id, size, color)
-  );
-  CREATE TABLE IF NOT EXISTS orders (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    order_number    TEXT NOT NULL UNIQUE,
-    user_id         INTEGER NOT NULL,
-    items           TEXT NOT NULL,
-    subtotal        INTEGER NOT NULL,
-    discount        INTEGER NOT NULL DEFAULT 0,
-    shipping_fee    INTEGER NOT NULL DEFAULT 3000,
-    total           INTEGER NOT NULL,
-    recipient_name  TEXT NOT NULL,
-    recipient_phone TEXT NOT NULL,
-    address         TEXT NOT NULL,
-    address_detail  TEXT DEFAULT '',
-    memo            TEXT DEFAULT '',
-    payment_method  TEXT NOT NULL DEFAULT 'card',
-    status          TEXT NOT NULL DEFAULT 'pending',
-    created_at      TEXT NOT NULL DEFAULT (datetime('now','localtime')),
-    updated_at      TEXT NOT NULL DEFAULT (datetime('now','localtime'))
-  );
-  CREATE TABLE IF NOT EXISTS reviews (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    product_id  INTEGER NOT NULL,
-    user_id     INTEGER NOT NULL,
-    rating      INTEGER NOT NULL,
-    body        TEXT NOT NULL,
-    size_info   TEXT DEFAULT '',
-    created_at  TEXT NOT NULL DEFAULT (datetime('now','localtime'))
-  );
-  CREATE TABLE IF NOT EXISTS wishlist (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id     INTEGER NOT NULL,
-    product_id  INTEGER NOT NULL,
-    created_at  TEXT NOT NULL DEFAULT (datetime('now','localtime')),
-    UNIQUE(user_id, product_id)
-  );
-`);
+/**
+ * 테이블 초기화 (MySQL 문법)
+ */
+const initDB = async () => {
+  // 별도 연결로 DB 생성 시도 (DB 미지정 상태)
+  const setupConn = await mysql.createConnection({
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    port: process.env.DB_PORT || 3306,
+  });
 
-module.exports = db;
+  try {
+    const dbName = process.env.DB_NAME || 'varo';
+    console.log(`[MySQL] Database '${dbName}' 확인 중...`);
+    await setupConn.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
+    await setupConn.query(`USE \`${dbName}\``);
+
+    // Users Table
+    await setupConn.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        name        VARCHAR(255) NOT NULL,
+        email       VARCHAR(255) NOT NULL UNIQUE,
+        password    VARCHAR(255) NOT NULL,
+        phone       VARCHAR(50),
+        address     TEXT,
+        grade       VARCHAR(20) NOT NULL DEFAULT 'bronze',
+        points      INT NOT NULL DEFAULT 0,
+        total_spent INT NOT NULL DEFAULT 0,
+        is_admin    TINYINT NOT NULL DEFAULT 0,
+        created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // Products Table
+    await setupConn.query(`
+      CREATE TABLE IF NOT EXISTS products (
+        id            INT AUTO_INCREMENT PRIMARY KEY,
+        product_code  VARCHAR(50) NOT NULL UNIQUE,
+        category_id   VARCHAR(50) NOT NULL,
+        brand         VARCHAR(50) NOT NULL DEFAULT 'VARO',
+        name          VARCHAR(255) NOT NULL,
+        price         INT NOT NULL,
+        sale_price    INT,
+        badge         VARCHAR(50),
+        styles        JSON NOT NULL,
+        main_img      VARCHAR(255) NOT NULL,
+        sub_img       VARCHAR(255) NOT NULL,
+        images        JSON NOT NULL,
+        colors        JSON NOT NULL,
+        sizes         JSON NOT NULL,
+        sold_out_sizes JSON NOT NULL,
+        description   TEXT,
+        material      VARCHAR(255),
+        care          VARCHAR(255),
+        rating        FLOAT NOT NULL DEFAULT 0,
+        review_count  INT NOT NULL DEFAULT 0,
+        stock         INT NOT NULL DEFAULT 100,
+        is_event      TINYINT NOT NULL DEFAULT 0,
+        is_active     TINYINT NOT NULL DEFAULT 1,
+        created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // Cart Table
+    await setupConn.query(`
+      CREATE TABLE IF NOT EXISTS cart (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        user_id     INT NOT NULL,
+        product_id  INT NOT NULL,
+        size        VARCHAR(50) NOT NULL,
+        color       VARCHAR(50) NOT NULL DEFAULT '',
+        qty         INT NOT NULL DEFAULT 1,
+        created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, product_id, size, color)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // Orders Table
+    await setupConn.query(`
+      CREATE TABLE IF NOT EXISTS orders (
+        id              INT AUTO_INCREMENT PRIMARY KEY,
+        order_number    VARCHAR(100) NOT NULL UNIQUE,
+        user_id         INT NOT NULL,
+        items           JSON NOT NULL,
+        subtotal        INT NOT NULL,
+        discount        INT NOT NULL DEFAULT 0,
+        shipping_fee    INT NOT NULL DEFAULT 3000,
+        total           INT NOT NULL,
+        recipient_name  VARCHAR(100) NOT NULL,
+        recipient_phone VARCHAR(50)  NOT NULL,
+        address         VARCHAR(255) NOT NULL,
+        address_detail  VARCHAR(255) DEFAULT '',
+        memo            TEXT,
+        payment_method  VARCHAR(50) NOT NULL DEFAULT 'card',
+        status          ENUM('pending','preparing','shipped','delivered','cancelled') NOT NULL DEFAULT 'pending',
+        created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // Order Items (평탄화된 상세 내역)
+    await setupConn.query(`
+      CREATE TABLE IF NOT EXISTS order_items (
+        id            INT AUTO_INCREMENT PRIMARY KEY,
+        order_id      INT NOT NULL,
+        product_id    INT NOT NULL,
+        product_name  VARCHAR(255) NOT NULL,
+        product_image VARCHAR(255) NOT NULL,
+        quantity      INT NOT NULL,
+        size          VARCHAR(50),
+        color         VARCHAR(50),
+        unit_price    INT NOT NULL,
+        subtotal      INT NOT NULL,
+        FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // Reviews Table
+    await setupConn.query(`
+      CREATE TABLE IF NOT EXISTS reviews (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        product_id  INT NOT NULL,
+        user_id     INT NOT NULL,
+        rating      INT NOT NULL,
+        body        TEXT NOT NULL,
+        size_info   VARCHAR(100) DEFAULT '',
+        created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // Wishlist Table
+    await setupConn.query(`
+      CREATE TABLE IF NOT EXISTS wishlist (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        user_id     INT NOT NULL,
+        product_id  INT NOT NULL,
+        created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, product_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // Guest Orders (비회원)
+    await setupConn.query(`
+      CREATE TABLE IF NOT EXISTS guest_orders (
+        id              INT AUTO_INCREMENT PRIMARY KEY,
+        order_number    VARCHAR(100) NOT NULL UNIQUE,
+        guest_id        VARCHAR(100) NOT NULL,
+        guest_email     VARCHAR(255) NOT NULL,
+        guest_name      VARCHAR(100) NOT NULL,
+        guest_phone     VARCHAR(50)  NOT NULL,
+        guest_password  VARCHAR(255) NOT NULL,
+        shipping_name   VARCHAR(100) NOT NULL,
+        shipping_phone  VARCHAR(50)  NOT NULL,
+        shipping_zipcode VARCHAR(20)  NOT NULL,
+        shipping_address VARCHAR(255) NOT NULL,
+        shipping_detail  VARCHAR(255) DEFAULT '',
+        delivery_request TEXT,
+        total_amount    INT NOT NULL,
+        discount_amount INT NOT NULL DEFAULT 0,
+        shipping_fee    INT NOT NULL DEFAULT 3000,
+        final_amount    INT NOT NULL,
+        payment_method  VARCHAR(50) NOT NULL DEFAULT 'card',
+        payment_status  VARCHAR(50) NOT NULL DEFAULT 'paid',
+        order_status    VARCHAR(50) NOT NULL DEFAULT 'confirmed',
+        created_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // Guest Order Items
+    await setupConn.query(`
+      CREATE TABLE IF NOT EXISTS guest_order_items (
+        id            INT AUTO_INCREMENT PRIMARY KEY,
+        order_id      INT NOT NULL,
+        product_id    INT NOT NULL,
+        product_name  VARCHAR(255) NOT NULL,
+        product_image VARCHAR(255) NOT NULL,
+        quantity      INT NOT NULL,
+        size          VARCHAR(50),
+        color         VARCHAR(50),
+        unit_price    INT NOT NULL,
+        subtotal      INT NOT NULL,
+        FOREIGN KEY(order_id) REFERENCES guest_orders(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // Guest Carts (비회원 장바구니)
+    await setupConn.query(`
+      CREATE TABLE IF NOT EXISTS guest_carts (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        guest_id    VARCHAR(100) NOT NULL,
+        product_id  INT NOT NULL,
+        size        VARCHAR(50) NOT NULL,
+        color       VARCHAR(50) NOT NULL DEFAULT '',
+        qty         INT NOT NULL DEFAULT 1,
+        expires_at  TIMESTAMP NOT NULL,
+        created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // Guest Wishlists
+    await setupConn.query(`
+      CREATE TABLE IF NOT EXISTS guest_wishlists (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        guest_id    VARCHAR(100) NOT NULL,
+        product_id  INT NOT NULL,
+        expires_at  TIMESTAMP NOT NULL,
+        created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    console.log('[MySQL] Database and Tables initialized successfully.');
+  } catch (err) {
+    console.error('[MySQL] Init Error:', err.message);
+    throw err;
+  } finally {
+    await setupConn.end();
+  }
+};
+
+// 즉시 실행 대신 server.js에서 호출하거나 필요시 내부 호출
+// initDB();
+
+module.exports = {
+  pool,
+  execute: (sql, params) => pool.execute(sql, params).then(([rows]) => rows),
+  query: (sql, params) => pool.query(sql, params).then(([rows]) => rows),
+  withTransaction: async (callback) => {
+    const connection = await pool.getConnection();
+    try {
+      await connection.beginTransaction();
+      const result = await callback(connection);
+      await connection.commit();
+      return result;
+    } catch (err) {
+      await connection.rollback();
+      throw err;
+    } finally {
+      connection.release();
+    }
+  },
+  initDB
+};

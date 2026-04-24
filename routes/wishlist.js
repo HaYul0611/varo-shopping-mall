@@ -12,47 +12,47 @@
 
 'use strict';
 
-const express      = require('express');
-const router       = express.Router();
+const express = require('express');
+const router = express.Router();
 const optionalAuth = require('../middleware/optionalAuth');
 const authMiddleware = require('../middleware/auth');
-const db           = require('../db');
+const db = require('../db/database');
 
 // ── GET /api/wishlist ────────────────────────────────────────────
-router.get('/', optionalAuth, (req, res) => {
+router.get('/', optionalAuth, async (req, res) => {
   try {
     let items;
     if (req.user) {
-      items = db.prepare(`
+      items = await db.query(`
         SELECT
           w.id,
           w.product_id,
           w.created_at,
-          p.name  AS product_name,
-          p.price AS product_price,
-          p.image AS product_image,
+          p.name     AS product_name,
+          p.price    AS product_price,
+          p.main_img AS product_image,
           p.stock
         FROM wishlists w
         JOIN products p ON p.id = w.product_id
         WHERE w.user_id = ?
         ORDER BY w.id DESC
-      `).all(req.user.id);
+      `, [req.user.id]);
     } else {
-      items = db.prepare(`
+      items = await db.query(`
         SELECT
           gw.id,
           gw.product_id,
           gw.created_at,
-          p.name  AS product_name,
-          p.price AS product_price,
-          p.image AS product_image,
+          p.name     AS product_name,
+          p.price    AS product_price,
+          p.main_img AS product_image,
           p.stock
         FROM guest_wishlists gw
         JOIN products p ON p.id = gw.product_id
         WHERE gw.guest_id = ?
-          AND gw.expires_at > datetime('now')
+          AND gw.expires_at > CURRENT_TIMESTAMP
         ORDER BY gw.id DESC
-      `).all(req.guestId);
+      `, [req.guestId]);
     }
 
     return res.json({ success: true, data: items });
@@ -63,7 +63,7 @@ router.get('/', optionalAuth, (req, res) => {
 });
 
 // ── POST /api/wishlist  (토글) ───────────────────────────────────
-router.post('/', optionalAuth, (req, res) => {
+router.post('/', optionalAuth, async (req, res) => {
   const { product_id } = req.body;
 
   if (!product_id || !Number.isInteger(Number(product_id))) {
@@ -71,35 +71,37 @@ router.post('/', optionalAuth, (req, res) => {
   }
 
   try {
-    // 상품 존재 확인
-    const product = db.prepare('SELECT id FROM products WHERE id = ?').get(product_id);
-    if (!product) return res.status(404).json({ success: false, message: '상품을 찾을 수 없습니다' });
+    const products = await db.execute('SELECT id FROM products WHERE id = ?', [product_id]);
+    if (!products.length) return res.status(404).json({ success: false, message: '상품을 찾을 수 없습니다' });
 
     let action;
     if (req.user) {
-      const existing = db.prepare(
-        'SELECT id FROM wishlists WHERE user_id = ? AND product_id = ?'
-      ).get(req.user.id, product_id);
+      const existingRows = await db.execute(
+        'SELECT id FROM wishlists WHERE user_id = ? AND product_id = ?',
+        [req.user.id, product_id]
+      );
 
-      if (existing) {
-        db.prepare('DELETE FROM wishlists WHERE id = ?').run(existing.id);
+      if (existingRows.length > 0) {
+        await db.execute('DELETE FROM wishlists WHERE id = ?', [existingRows[0].id]);
         action = 'removed';
       } else {
-        db.prepare('INSERT INTO wishlists (user_id, product_id) VALUES (?, ?)').run(req.user.id, product_id);
+        await db.execute('INSERT INTO wishlists (user_id, product_id) VALUES (?, ?)', [req.user.id, product_id]);
         action = 'added';
       }
     } else {
-      const existing = db.prepare(
-        `SELECT id FROM guest_wishlists WHERE guest_id = ? AND product_id = ? AND expires_at > datetime('now')`
-      ).get(req.guestId, product_id);
+      const existingRows = await db.execute(
+        `SELECT id FROM guest_wishlists WHERE guest_id = ? AND product_id = ? AND expires_at > CURRENT_TIMESTAMP`,
+        [req.guestId, product_id]
+      );
 
-      if (existing) {
-        db.prepare('DELETE FROM guest_wishlists WHERE id = ?').run(existing.id);
+      if (existingRows.length > 0) {
+        await db.execute('DELETE FROM guest_wishlists WHERE id = ?', [existingRows[0].id]);
         action = 'removed';
       } else {
-        db.prepare(
-          `INSERT OR IGNORE INTO guest_wishlists (guest_id, product_id) VALUES (?, ?)`
-        ).run(req.guestId, product_id);
+        await db.execute(
+          `INSERT IGNORE INTO guest_wishlists (guest_id, product_id, expires_at) VALUES (?, ?, DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 30 DAY))`,
+          [req.guestId, product_id]
+        );
         action = 'added';
       }
     }
@@ -116,7 +118,7 @@ router.post('/', optionalAuth, (req, res) => {
 });
 
 // ── DELETE /api/wishlist/:product_id ─────────────────────────────
-router.delete('/:product_id', optionalAuth, (req, res) => {
+router.delete('/:product_id', optionalAuth, async (req, res) => {
   const product_id = Number(req.params.product_id);
 
   if (!Number.isInteger(product_id) || product_id < 1) {
@@ -125,9 +127,9 @@ router.delete('/:product_id', optionalAuth, (req, res) => {
 
   try {
     if (req.user) {
-      db.prepare('DELETE FROM wishlists WHERE user_id = ? AND product_id = ?').run(req.user.id, product_id);
+      await db.execute('DELETE FROM wishlists WHERE user_id = ? AND product_id = ?', [req.user.id, product_id]);
     } else {
-      db.prepare('DELETE FROM guest_wishlists WHERE guest_id = ? AND product_id = ?').run(req.guestId, product_id);
+      await db.execute('DELETE FROM guest_wishlists WHERE guest_id = ? AND product_id = ?', [req.guestId, product_id]);
     }
     return res.json({ success: true, message: '위시리스트에서 제거되었습니다' });
   } catch (err) {
@@ -137,29 +139,26 @@ router.delete('/:product_id', optionalAuth, (req, res) => {
 });
 
 // ── POST /api/wishlist/merge ─────────────────────────────────────
-router.post('/merge', authMiddleware, (req, res) => {
+router.post('/merge', authMiddleware, async (req, res) => {
   const { guest_id } = req.body;
 
   if (!guest_id) return res.status(400).json({ success: false, message: 'guest_id가 필요합니다' });
 
   try {
-    const mergeTransaction = db.transaction(() => {
-      const guestItems = db.prepare(
-        `SELECT product_id FROM guest_wishlists WHERE guest_id = ? AND expires_at > datetime('now')`
-      ).all(guest_id);
+    const guestItems = await db.query(
+      `SELECT product_id FROM guest_wishlists WHERE guest_id = ? AND expires_at > CURRENT_TIMESTAMP`,
+      [guest_id]
+    );
 
-      for (const item of guestItems) {
-        db.prepare(
-          'INSERT OR IGNORE INTO wishlists (user_id, product_id) VALUES (?, ?)'
-        ).run(req.user.id, item.product_id);
-      }
+    for (const item of guestItems) {
+      await db.execute(
+        'INSERT IGNORE INTO wishlists (user_id, product_id) VALUES (?, ?)',
+        [req.user.id, item.product_id]
+      );
+    }
 
-      db.prepare('DELETE FROM guest_wishlists WHERE guest_id = ?').run(guest_id);
-      return guestItems.length;
-    });
-
-    const count = mergeTransaction();
-    return res.json({ success: true, message: `위시리스트 ${count}개 항목이 병합되었습니다` });
+    await db.execute('DELETE FROM guest_wishlists WHERE guest_id = ?', [guest_id]);
+    return res.json({ success: true, message: `위시리스트 ${guestItems.length}개 항목이 병합되었습니다` });
   } catch (err) {
     console.error('[Wishlist MERGE]', err);
     return res.status(500).json({ success: false, message: '병합 실패' });

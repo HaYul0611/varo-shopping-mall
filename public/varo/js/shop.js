@@ -35,7 +35,7 @@
 
     // ── 상태
     const state = {
-      products: [...PRODUCTS],
+      products: [], // 하이브리드로 채워짐
       filteredProducts: [],
       filters: {
         category: 'all',
@@ -49,6 +49,50 @@
       sort: 'newest',
       pageSize: 20
     };
+
+    let LIVE_PRODUCTS = [];
+
+    // 데이터 동기화 엔진
+    const syncLiveData = async () => {
+      try {
+        const res = await window.API.products.getAll();
+        if (res.success) {
+          LIVE_PRODUCTS = res.products || res.data || [];
+          updateMergedProducts();
+        }
+      } catch (e) {
+        console.warn('Live sync failed, using static data.');
+        updateMergedProducts();
+      }
+    };
+
+    const updateMergedProducts = () => {
+      const staticList = (window.VARO_DATA && window.VARO_DATA.PRODUCTS) ? window.VARO_DATA.PRODUCTS : [];
+      // 하이브리드 병합
+      const merged = [...(LIVE_PRODUCTS.map(p => ({
+        id: String(p.id),
+        name: p.name,
+        mainImg: p.mainImg?.startsWith('.') ? p.mainImg.replace('./', '/varo/') : p.mainImg,
+        subImg: p.subImg?.startsWith('.') ? p.subImg.replace('./', '/varo/') : (p.mainImg?.startsWith('.') ? p.mainImg.replace('./', '/varo/') : p.mainImg),
+        price: p.price,
+        salePrice: p.salePrice,
+        badge: p.badge,
+        categoryId: p.categoryId,
+        description: p.description,
+        reviewCount: p.reviewCount || 0,
+        colors: p.colors || [],
+        sizes: p.sizes || []
+      }))), ...staticList];
+
+      state.products = merged;
+      applyFilters();
+    };
+
+    // 실시간 변경 감지 리스너
+    window.addEventListener('varo:dataChange', (e) => {
+      console.log('Shop Page Sync Triggered:', e.detail.type);
+      syncLiveData();
+    });
 
     // ── URL 파라미터 처리
     const parseUrlParams = () => {
@@ -293,7 +337,7 @@
 
     // ── 초기 실행
     parseUrlParams();
-    applyFilters();
+    syncLiveData();
   };
 
   // ── 실행 제어
