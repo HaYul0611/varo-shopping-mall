@@ -15,28 +15,30 @@ const EXPIRES = process.env.JWT_EXPIRES_IN || '7d';
 
 /* ── 회원가입 POST /api/auth/register ───── */
 router.post('/register', async (req, res) => {
-  const { name, email, password, phone } = req.body;
+  const { name, email, password, phone, height, weight } = req.body;
   if (!name || !email || !password) {
     return res.status(400).json({ error: '이름, 이메일, 비밀번호는 필수입니다.' });
   }
-  if (password.length < 6) {
-    return res.status(400).json({ error: '비밀번호는 6자 이상이어야 합니다.' });
-  }
+
+  const encEmail = db.encryptDeterministic(email);
 
   try {
-    const existing = await db.execute('SELECT id FROM users WHERE email = ?', [email]);
+    const existing = await db.execute('SELECT id FROM users WHERE email = ?', [encEmail]);
     if (existing.length > 0) return res.status(409).json({ error: '이미 사용중인 이메일입니다.' });
 
     const hash = bcrypt.hashSync(password, 10);
+    const encPhone = db.encrypt(phone);
+
     const result = await db.execute(
-      'INSERT INTO users (name, email, password, phone, grade) VALUES (?, ?, ?, ?, ?)',
-      [name, email, hash, phone || null, 'bronze']
+      'INSERT INTO users (name, email, password, phone, height, weight, grade) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [name, encEmail, hash, encPhone, height || null, weight || null, 'bronze']
     );
 
     const token = jwt.sign({ id: result.insertId }, SECRET, { expiresIn: EXPIRES });
-    const userRows = await db.execute('SELECT id, name, email, grade, points, is_admin FROM users WHERE id = ?', [result.insertId]);
-
-    res.status(201).json({ token, user: userRows[0] });
+    res.status(201).json({
+      token,
+      user: { id: result.insertId, name, email, grade: 'bronze', points: 0 }
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -49,8 +51,10 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({ error: '이메일과 비밀번호를 입력하세요.' });
   }
 
+  const encEmail = db.encryptDeterministic(email);
+
   try {
-    const users = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+    const users = await db.execute('SELECT * FROM users WHERE email = ?', [encEmail]);
     const user = users[0];
 
     if (!user || !bcrypt.compareSync(password, user.password)) {
@@ -58,8 +62,17 @@ router.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign({ id: user.id }, SECRET, { expiresIn: EXPIRES });
-    const { password: _, ...safeUser } = user;
-    res.json({ token, user: safeUser });
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: db.decrypt(user.email),
+        grade: user.grade,
+        points: user.points,
+        is_admin: user.is_admin
+      }
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -69,10 +82,15 @@ router.post('/login', async (req, res) => {
 router.get('/me', requireAuth, async (req, res) => {
   try {
     const users = await db.execute(
-      'SELECT id, name, email, grade, points, total_spent, phone, address, is_admin FROM users WHERE id = ?',
+      'SELECT id, name, email, grade, points, total_spent, phone, address, height, weight, is_admin FROM users WHERE id = ?',
       [req.user.id]
     );
-    res.json(users[0]);
+    const user = users[0];
+    if (user) {
+      user.email = db.decrypt(user.email);
+      user.phone = db.decrypt(user.phone);
+    }
+    res.json(user);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

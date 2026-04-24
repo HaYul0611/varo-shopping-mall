@@ -38,6 +38,29 @@ const App = (() => {
     }
   };
 
+  const Wishlist = {
+    KEY: 'varo_wishlist',
+    getItems() { return JSON.parse(localStorage.getItem(this.KEY) || '[]'); },
+    has(id) { return this.getItems().includes(String(id)); },
+    toggle(id) {
+      let items = this.getItems();
+      const sId = String(id);
+      const index = items.indexOf(sId);
+      let active = false;
+      if (index > -1) {
+        items.splice(index, 1);
+      } else {
+        items.push(sId);
+        active = true;
+      }
+      localStorage.setItem(this.KEY, JSON.stringify(items));
+      if (window.Utils?.showToast) {
+        window.Utils.showToast(active ? '관심 상품에 추가되었습니다 ♡' : '관심 상품에서 제외되었습니다.', active ? 'success' : 'info');
+      }
+      return active;
+    }
+  };
+
   const syncAuthState = () => {
     const user = JSON.parse(localStorage.getItem('varo_user') || 'null');
     const utilNav = document.querySelector('.header-top__util');
@@ -164,7 +187,7 @@ const App = (() => {
     });
   };
 
-  return { init, Cart };
+  return { init, Cart, Wishlist };
 })();
 
 window.App = App;
@@ -188,64 +211,58 @@ const startApp = () => {
           <li class="category-nav__item has-sub">
             <a href="./shop.html?category=outer" style="font-size: 12px !important; font-weight: 500 !important; color: #333 !important;">OUTER</a>
             <ul class="sub-menu">
-              <li><a href="./shop.html?category=outer">전체보기</a></li>
-              <li><a href="./shop.html?sub=jacket">자켓</a></li>
-              <li><a href="./shop.html?sub=coat">코트</a></li>
-              <li><a href="./shop.html?sub=padding">패딩</a></li>
-              <li><a href="./shop.html?sub=jumper">점퍼</a></li>
-              <li><a href="./shop.html?sub=leather">레더/무스탕</a></li>
+              <li><a href="./shop.html?category=outer&sub=jacket">자켓</a></li>
+              <li><a href="./shop.html?category=outer&sub=coat">코트</a></li>
+              <li><a href="./shop.html?category=outer&sub=padding">패딩</a></li>
+              <li><a href="./shop.html?category=outer&sub=jumper">점퍼</a></li>
+              <li><a href="./shop.html?category=outer&sub=leather">레더/무스탕</a></li>
             </ul>
           </li>
           <li class="category-nav__item has-sub">
             <a href="./shop.html?category=shirt" style="font-size: 12px !important; font-weight: 500 !important; color: #333 !important;">SHIRT</a>
             <ul class="sub-menu">
-              <li><a href="./shop.html?category=shirt">전체보기</a></li>
-              <li><a href="./shop.html?sub=shortshirt">반팔셔츠</a></li>
-              <li><a href="./shop.html?sub=longshirt">긴팔셔츠</a></li>
-              <li><a href="./shop.html?sub=overshirt">오버셔츠</a></li>
-              <li><a href="./shop.html?sub=denim-shirt">데님셔츠</a></li>
+              <li><a href="./shop.html?category=shirt&sub=shortshirt">반팔셔츠</a></li>
+              <li><a href="./shop.html?category=shirt&sub=longshirt">긴팔셔츠</a></li>
+              <li><a href="./shop.html?category=shirt&sub=overshirt">오버셔츠</a></li>
+              <li><a href="./shop.html?category=shirt&sub=denim-shirt">데님셔츠</a></li>
             </ul>
           </li>
           <li class="category-nav__item has-sub">
             <a href="./shop.html?category=top" style="font-size: 12px !important; font-weight: 500 !important; color: #333 !important;">TOP</a>
             <ul class="sub-menu">
-              <li><a href="./shop.html?category=top">전체보기</a></li>
-              <li><a href="./shop.html?sub=shorttee">반팔티</a></li>
-              <li><a href="./shop.html?sub=longtee">긴팔티</a></li>
-              <li><a href="./shop.html?sub=sweatshirt">맨투맨</a></li>
-              <li><a href="./shop.html?sub=hoodie">후드티</a></li>
-              <li><a href="./shop.html?sub=sleeveless">민소매</a></li>
+              <li><a href="./shop.html?category=top&sub=shorttee">반팔티</a></li>
+              <li><a href="./shop.html?category=top&sub=longtee">긴팔티</a></li>
+              <li><a href="./shop.html?category=top&sub=sweatshirt">맨투맨</a></li>
+              <li><a href="./shop.html?category=top&sub=hoodie">후드티</a></li>
+              <li><a href="./shop.html?category=top&sub=sleeveless">민소매</a></li>
             </ul>
           </li>
           <li class="category-nav__item has-sub">
             <a href="./shop.html?category=bottom" style="font-size: 12px !important; font-weight: 500 !important; color: #333 !important;">BOTTOM</a>
             <ul class="sub-menu">
-              <li><a href="./shop.html?category=bottom">전체보기</a></li>
-              <li><a href="./shop.html?sub=denim">데님팬츠</a></li>
-              <li><a href="./shop.html?sub=slacks">슬랙스</a></li>
-              <li><a href="./shop.html?sub=cargo">카고팬츠</a></li>
-              <li><a href="./shop.html?sub=jogger">조거팬츠</a></li>
-              <li><a href="./shop.html?sub=shorts">반바지</a></li>
+              <li><a href="./shop.html?category=bottom&sub=denim">데님팬츠</a></li>
+              <li><a href="./shop.html?category=bottom&sub=slacks">슬랙스</a></li>
+              <li><a href="./shop.html?category=bottom&sub=cargo">카고팬츠</a></li>
+              <li><a href="./shop.html?category=bottom&sub=jogger">조거팬츠</a></li>
+              <li><a href="./shop.html?category=bottom&sub=shorts">반바지</a></li>
             </ul>
           </li>
           <li class="category-nav__item has-sub">
             <a href="./shop.html?category=knit" style="font-size: 12px !important; font-weight: 500 !important; color: #333 !important;">KNIT</a>
             <ul class="sub-menu">
-              <li><a href="./shop.html?category=knit">전체보기</a></li>
-              <li><a href="./shop.html?sub=pullover">풀오버</a></li>
-              <li><a href="./shop.html?sub=zipup">집업니트</a></li>
-              <li><a href="./shop.html?sub=cardigan">가디건</a></li>
-              <li><a href="./shop.html?sub=vest">니트베스트</a></li>
+              <li><a href="./shop.html?category=knit&sub=pullover">풀오버</a></li>
+              <li><a href="./shop.html?category=knit&sub=zipup">집업니트</a></li>
+              <li><a href="./shop.html?category=knit&sub=cardigan">가디건</a></li>
+              <li><a href="./shop.html?category=knit&sub=vest">니트베스트</a></li>
             </ul>
           </li>
           <li class="category-nav__item has-sub">
             <a href="./shop.html?category=shoes" style="font-size: 12px !important; font-weight: 500 !important; color: #333 !important;">SHOES</a>
             <ul class="sub-menu">
-              <li><a href="./shop.html?category=shoes">전체보기</a></li>
-              <li><a href="./shop.html?sub=sneakers">스니커즈</a></li>
-              <li><a href="./shop.html?sub=loafer">로퍼</a></li>
-              <li><a href="./shop.html?sub=sandal">샌들</a></li>
-              <li><a href="./shop.html?sub=boots">부츠</a></li>
+              <li><a href="./shop.html?category=shoes&sub=sneakers">스니커즈</a></li>
+              <li><a href="./shop.html?category=shoes&sub=loafer">로퍼</a></li>
+              <li><a href="./shop.html?category=shoes&sub=sandal">샌들</a></li>
+              <li><a href="./shop.html?category=shoes&sub=boots">부츠</a></li>
             </ul>
           </li>
           <li class="category-nav__item"><a href="./event.html" style="font-size: 13px !important; font-weight: 700 !important; color: #D96B3C !important;">1+1 EVENT</a></li>

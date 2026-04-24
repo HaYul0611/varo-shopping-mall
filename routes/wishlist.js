@@ -139,7 +139,7 @@ router.delete('/:product_id', optionalAuth, async (req, res) => {
 });
 
 // ── POST /api/wishlist/merge ─────────────────────────────────────
-router.post('/merge', authMiddleware, async (req, res) => {
+router.post('/merge', authMiddleware.requireAuth, async (req, res) => {
   const { guest_id } = req.body;
 
   if (!guest_id) return res.status(400).json({ success: false, message: 'guest_id가 필요합니다' });

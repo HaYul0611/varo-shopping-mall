@@ -1,6 +1,50 @@
 // db/database.js — MySQL (mysql2/promise 기반)
 require('dotenv').config();
 const mysql = require('mysql2/promise');
+const crypto = require('crypto');
+
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'varo_premium_secret_key_32bytes_'; // Must be 32 bytes
+const IV_LENGTH = 16;
+
+const encrypt = (text) => {
+  if (!text) return null;
+  const iv = crypto.randomBytes(IV_LENGTH);
+  const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
+  let encrypted = cipher.update(text);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+  return iv.toString('hex') + ':' + encrypted.toString('hex');
+};
+
+const encryptDeterministic = (text) => {
+  if (!text) return null;
+  const iv = Buffer.alloc(IV_LENGTH, 0); // 고정 IV 사용 (검색용)
+  const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
+  let encrypted = cipher.update(text);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+  return encrypted.toString('hex');
+};
+
+const decrypt = (text) => {
+  if (!text) return null;
+  if (text.includes(':')) {
+    // Random IV 방식
+    const textParts = text.split(':');
+    const iv = Buffer.from(textParts.shift(), 'hex');
+    const encryptedText = Buffer.from(textParts.join(':'), 'hex');
+    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
+    let decrypted = decipher.update(encryptedText);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    return decrypted.toString();
+  } else {
+    // Deterministic 방식
+    const iv = Buffer.alloc(IV_LENGTH, 0);
+    const encryptedText = Buffer.from(text, 'hex');
+    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
+    let decrypted = decipher.update(encryptedText);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    return decrypted.toString();
+  }
+};
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
@@ -40,11 +84,13 @@ const initDB = async () => {
         name        VARCHAR(255) NOT NULL,
         email       VARCHAR(255) NOT NULL UNIQUE,
         password    VARCHAR(255) NOT NULL,
-        phone       VARCHAR(50),
+        phone       VARCHAR(255),  -- 암호화로 인해 길이 확장
         address     TEXT,
         grade       VARCHAR(20) NOT NULL DEFAULT 'bronze',
         points      INT NOT NULL DEFAULT 0,
         total_spent INT NOT NULL DEFAULT 0,
+        height      FLOAT,         -- [NEW] 체형 기반 추천용
+        weight      FLOAT,         -- [NEW] 체형 기반 추천용
         is_admin    TINYINT NOT NULL DEFAULT 0,
         created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -76,6 +122,9 @@ const initDB = async () => {
         review_count  INT NOT NULL DEFAULT 0,
         stock         INT NOT NULL DEFAULT 100,
         is_event      TINYINT NOT NULL DEFAULT 0,
+        is_flash_sale TINYINT NOT NULL DEFAULT 0, -- [NEW] 플래시 세일 여부
+        flash_sale_price INT,                     -- [NEW] 플래시 세일 가격
+        flash_sale_end TIMESTAMP NULL,            -- [NEW] 플래시 세일 종료 시간
         is_active     TINYINT NOT NULL DEFAULT 1,
         created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -230,6 +279,20 @@ const initDB = async () => {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
 
+    // Admin Logs Table
+    await setupConn.query(`
+      CREATE TABLE IF NOT EXISTS admin_logs (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        admin_id    INT NOT NULL,
+        action      VARCHAR(50) NOT NULL,
+        target_type VARCHAR(50) NOT NULL,
+        target_id   INT,
+        details     TEXT,
+        ip_address  VARCHAR(50),
+        created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
     console.log('[MySQL] Database and Tables initialized successfully.');
   } catch (err) {
     console.error('[MySQL] Init Error:', err.message);
@@ -246,6 +309,9 @@ module.exports = {
   pool,
   execute: (sql, params) => pool.execute(sql, params).then(([rows]) => rows),
   query: (sql, params) => pool.query(sql, params).then(([rows]) => rows),
+  encrypt,
+  encryptDeterministic,
+  decrypt,
   withTransaction: async (callback) => {
     const connection = await pool.getConnection();
     try {

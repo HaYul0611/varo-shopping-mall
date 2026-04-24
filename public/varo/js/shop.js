@@ -44,6 +44,7 @@
         minPrice: null,
         maxPrice: null,
         size: null,
+        sub: null,
         query: ''
       },
       sort: 'newest',
@@ -56,12 +57,11 @@
     const syncLiveData = async () => {
       try {
         const res = await window.API.products.getAll();
-        if (res.success) {
-          LIVE_PRODUCTS = res.products || res.data || [];
-          updateMergedProducts();
-        }
+        // API.products.getAll()이 배열을 반환하면 그대로 사용, 객체면 내부 속성 참조
+        LIVE_PRODUCTS = Array.isArray(res) ? res : (res.products || res.data || []);
+        updateMergedProducts();
       } catch (e) {
-        console.warn('Live sync failed, using static data.');
+        console.warn('Live sync failed, using static data.', e);
         updateMergedProducts();
       }
     };
@@ -72,8 +72,8 @@
       const merged = [...(LIVE_PRODUCTS.map(p => ({
         id: String(p.id),
         name: p.name,
-        mainImg: p.mainImg?.startsWith('.') ? p.mainImg.replace('./', '/varo/') : p.mainImg,
-        subImg: p.subImg?.startsWith('.') ? p.subImg.replace('./', '/varo/') : (p.mainImg?.startsWith('.') ? p.mainImg.replace('./', '/varo/') : p.mainImg),
+        mainImg: p.main_img || p.mainImg || '../../assets/placeholder.png',
+        subImg: p.sub_img || p.subImg || p.main_img || p.mainImg || '../../assets/placeholder.png',
         price: p.price,
         salePrice: p.salePrice,
         badge: p.badge,
@@ -102,6 +102,7 @@
       if (quickFilter && ['new', 'best', 'sale'].includes(quickFilter)) {
         state.filters.badge = quickFilter;
       }
+      state.filters.sub = params.get('sub') || null;
       state.filters.query = params.get('q') || '';
 
       // UI 동기화 (카테고리 탭)
@@ -119,6 +120,37 @@
       // 카테고리 필터
       if (state.filters.category !== 'all') {
         result = result.filter(p => p.categoryId === state.filters.category);
+      }
+
+      // 서브 카테고리(sub) 필터
+      if (state.filters.sub) {
+        const sub = state.filters.sub.toLowerCase();
+        const subMap = {
+          'jacket': '자켓', 'coat': '코트', 'padding': '패딩', 'jumper': '점퍼', 'leather': '레더',
+          'shortshirt': '반팔셔츠', 'longshirt': '긴팔셔츠', 'overshirt': '오버사즈', 'denim-shirt': '데님셔츠',
+          'shorttee': '반팔티', 'longtee': '긴팔티', 'sweatshirt': '맨투맨', 'hoodie': '후드', 'sleeveless': '민소매',
+          'denim': '데님', 'slacks': '슬랙스', 'cargo': '카고', 'jogger': '조거', 'shorts': '반바지',
+          'pullover': '풀오버', 'zipup': '집업', 'cardigan': '가디건', 'vest': '베스트',
+          'sneakers': '스니커즈', 'loafer': '로퍼', 'sandal': '샌들', 'boots': '부츠'
+        };
+        const korSub = subMap[sub] || sub;
+
+        result = result.filter(p => {
+          const n = p.name ? p.name.toLowerCase() : '';
+          const d = p.description ? p.description.toLowerCase() : '';
+          const s = Array.isArray(p.styles) ? p.styles.join(' ').toLowerCase() : '';
+
+          // '오버' 키워드가 '풀오버' 등과 혼동되지 않도록 정교화
+          const isOvershirt = sub === 'overshirt';
+          if (isOvershirt) {
+            // 오버셔츠의 경우 '오버(사이즈/핏)' + '셔츠' 조합이거나 '오버사즈' 등을 체크
+            const hasOver = n.includes('오버') || d.includes('오버') || s.includes('오버');
+            const hasShirt = n.includes('셔츠') || d.includes('셔츠') || s.includes('셔츠');
+            return (hasOver && hasShirt) || n.includes('overshirt');
+          }
+
+          return n.includes(korSub) || n.includes(sub) || d.includes(korSub) || s.includes(korSub) || s.includes(sub);
+        });
       }
 
       // 뱃지(퀵) 필터
@@ -218,8 +250,8 @@
         <article class="product-card" onclick="location.href='./product.html?id=${id}'">
           <div class="product-card__img-wrap">
             ${badge ? `<span class="product-card__badge product-card__badge--${badge}">${badge.toUpperCase()}</span>` : ''}
-            <img src="${mainImg}" alt="${name}" class="product-card__img product-card__img--main" crossorigin="anonymous" loading="lazy">
-            <img src="${subImg}"  alt="${name}" class="product-card__img product-card__img--sub"  crossorigin="anonymous" loading="lazy" onerror="this.src='${mainImg}'">
+            <img src="${mainImg}" alt="${name}" class="product-card__img product-card__img--main" loading="lazy" onerror="this.src='../../assets/placeholder.png'">
+            <img src="${subImg}"  alt="${name}" class="product-card__img product-card__img--sub"  loading="lazy" onerror="this.src='${mainImg}'">
             
             <!-- ── 호버 상세 오버레이 (추가) ── -->
             <div class="product-card__overlay">

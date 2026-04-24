@@ -9,10 +9,13 @@
  * - 관련 상품 추천 렌더링
  */
 
-import { PRODUCTS, REVIEWS } from './data.js';
-import Utils from './utils.js';
+const Utils = window.Utils;
 
 const ProductDetail = (() => {
+  /* ─── 전역 데이터 추출 (init에서 할당) ─── */
+  let PRODUCTS = [];
+  let REVIEWS = {};
+
   /* ─── 상태 관리 (State) ──────────────────────────────── */
   const state = {
     product: null,
@@ -22,27 +25,30 @@ const ProductDetail = (() => {
     currentImgIndex: 0,
   };
 
-  /* ─── DOM 요소 ───────────────────────────────────────── */
-  const refs = {
-    breadcrumb: document.getElementById('breadcrumbProduct'),
-    galleryMain: document.getElementById('galleryMainImg'),
-    galleryThumbs: document.getElementById('galleryThumbs'),
-    productInfo: document.getElementById('productInfo'),
-    zoomBtn: document.getElementById('galleryZoom'),
-    modal: document.getElementById('galleryModal'),
-    modalImg: document.getElementById('galleryModalImg'),
-    modalClose: document.getElementById('galleryModalClose'),
-    tabBtns: document.querySelectorAll('.tab-btn'),
-    tabPanels: document.querySelectorAll('.tab-panel'),
-    reviewBadge: document.getElementById('reviewCountBadge'),
-    reviewSection: document.getElementById('reviewSection'),
-    relatedGrid: document.getElementById('relatedGrid'),
-    mobileCartBtn: document.getElementById('mobileCtaCart'),
-    mobileWishBtn: document.getElementById('mobileCataWish'),
-  };
+  /* ─── DOM 요소 선언만 (할당은 init에서) ─── */
+  let refs = {};
 
   /* ─── 초기화 (Init) ──────────────────────────────────── */
-  const init = () => {
+  const init = async () => {
+    // DOM 요소 바인딩
+    refs = {
+      breadcrumb: document.getElementById('breadcrumbProduct'),
+      galleryMain: document.getElementById('galleryMainImg'),
+      galleryThumbs: document.getElementById('galleryThumbs'),
+      productInfo: document.getElementById('productInfo'),
+      zoomBtn: document.getElementById('galleryZoom'),
+      modal: document.getElementById('galleryModal'),
+      modalImg: document.getElementById('galleryModalImg'),
+      modalClose: document.getElementById('galleryModalClose'),
+      tabBtns: document.querySelectorAll('.tab-btn'),
+      tabPanels: document.querySelectorAll('.tab-panel'),
+      reviewBadge: document.getElementById('reviewCountBadge'),
+      reviewSection: document.getElementById('reviewSection'),
+      relatedGrid: document.getElementById('relatedGrid'),
+      mobileCartBtn: document.getElementById('mobileCtaCart'),
+      mobileWishBtn: document.getElementById('mobileCataWish'),
+    };
+
     const params = new URLSearchParams(window.location.search);
     const productId = params.get('id');
 
@@ -52,118 +58,231 @@ const ProductDetail = (() => {
       return;
     }
 
-    state.product = PRODUCTS.find(p => p.id === productId);
-    if (!state.product) {
+    // 지연 로딩 대응: window.VARO_DATA에서 직접 추출하여 클로저 변수에 할당
+    const VD = window.VARO_DATA || { PRODUCTS: [], REVIEWS: {} };
+    PRODUCTS = VD.PRODUCTS || [];
+    REVIEWS = VD.REVIEWS || {};
+
+    // 하이브리드 데이터 로드 (Static -> API)
+    let product = PRODUCTS.find(p => p.id === productId);
+
+    try {
+      const res = await window.API.products.getById(productId);
+      if (res && res.success) {
+        const p = res.product || res.data;
+        // DB 데이터를 프론트엔드 포맷으로 변환
+        product = {
+          id: String(p.id || p.product_code),
+          brand: p.brand || 'VARO',
+          name: p.name,
+          price: p.price,
+          salePrice: p.sale_price || p.salePrice,
+          mainImg: p.main_img || p.mainImg || '../../assets/placeholder.png',
+          subImg: p.sub_img || p.subImg || '../../assets/placeholder.png',
+          images: Array.isArray(p.images) ? p.images : (p.main_img ? [p.main_img, p.sub_img].filter(Boolean) : null),
+          colors: Array.isArray(p.colors) ? p.colors : JSON.parse(p.colors || '[]'),
+          sizes: Array.isArray(p.sizes) ? p.sizes : JSON.parse(p.sizes || '[]'),
+          soldOutSizes: Array.isArray(p.sold_out_sizes) ? p.sold_out_sizes : JSON.parse(p.sold_out_sizes || '[]'),
+          description: p.description,
+          material: p.material,
+          care: p.care,
+          rating: p.rating || 5.0,
+          reviewCount: p.review_count || p.reviewCount || 0,
+          categoryId: p.category_id || p.categoryId
+        };
+      }
+    } catch (e) {
+      console.warn('[Product] API sync failed, falling back to static data.');
+    }
+
+    if (!product) {
       alert('존재하지 않는 상품입니다.');
       location.href = './shop.html';
       return;
     }
 
+    // images 보정
+    if (!product.images || product.images.length === 0) {
+      product.images = [product.mainImg, product.subImg].filter(Boolean);
+    }
+    if (product.images.length === 0) product.images = ['../../assets/placeholder.png'];
+
+    state.product = product;
+
     // 초기 데이터 설정
-    state.selectedColor = state.product.colors[0]; // 기본 컬러
+    state.selectedColor = (state.product.colors && state.product.colors.length > 0)
+      ? state.product.colors[0]
+      : { name: 'Standard', hex: 'var(--color-black)' };
 
     renderUI();
     bindEvents();
     renderRelated();
     renderReviews();
     renderStylingSets();   // [ADD] 스타일링 제안
-    renderReviewGallery();  // [ADD] 리뷰 갤러리
-    initSizeGuide();       // [ADD] 사이즈 가이드 모달
+    initSizeGuide();       // [ADD] 사이즈 가이드 모달 및 탭 연동
+    renderDetailImages();  // [ADD] 상세 이미지 렌더링
+  };
+
+  const renderDetailImages = () => {
+    const container = document.getElementById('detailImages');
+    if (!container) return;
+
+    let detailImgs = [];
+    try {
+      const images = state.product.images;
+      detailImgs = typeof images === 'string' ? JSON.parse(images) : (Array.isArray(images) ? images : []);
+    } catch (e) {
+      console.warn("상세 이미지 파싱 실패:", e);
+    }
+
+    if (detailImgs.length === 0) {
+      // 상세 이미지가 없을 경우 메인/서브 이미지라도 노출 (상용 기준 보완)
+      if (state.product.mainImg) detailImgs.push(state.product.mainImg);
+      if (state.product.subImg) detailImgs.push(state.product.subImg);
+    }
+
+    container.innerHTML = detailImgs.map(img => `<img src="${img}" alt="상세 정보" loading="lazy" style="width:100%; display:block; margin-bottom:10px;" onerror="this.style.display='none'">`).join('');
   };
 
   /* ─── UI 렌더링 ─────────────────────────────────────── */
   const renderUI = () => {
-    const { product } = state;
-    const isSale = product.salePrice !== null;
-    const currentPrice = isSale ? product.salePrice : product.price;
+    try {
+      const { product } = state;
+      if (!product) return;
 
-    // 페이지 타이틀 및 브레드크럼
-    document.title = `${product.name} — VARO`;
-    if (refs.breadcrumb) refs.breadcrumb.textContent = product.name;
+      const isSale = product.salePrice != null;
+      const currentPrice = isSale ? product.salePrice : product.price;
 
-    // 갤러리 메인 이미지
-    if (refs.galleryMain) refs.galleryMain.src = product.images[0];
+      // 페이지 타이틀 및 브레드크럼
+      document.title = `${product.name} — VARO`;
+      if (refs.breadcrumb) refs.breadcrumb.textContent = product.name;
 
-    // 썸네일 생성
-    if (refs.galleryThumbs) {
-      refs.galleryThumbs.innerHTML = product.images.map((img, idx) => `
-        <div class="product-gallery__thumb ${idx === 0 ? 'is-active' : ''}" data-index="${idx}">
-          <img src="${img}" alt="${product.name} 썸네일 ${idx + 1}">
-        </div>
-      `).join('');
-    }
+      // 갤러리 메인 이미지
+      if (refs.galleryMain && product.images && product.images.length > 0) {
+        refs.galleryMain.src = product.images[0];
+      }
 
-    // 상품 상세 정보 영역
-    if (refs.productInfo) {
-      refs.productInfo.innerHTML = `
-        <div class="product-info__top">
-          <p class="product-info__brand">${Utils.escapeHTML(product.brand)}</p>
-          <h1 class="product-info__name">${Utils.escapeHTML(product.name)}</h1>
-          
-          <div class="product-info__rating">
-            <div class="rating-stars">${renderStars(product.rating)}</div>
-            <span class="product-info__rating-val">${product.rating}</span>
-            <span class="product-info__review-count" id="infoReviewBtn">(${product.reviewCount} Reviews)</span>
+      // 썸네일 생성
+      if (refs.galleryThumbs && product.images) {
+        refs.galleryThumbs.innerHTML = product.images.map((img, idx) => `
+          <div class="product-gallery__thumb ${idx === state.currentImgIndex ? 'is-active' : ''}" data-index="${idx}">
+            <img src="${img}" alt="${product.name} 썸네일 ${idx + 1}" onerror="this.src='../../assets/placeholder.png'">
+          </div>
+        `).join('');
+      }
+
+      // 상품 설명 배너 보강 (쇼핑몰 특성에 맞게 수정)
+      const descBanner = document.getElementById('productDescBanner');
+      if (descBanner) {
+        const categoryId = product.categoryId || '';
+        const isAcc = categoryId.includes('acc') || categoryId.includes('shoes');
+
+        descBanner.innerHTML = `
+          <div class="premium-desc">
+            <div class="premium-desc__header">
+              <span class="premium-desc__subtitle">VARO STUDIO SELECTION</span>
+              <h3 class="premium-desc__title">DESIGNER'S NOTES</h3>
+            </div>
+            <div class="premium-desc__content">
+              <p class="premium-desc__text">${product.description || 'VARO만의 감성으로 풀어낸 데일리 아이템입니다. 오랜 시간 착용 가능하도록 견고하게 제작되었습니다.'}</p>
+              <div class="premium-desc__grid">
+                <div class="premium-desc__item">
+                  <span class="premium-desc__label">FABRIC</span>
+                  <p class="premium-desc__val">${product.material || 'Premium Fabric'}</p>
+                </div>
+                <div class="premium-desc__item">
+                  <span class="premium-desc__label">FIT</span>
+                  <p class="premium-desc__val">${isAcc ? 'Standard Fit' : 'Modern Relaxed Fit'}</p>
+                </div>
+                <div class="premium-desc__item">
+                  <span class="premium-desc__label">CARE</span>
+                  <p class="premium-desc__val">${product.care || 'Dry Cleaning Recommended'}</p>
+                </div>
+              </div>
+            </div>
+            <div class="premium-desc__footer">
+              <p class="premium-desc__tip"><span>TIP:</span> ${isAcc ? '다양한 스타일링에 포인트가 되어주는 아이템입니다.' : '정사이즈 구매를 권장하며, 자연스러운 실루엣을 연출합니다.'}</p>
+            </div>
+          </div>
+        `;
+      }
+
+      // 상품 상세 정보 영역
+      if (refs.productInfo) {
+        const u = window.Utils || Utils; // 전역/로컬 모두 대응
+
+        refs.productInfo.innerHTML = `
+          <div class="product-info__top">
+            <p class="product-info__brand">${u.escapeHTML(product.brand || 'VARO STUDIO')}</p>
+            <h1 class="product-info__name">${u.escapeHTML(product.name)}</h1>
+            
+            <div class="product-info__rating">
+              <div class="rating-stars">${renderStars(product.rating)}</div>
+              <span class="product-info__rating-val">${product.rating || '5.0'}</span>
+              <span class="product-info__review-count" id="infoReviewBtn">(${product.reviewCount || 0} Reviews)</span>
+            </div>
+
+            <div class="product-info__price-wrap">
+              ${isSale ? `<span class="product-info__price--discount">${u.discountRate(product.price, product.salePrice)}%</span>` : ''}
+              <span class="product-info__price--main">${u.formatPrice(currentPrice)}</span>
+              ${isSale ? `<span class="product-info__price--original">${u.formatPrice(product.price)}</span>` : ''}
+            </div>
           </div>
 
-          <div class="product-info__price-wrap">
-            ${isSale ? `<span class="product-info__price--discount">${Utils.discountRate(product.price, product.salePrice)}%</span>` : ''}
-            <span class="product-info__price--main">${Utils.formatPrice(currentPrice)}</span>
-            ${isSale ? `<span class="product-info__price--original">${Utils.formatPrice(product.price)}</span>` : ''}
+          <div class="product-info__color-section">
+            <p class="product-info__label">COLOR: <span class="product-info__color-value" id="selectedColorName">${state.selectedColor?.name || 'Standard'}</span></p>
+            <div class="product-color-swatches">
+              ${(product.colors || []).map(c => `
+                <button class="product-color-swatch ${(c.name === state.selectedColor?.name) ? 'is-active' : ''} ${c.hex?.toLowerCase() === '#ffffff' ? 'product-color-swatch--light' : ''}" 
+                        style="background-color: ${c.hex}" 
+                        data-color="${c.name}" title="${c.name}"></button>
+              `).join('')}
+            </div>
           </div>
-        </div>
 
-        <div class="product-info__color-section">
-          <p class="product-info__label">COLOR: <span class="product-info__color-value" id="selectedColorName">${state.selectedColor.name}</span></p>
-          <div class="product-color-swatches">
-            ${product.colors.map(c => `
-              <button class="product-color-swatch ${c.name === state.selectedColor.name ? 'is-active' : ''} ${c.hex.toLowerCase() === '#ffffff' ? 'product-color-swatch--light' : ''}" 
-                      style="background-color: ${c.hex}" 
-                      data-color="${c.name}" title="${c.name}"></button>
-            `).join('')}
+          <div class="product-info__size-section">
+            <div class="product-info__size-header">
+              <p class="product-info__label">SIZE</p>
+              <button class="size-guide-btn">Size Guide</button>
+            </div>
+            <div class="product-sizes">
+              ${(product.sizes || []).map(s => {
+          const isSoldOut = (product.soldOutSizes || []).includes(s);
+          return `<button class="size-btn ${isSoldOut ? 'size-btn--sold-out' : ''}" data-size="${s}" ${isSoldOut ? 'disabled' : ''}>${s}</button>`;
+        }).join('')}
+            </div>
           </div>
-        </div>
 
-        <div class="product-info__size-section">
-          <div class="product-info__size-header">
-            <p class="product-info__label">SIZE</p>
-            <button class="size-guide-btn">Size Guide</button>
+          <div class="product-info__qty-section">
+            <p class="product-info__label">수량</p>
+            <div class="product-qty">
+              <button class="qty-btn" data-action="minus" aria-label="수량 감소">${u.icon('minus')}</button>
+              <span class="qty-value" id="qtyValue">1</span>
+              <button class="qty-btn" data-action="plus" aria-label="수량 증가">${u.icon('plus')}</button>
+            </div>
           </div>
-          <div class="product-sizes">
-            ${product.sizes.map(s => {
-        const isSoldOut = product.soldOutSizes.includes(s);
-        return `<button class="size-btn ${isSoldOut ? 'size-btn--sold-out' : ''}" data-size="${s}" ${isSoldOut ? 'disabled' : ''}>${s}</button>`;
-      }).join('')}
+
+          <div class="product-info__cta">
+            <button class="product-wish-btn ${window.App?.Wishlist?.has?.(product.id) ? 'is-active' : ''}" id="mainWishBtn" aria-label="위시리스트 추가">
+              ${u.icon('heart')}
+            </button>
+            
+            ${(product.soldOutSizes || []).length === (product.sizes || []).length && (product.sizes || []).length > 0 ? `
+              <button class="btn btn--restock btn--full" id="restockApplyBtn">재입고 알림 신청</button>
+            ` : `
+              <button class="btn btn--outline product-cta-btn" id="addToCartBtn">장바구니에 넣기</button>
+              <button class="btn btn--primary product-cta-btn" id="buyNowBtn">바로 구매하기</button>
+            `}
           </div>
-        </div>
 
-        <div class="product-info__qty-section">
-          <p class="product-info__label">QUANTITY</p>
-          <div class="product-qty">
-            <button class="qty-btn" data-action="minus" aria-label="수량 감소">${Utils.icon('minus')}</button>
-            <span class="qty-value" id="qtyValue">1</span>
-            <button class="qty-btn" data-action="plus" aria-label="수량 증가">${Utils.icon('plus')}</button>
+          <div class="product-info__meta">
+            <p><strong>Material:</strong> ${product.material || 'Premium Cashmere Blend'}</p>
+            <p><strong>Care:</strong> ${product.care || 'Professional Dry Clean'}</p>
           </div>
-        </div>
-
-        <div class="product-info__cta">
-          <button class="product-wish-btn ${window.App?.Wishlist?.has?.(product.id) ? 'is-active' : ''}" id="mainWishBtn" aria-label="위시리스트 추가">
-            ${Utils.icon('heart')}
-          </button>
-          
-          ${product.soldOutSizes.length === product.sizes.length ? `
-            <button class="btn btn--restock btn--full" id="restockApplyBtn">재입고 알림 신청</button>
-          ` : `
-            <button class="btn btn--outline product-cta-btn" id="addToCartBtn">ADD TO CART</button>
-            <button class="btn btn--primary product-cta-btn" id="buyNowBtn">BUY IT NOW</button>
-          `}
-        </div>
-
-        <div class="product-info__meta">
-          <p><strong>Material:</strong> ${product.material || 'Cotton 100%'}</p>
-          <p><strong>Care:</strong> ${product.care || 'Dry Clean Recommended'}</p>
-        </div>
-      `;
+        `;
+      }
+    } catch (err) {
+      console.error('[Product] Fatal Render Error:', err);
     }
   };
 
@@ -260,9 +379,14 @@ const ProductDetail = (() => {
         const target = btn.dataset.tab;
         refs.tabBtns.forEach(b => b.classList.remove('is-active'));
         btn.classList.add('is-active');
-        refs.tabPanels.forEach(p => {
-          p.hidden = p.id !== `tab${target.charAt(0).toUpperCase() + target.slice(1)}`;
-        });
+
+        // 모든 패널 숨기기
+        document.querySelectorAll('.tab-panel').forEach(p => p.hidden = true);
+
+        // 대상 패널 보이기 (ID 매칭 보정)
+        const panelId = `tab${target.charAt(0).toUpperCase() + target.slice(1)}`;
+        const panel = document.getElementById(panelId);
+        if (panel) panel.hidden = false;
       });
     });
   };
@@ -368,11 +492,46 @@ const ProductDetail = (() => {
     const overlay = document.getElementById('sizeModalOverlay');
     const tableContainer = document.getElementById('sizeGuideTableContainer');
 
-    if (!modal || !tableContainer) return;
+    if (!tableContainer) return;
+
+    // 카테고리 체크: 액세서리나 슈즈의 경우 AI 추천 숨김
+    const category = state.product.categoryId || state.product.category || '';
+    const isAcc = category.includes('acc') || category.includes('shoes');
+    const aiSection = document.getElementById('aiSizeRecommend');
+
+    if (isAcc && aiSection) {
+      aiSection.style.display = 'none';
+    } else if (aiSection) {
+      aiSection.style.display = 'block';
+    }
+
+    // AI 스마트 가이드 이벤트 바인딩
+    const btnRunAi = document.getElementById('btnRunAi');
+    if (btnRunAi) {
+      btnRunAi.addEventListener('click', () => {
+        const height = parseInt(document.getElementById('inputHeight')?.value, 10);
+        const weight = parseInt(document.getElementById('inputWeight')?.value, 10);
+        const resultDiv = document.getElementById('aiResult');
+        const recommendedSize = document.getElementById('recommendedSize');
+
+        if (!height || !weight || height < 100 || weight < 30) {
+          alert('정확한 키와 몸무게를 입력해주세요.');
+          return;
+        }
+
+        // 간단한 Mock 추론 로직
+        let size = 'M';
+        if (weight >= 85 || height >= 185) size = 'XL';
+        else if (weight >= 75 || height >= 178) size = 'L';
+        else if (weight <= 60 && height <= 168) size = 'S';
+
+        recommendedSize.textContent = size;
+        resultDiv.removeAttribute('hidden');
+      });
+    }
 
     // 데이터 바인딩
-    const category = state.product.categoryId;
-    const guide = window.VARO_DATA?.SIZE_GUIDE[category];
+    const guide = window.VARO_DATA?.SIZE_GUIDE[category] || window.VARO_DATA?.SIZE_GUIDE['상의'];
 
     if (!guide) {
       tableContainer.innerHTML = '<p style="text-align:center; padding: 20px;">이 카테고리는 사이즈 가이드가 준비 중입니다.</p>';
@@ -390,6 +549,10 @@ const ProductDetail = (() => {
       });
       html += '</tbody></table>';
       tableContainer.innerHTML = html;
+
+      // [ADD] 탭 내부 컨테이너에도 동일하게 렌더링
+      const tabContainer = document.getElementById('tabSizeGuideContainer');
+      if (tabContainer) tabContainer.innerHTML = html;
     }
 
     const close = () => modal.classList.remove('is-active');

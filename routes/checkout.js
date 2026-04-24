@@ -238,7 +238,7 @@ router.post('/', optionalAuth, async (req, res) => {
           amounts.totalAmount, amounts.discountAmount,
           amounts.shippingFee, amounts.finalAmount,
           payment.method,
-          shipping.name, shipping.phone, shipping.address, shipping.detail ?? '',
+          shipping.name, db.encrypt(shipping.phone), shipping.address, shipping.detail ?? '',
           shipping.request ?? '', JSON.stringify(validatedItems)
         ]);
 
@@ -296,8 +296,8 @@ router.post('/', optionalAuth, async (req, res) => {
             payment_method, payment_status, order_status
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'paid', 'confirmed')
         `, [
-          orderNumber, req.guestId, guest_email, guest_name, guest_phone, guest_password,
-          shipping.name, shipping.phone, shipping.zipcode,
+          orderNumber, req.guestId, db.encryptDeterministic(guest_email), guest_name, db.encrypt(guest_phone), guest_password,
+          shipping.name, db.encrypt(shipping.phone), shipping.zipcode,
           shipping.address, shipping.detail ?? '', shipping.request ?? '',
           amounts.totalAmount, amounts.discountAmount, amounts.shippingFee, amounts.finalAmount,
           payment.method
@@ -361,6 +361,9 @@ router.post('/lookup', async (req, res) => {
     }
 
     const order = orders[0];
+    order.guest_email = db.decrypt(order.guest_email);
+    order.guest_phone = db.decrypt(order.guest_phone);
+    order.shipping_phone = db.decrypt(order.shipping_phone);
     const items = await db.query('SELECT * FROM guest_order_items WHERE order_id = ?', [order.id]);
 
     order.items = items;
@@ -388,19 +391,24 @@ router.get('/order/:orderNumber', optionalAuth, async (req, res) => {
       if (orders.length === 0) return res.status(404).json({ success: false, message: '주문을 찾을 수 없습니다' });
 
       const order = orders[0];
+      order.recipient_phone = db.decrypt(order.recipient_phone);
       order.items = await db.query('SELECT * FROM order_items WHERE order_id = ?', [order.id]);
       return res.json({ success: true, data: order });
     } else {
       if (!email) return res.status(400).json({ success: false, message: '이메일 주소가 필요합니다' });
 
+      const encEmail = db.encryptDeterministic(email);
       const orders = await db.query(`
         SELECT o.* FROM guest_orders o
         WHERE o.order_number = ? AND o.guest_email = ?
-      `, [orderNumber, email.toLowerCase()]);
+      `, [orderNumber, encEmail]);
 
       if (orders.length === 0) return res.status(404).json({ success: false, message: '주문을 찾을 수 없거나 이메일이 일치하지 않습니다' });
 
       const order = orders[0];
+      order.guest_email = db.decrypt(order.guest_email);
+      order.guest_phone = db.decrypt(order.guest_phone);
+      order.shipping_phone = db.decrypt(order.shipping_phone);
       order.items = await db.query('SELECT * FROM guest_order_items WHERE order_id = ?', [order.id]);
       return res.json({ success: true, data: order });
     }
@@ -411,7 +419,7 @@ router.get('/order/:orderNumber', optionalAuth, async (req, res) => {
 });
 
 // ── GET /api/checkout/orders  (회원 전용: 나의 주문 목록) ─────────
-router.get('/orders', authMiddleware, async (req, res) => {
+router.get('/orders', authMiddleware.requireAuth, async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
   const offset = (Number(page) - 1) * Number(limit);
 
@@ -435,7 +443,7 @@ router.get('/orders', authMiddleware, async (req, res) => {
 });
 
 // ── POST /api/checkout/orders/:id/cancel ─────────────────────────
-router.post('/orders/:id/cancel', authMiddleware, async (req, res) => {
+router.post('/orders/:id/cancel', authMiddleware.requireAuth, async (req, res) => {
   const orderId = Number(req.params.id);
 
   try {

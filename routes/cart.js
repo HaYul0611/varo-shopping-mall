@@ -221,7 +221,7 @@ router.delete('/', optionalAuth, async (req, res) => {
 });
 
 // ── POST /api/cart/merge  (로그인 시 비회원 → 회원 병합) ─────────
-router.post('/merge', authMiddleware, async (req, res) => {
+router.post('/merge', authMiddleware.requireAuth, async (req, res) => {
   const { guest_id } = req.body;
 
   if (!guest_id || typeof guest_id !== 'string') {

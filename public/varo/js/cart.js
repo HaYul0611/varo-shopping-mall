@@ -27,7 +27,7 @@ const CartPage = (() => {
     shipping: document.getElementById('summaryShipping'),
     discount: document.getElementById('summaryDiscount'),
     discountRow: document.getElementById('discountRow'),
-    finalTotal: document.getElementById('summaryTotal'),
+    finalTotal: document.getElementById('summaryFinalTotal'),
 
     // Tools
     checkAll: document.getElementById('cartCheckAll'),
@@ -42,6 +42,9 @@ const CartPage = (() => {
     // Free Shipping Progress
     freeShipBar: document.getElementById('freeShipBar'),
     freeShipText: document.getElementById('freeShipText'),
+
+    // Empty state recommends
+    emptyRecommend: document.getElementById('emptyRecommendGrid'),
   };
 
   const init = () => {
@@ -56,39 +59,57 @@ const CartPage = (() => {
     if (items.length === 0) {
       refs.empty.hidden = false;
       refs.layout.hidden = true;
+      renderRecommendations();
       return;
     }
 
     refs.empty.hidden = true;
     refs.layout.hidden = false;
 
-    // 리스트 렌더링
+    // 리스트 렌더링 (New Trendy Structure)
     refs.list.innerHTML = items.map((item, idx) => `
       <li class="cart-item" data-index="${idx}">
         <div class="cart-item__check">
           <input type="checkbox" checked class="item-checkbox">
         </div>
-        <div class="cart-item__img" onclick="location.href='./product.html?id=${item.productId}'">
-          <img src="${item.mainImg}" alt="${item.name}">
-        </div>
+        <img class="cart-item__img" src="${item.mainImg}" alt="${item.name}" onclick="location.href='./product.html?id=${item.productId}'">
         <div class="cart-item__info">
-          <p class="cart-item__brand">${item.brand}</p>
           <h3 class="cart-item__name">${item.name}</h3>
-          <p class="cart-item__option">옵션: ${item.color} / ${item.size}</p>
-          <div class="cart-item__qty-wrap">
-            <button class="qty-btn" data-action="minus" data-index="${idx}">${Utils.icon('minus')}</button>
-            <span class="qty-val">${item.qty}</span>
-            <button class="qty-btn" data-action="plus" data-index="${idx}">${Utils.icon('plus')}</button>
+          <p class="cart-item__option">OPTION: ${item.color} / ${item.size}</p>
+          <div class="cart-item__qty">
+            <div class="qty-control">
+              <button data-action="minus" data-index="${idx}">-</button>
+              <span>${item.qty}</span>
+              <button data-action="plus" data-index="${idx}">+</button>
+            </div>
+            <button class="cart-item__remove btn-text u-ml-10" data-index="${idx}">REMOVE</button>
           </div>
         </div>
         <div class="cart-item__price-block">
           <span class="cart-item__price">${Utils.formatPrice(item.price * item.qty)}</span>
-          <button class="cart-item__remove" data-index="${idx}">${Utils.icon('x')}</button>
         </div>
       </li>
     `).join('');
 
     updateSummary();
+  };
+
+  const renderRecommendations = () => {
+    if (!refs.emptyRecommend) return;
+    const { PRODUCTS } = window.VARO_DATA;
+    // 베스트 상품 4개 추천
+    const bests = PRODUCTS.filter(p => p.badge === 'best').slice(0, 4);
+    refs.emptyRecommend.innerHTML = bests.map(p => `
+      <article class="product-card" onclick="location.href='./product.html?id=${p.id}'">
+        <div class="product-card__img-wrap">
+          <img src="${p.mainImg}" alt="${p.name}" class="product-card__img" loading="lazy">
+        </div>
+        <div class="product-card__info">
+          <h4 class="product-card__name">${p.name}</h4>
+          <p class="product-card__price">${Utils.formatPrice(p.salePrice ?? p.price)}</p>
+        </div>
+      </article>
+    `).join('');
   };
 
   const updateSummary = () => {
@@ -182,12 +203,54 @@ const CartPage = (() => {
       }
     });
 
-    // 주문하기
+    // 주문하기 (PortOne 실결제 연동)
     refs.checkoutBtn?.addEventListener('click', () => {
-      Utils.showToast('결제 시스템으로 이동합니다...', 'success');
-      setTimeout(() => {
-        location.href = './checkout.html';
-      }, 1000);
+      const items = window.App?.Cart.getItems() || [];
+      if (items.length === 0) {
+        Utils.showToast('장바구니가 비어 있습니다.', 'error');
+        return;
+      }
+
+      const totalAmount = parseInt(document.getElementById('summaryFinalTotal').textContent.replace(/[^0-9]/g, ''));
+      const orderName = items.length === 1 ? items[0].name : `${items[0].name} 외 ${items.length - 1}건`;
+
+      // 1. PortOne 객체 초기화 (상용에서는 실제 가맹점 식별코드 사용)
+      const IMP = window.IMP;
+      if (!IMP) {
+        Utils.showToast('결제 시스템을 불러오는 중입니다. 잠시 후 다시 시도해주세요.', 'error');
+        return;
+      }
+
+      // 테스트 식별코드 (imp00000000 등 포트원 공용 테스트 ID 적용)
+      IMP.init('imp14397622');
+
+      // 2. 결제창 호출
+      Utils.showToast('결제 모듈을 띄웁니다...', 'success');
+
+      IMP.request_pay({
+        pg: 'tosspayments',           // 테스트용 토스페이먼츠
+        pay_method: 'card',           // 카드 결제
+        merchant_uid: 'VARO_ORDER_' + new Date().getTime(),
+        name: orderName,
+        amount: totalAmount,
+        buyer_email: window.App?.Auth?.getUser()?.email || 'customer@varo.com',
+        buyer_name: window.App?.Auth?.getUser()?.customer || '바로서버고객',
+        buyer_tel: '010-0000-0000',
+        buy_addr: '서울특별시 강남구 테헤란로 123',
+        buyer_postcode: '06236'
+      }, function (rsp) {
+        if (rsp.success) {
+          // 결제 성공 로직
+          Utils.showToast('결제가 성공적으로 완료되었습니다!', 'success');
+          window.App.Cart.clear();
+          setTimeout(() => {
+            location.href = './index.html';
+          }, 1500);
+        } else {
+          // 결제 취소/실패 로직
+          Utils.showToast(`결제가 취소되었습니다. (${rsp.error_msg})`, 'error');
+        }
+      });
     });
   };
 

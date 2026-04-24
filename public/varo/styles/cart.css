@@ -1,0 +1,276 @@
+/* styles/cart.css - VARO Shopping Bag Premium Styling */
+
+.cart-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 60px;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .cart-layout {
+    grid-template-columns: 1fr 380px;
+  }
+}
+
+/* ── 빈 장바구니 ── */
+.cart-empty {
+  padding: 100px 0;
+  text-align: center;
+}
+
+.cart-empty__inner {
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cart-empty svg {
+  color: #ddd;
+  margin-bottom: 24px;
+}
+
+.cart-empty__text {
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--color-black);
+}
+
+.cart-empty__sub {
+  color: var(--color-gray);
+  line-height: 1.6;
+}
+
+.recommend-title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 400;
+  margin: 80px 0 30px;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+
+/* ── 장바구니 아이템 ── */
+.cart-items__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 30px;
+}
+
+.cart-check-all {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cart-list {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  gap: 24px;
+  padding-bottom: 30px;
+  border-bottom: 0.5px solid var(--color-border-light);
+}
+
+.cart-item__img {
+  width: 100px;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  background: var(--color-light);
+}
+
+.cart-item__info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cart-item__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-black);
+}
+
+.cart-item__option {
+  font-size: 11px;
+  color: var(--color-gray);
+}
+
+.cart-item__price {
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: auto;
+}
+
+.cart-item__qty {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.qty-control {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  height: 30px;
+}
+
+.qty-control button {
+  width: 30px;
+  height: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.qty-control span {
+  width: 40px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.cart-item__remove {
+  color: #bbb;
+  cursor: pointer;
+}
+
+.cart-item__remove:hover {
+  color: var(--color-black);
+}
+
+/* ── 주문 요약 (Sticky) ── */
+.cart-summary-container {
+  position: relative;
+}
+
+.cart-summary {
+  position: sticky;
+  top: 120px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  padding: 30px;
+}
+
+.cart-summary__title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  letter-spacing: 0.05em;
+}
+
+.cart-summary__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cart-summary__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--color-gray);
+}
+
+.cart-summary__row dd {
+  color: var(--color-black);
+  font-weight: 600;
+}
+
+.cart-summary__total {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.cart-summary__total dd {
+  font-size: 20px;
+  color: var(--color-accent);
+}
+
+.cart-summary__free-ship {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f9f9f9;
+}
+
+.free-ship-progress {
+  height: 2px;
+  background: #eee;
+  margin-bottom: 10px;
+}
+
+.free-ship-bar {
+  height: 100%;
+  background: var(--color-accent);
+  transition: width 0.5s ease;
+}
+
+.cart-summary__coupon .coupon-field {
+  display: flex;
+  gap: 5px;
+}
+
+.cart-summary__coupon input {
+  flex: 1;
+  height: 44px;
+  border: 1px solid var(--color-border);
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.cart-summary__benefits {
+  list-style: none;
+  padding: 0;
+}
+
+.cart-summary__benefits li {
+  font-size: 11px;
+  color: var(--color-gray);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cart-summary__benefits li::before {
+  content: '✓';
+  color: var(--color-accent);
+}
+
+.btn--wide {
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+/* ── 애니메이션 ── */
+.cart-item {
+  animation: fadeIn 0.5s ease both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

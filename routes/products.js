@@ -48,6 +48,28 @@ const parseProduct = (row) => {
   };
 };
 
+/* ── 다중 파일 업로드 POST /api/products/upload ─────────── */
+router.post('/upload', requireAuth, requireAdmin, upload.fields([
+  { name: 'mainFile', maxCount: 1 },
+  { name: 'subFile', maxCount: 1 },
+  { name: 'detailFiles', maxCount: 10 }
+]), (req, res) => {
+  try {
+    const getUrl = (file) => file ? `./assets/products/${file.filename}` : null;
+
+    res.json({
+      success: true,
+      urls: {
+        main: req.files['mainFile'] ? getUrl(req.files['mainFile'][0]) : null,
+        sub: req.files['subFile'] ? getUrl(req.files['subFile'][0]) : null,
+        details: req.files['detailFiles'] ? req.files['detailFiles'].map(getUrl) : []
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: '파일 업로드 실패: ' + err.message });
+  }
+});
+
 /* ── 전체 목록 GET /api/products ─────────── */
 router.get('/', optionalAuth, async (req, res) => {
   const { category, filter, style, sort, q, limit, offset } = req.query;

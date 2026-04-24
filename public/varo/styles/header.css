@@ -39,7 +39,7 @@
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 40px;
 }
 
 .header-top__notice {
@@ -174,7 +174,7 @@
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 40px;
 }
 
 /* 로고 — Fraunces 세리프 적용 */
@@ -322,7 +322,7 @@
   align-items: center;
   max-width: 1440px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 40px;
   overflow: visible !important;
 
   gap: 0;

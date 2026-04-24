@@ -642,3 +642,77 @@
   margin-bottom: 0 !important;
   padding-bottom: 0 !important;
 }
+
+/* ══════════════════════════════════════════════════
+   NEW: FLASH SALE (Premium Time Sale Engine)
+   ══════════════════════════════════════════════════ */
+.home-section--flash {
+  background: #111;
+  color: #fff;
+  padding: 100px 0;
+  text-align: center;
+}
+
+.flash-sale-badge {
+  display: inline-block;
+  background: #FF3B30;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 4px;
+  margin-bottom: 24px;
+  letter-spacing: 0.1em;
+}
+
+.flash-sale-title {
+  font-family: var(--font-serif);
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 300;
+  margin-bottom: 30px;
+  letter-spacing: -0.02em;
+}
+
+.flash-sale-timer {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 15px;
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 700;
+  margin-bottom: 60px;
+}
+
+.timer-unit {
+  min-width: 80px;
+}
+
+.flash-sale-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+@media (min-width: 1024px) {
+  .flash-sale-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+  }
+}
+
+.home-section--flash .product-card__info {
+  text-align: left;
+}
+
+.home-section--flash .product-card__name {
+  color: #fff;
+}
+
+.home-section--flash .product-card__price {
+  color: #FF3B30;
+}
+
+.home-section--flash .product-card__price--original {
+  color: #666;
+}

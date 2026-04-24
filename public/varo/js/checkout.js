@@ -37,7 +37,7 @@ const init = async () => {
   const rawItems = sessionStorage.getItem('varo_checkout_items');
   if (!rawItems) {
     showError('결제할 상품이 없습니다. 장바구니로 이동합니다.');
-    setTimeout(() => { location.href = '/varo/cart.html'; }, 2000);
+    setTimeout(() => { location.href = './cart.html'; }, 2000);
     return;
   }
 
@@ -113,7 +113,7 @@ const renderOrderItems = (items) => {
   container.innerHTML = items.map(item => `
     <div class="checkout-item">
       <div class="checkout-item__img">
-        <img src="${item.product_image || '/varo/img/placeholder.png'}" alt="${item.product_name}" loading="lazy">
+        <img src="${item.product_image || '../../assets/placeholder.png'}" alt="${item.product_name}" loading="lazy">
       </div>
       <div class="checkout-item__info">
         <p class="checkout-item__name">${item.product_name}</p>

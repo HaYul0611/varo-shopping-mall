@@ -11,7 +11,6 @@ const MegaMenu = (() => {
     outer: {
       title: '아우터',
       cats: [
-        { label: '전체보기', href: './shop.html?category=outer', count: 147 },
         { label: '자켓', href: './shop.html?sub=jacket', count: 38 },
         { label: '코트', href: './shop.html?sub=coat', count: 29 },
         { label: '패딩', href: './shop.html?sub=padding', count: 24 },
@@ -30,7 +29,6 @@ const MegaMenu = (() => {
     shirt: {
       title: '셔츠',
       cats: [
-        { label: '전체보기', href: './shop.html?category=shirt', count: 89 },
         { label: '반팔셔츠', href: './shop.html?sub=shortshirt', count: 22 },
         { label: '긴팔셔츠', href: './shop.html?sub=longshirt', count: 31 },
         { label: '오버셔츠', href: './shop.html?sub=overshirt', count: 18 },
@@ -48,7 +46,6 @@ const MegaMenu = (() => {
     top: {
       title: '상의',
       cats: [
-        { label: '전체보기', href: './shop.html?category=top', count: 203 },
         { label: '반팔티', href: './shop.html?sub=shorttee', count: 54 },
         { label: '긴팔티', href: './shop.html?sub=longtee', count: 47 },
         { label: '맨투맨', href: './shop.html?sub=sweatshirt', count: 38 },
@@ -67,7 +64,6 @@ const MegaMenu = (() => {
     knit: {
       title: '니트',
       cats: [
-        { label: '전체보기', href: './shop.html?category=knit', count: 74 },
         { label: '풀오버', href: './shop.html?sub=pullover', count: 22 },
         { label: '집업니트', href: './shop.html?sub=zipup', count: 18 },
         { label: '가디건', href: './shop.html?sub=cardigan', count: 16 },
@@ -85,7 +81,6 @@ const MegaMenu = (() => {
     bottom: {
       title: '하의',
       cats: [
-        { label: '전체보기', href: './shop.html?category=bottom', count: 178 },
         { label: '데님팬츠', href: './shop.html?sub=denim', count: 48 },
         { label: '슬랙스', href: './shop.html?sub=slacks', count: 36 },
         { label: '카고팬츠', href: './shop.html?sub=cargo', count: 29 },
@@ -104,7 +99,6 @@ const MegaMenu = (() => {
     setup: {
       title: '세트업',
       cats: [
-        { label: '전체보기', href: './shop.html?category=setup', count: 42 },
         { label: '상하의 세트', href: './shop.html?sub=set', count: 18 },
         { label: '트레이닝 세트', href: './shop.html?sub=training', count: 14 },
         { label: '수트 세트', href: './shop.html?sub=suit', count: 10 },
@@ -120,7 +114,6 @@ const MegaMenu = (() => {
     shoes: {
       title: '슈즈',
       cats: [
-        { label: '전체보기', href: './shop.html?category=shoes', count: 62 },
         { label: '스니커즈', href: './shop.html?sub=sneakers', count: 18 },
         { label: '로퍼', href: './shop.html?sub=loafer', count: 14 },
         { label: '샌들', href: './shop.html?sub=sandal', count: 12 },

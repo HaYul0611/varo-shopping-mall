@@ -38,7 +38,7 @@ const IndexPage = (() => {
       slide.innerHTML = `
         <a href="${data.ctaHref || './shop.html'}" class="main-slider__panel ${isFull ? 'main-slider__panel--full' : ''}">
           ${imgPanels.map((src, i) => `
-            <img src="${src}" alt="배너 이미지 ${i + 1}" crossorigin="anonymous" loading="${idx === 0 ? 'eager' : 'lazy'}">
+            <img src="${src}" alt="배너 이미지 ${i + 1}" loading="${idx === 0 ? 'eager' : 'lazy'}">
           `).join('')}
         </a>
       `;
@@ -90,23 +90,21 @@ const IndexPage = (() => {
 
     const mainImg = document.createElement('img');
     mainImg.className = 'product-card__img product-card__img--main';
-    mainImg.src = product.mainImg;
+    mainImg.src = product.mainImg || '../../assets/placeholder.png';
     mainImg.alt = product.name;
-    mainImg.crossOrigin = 'anonymous'; // ORB 방지
     mainImg.loading = 'lazy';
     mainImg.width = 600;
     mainImg.height = 800;
 
     const subImg = document.createElement('img');
     subImg.className = 'product-card__img product-card__img--sub';
-    subImg.src = product.subImg || product.mainImg;
+    subImg.src = product.subImg || product.mainImg || '../../assets/placeholder.png';
     subImg.alt = '';
-    subImg.crossOrigin = 'anonymous'; // ORB 방지
     subImg.loading = 'lazy';
     subImg.width = 600;
     subImg.height = 800;
     subImg.setAttribute('aria-hidden', 'true');
-    subImg.onerror = () => { subImg.src = product.mainImg; }; // 폴백
+    subImg.onerror = () => { subImg.src = product.mainImg || '../../assets/placeholder.png'; }; // 폴백
 
     imgWrap.append(mainImg, subImg);
 
@@ -261,17 +259,78 @@ const IndexPage = (() => {
     const merged = [...(LIVE_PRODUCTS.map(p => ({
       id: p.id,
       name: p.name,
-      mainImg: p.mainImg?.startsWith('.') ? p.mainImg.replace('./', '/varo/') : p.mainImg,
-      subImg: p.subImg?.startsWith('.') ? p.subImg.replace('./', '/varo/') : p.subImg,
+      mainImg: p.main_img || p.mainImg || '../../assets/placeholder.png',
+      subImg: p.sub_img || p.subImg || p.main_img || p.mainImg || '../../assets/placeholder.png',
       price: p.price,
       salePrice: p.salePrice,
       badge: p.badge,
       categoryId: p.categoryId,
       isNew: p.badge === 'new',
+      isFlashSale: p.isFlashSale || false,
+      flashSalePrice: p.flashSalePrice,
+      flashSaleEnd: p.flashSaleEnd,
       description: p.description,
       reviewCount: p.reviewCount || 0
     }))), ...staticProducts];
     return merged;
+  };
+
+  /* ── 플래시 세일 (Time Sale) 엔진 ── */
+  let flashInterval;
+  const renderFlashSale = () => {
+    const section = document.getElementById('flashSaleSection');
+    const grid = document.getElementById('flashSaleGrid');
+    if (!section || !grid) return;
+
+    const products = getProducts();
+    const flashItems = products.filter(p => p.isFlashSale && p.flashSaleEnd);
+
+    if (flashItems.length === 0) {
+      section.hidden = true;
+      return;
+    }
+
+    section.hidden = false;
+    grid.innerHTML = '';
+    flashItems.slice(0, 4).forEach(p => {
+      // 플래시 세일용 커스텀 빌더 (가격 강조)
+      const card = buildCard(p);
+      if (p.flashSalePrice) {
+        const priceEl = card.querySelector('.product-card__price--sale') || card.querySelector('.product-card__price');
+        priceEl.textContent = (p.flashSalePrice).toLocaleString() + '원';
+        priceEl.classList.add('u-color-error');
+      }
+      grid.appendChild(card);
+    });
+
+    startFlashTimer(flashItems[0].flashSaleEnd);
+  };
+
+  const startFlashTimer = (endTime) => {
+    clearInterval(flashInterval);
+    const target = new Date(endTime).getTime();
+
+    const update = () => {
+      const now = new Date().getTime();
+      const diff = target - now;
+
+      if (diff <= 0) {
+        clearInterval(flashInterval);
+        renderFlashSale(); // 다시 렌더링하여 숨김 처리
+        return;
+      }
+
+      const h = Math.floor(diff / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+      document.getElementById('timerHours').textContent = String(h).padStart(2, '0');
+      document.getElementById('timerMinutes').textContent = String(m).padStart(2, '0');
+      document.getElementById('timerSeconds').textContent = String(s).padStart(2, '0');
+    };
+
+    update();
+    flashInterval = setInterval(update, 1000);
   };
 
   /* 룩플 전용 렌더링 함수들 */
@@ -321,6 +380,7 @@ const IndexPage = (() => {
   };
 
   const renderAll = () => {
+    renderFlashSale();
     renderWeeklyBest(document.querySelector('.lookple-tab-btn.is-active')?.dataset.category || 'best');
     renderNewProduct();
     renderLookpleBest();
