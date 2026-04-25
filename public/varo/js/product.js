@@ -438,37 +438,12 @@ const ProductDetail = (() => {
     }
 
     const { product, selectedColor, selectedSize, quantity } = state;
-    const cartKey = 'varo_cart';
-    const cart = Utils.storage.get(cartKey) || [];
-
-    const existing = cart.find(item =>
-      item.productId === product.id &&
-      item.size === selectedSize &&
-      item.color === selectedColor.name
-    );
-
-    if (existing) {
-      existing.qty += quantity;
-    } else {
-      cart.push({
-        productId: product.id,
-        name: product.name,
-        brand: product.brand,
-        price: product.salePrice ?? product.price,
-        mainImg: product.mainImg,
-        size: selectedSize,
-        color: selectedColor.name,
-        qty: quantity
-      });
-    }
-
-    Utils.storage.set(cartKey, cart);
-    window.dispatchEvent(new Event('cartUpdated')); // 헤더 뱃지 갱신용
+    
+    // 공통 Cart 모듈 사용 (실시간 배지 업데이트 포함)
+    window.App.Cart.addItem(product, selectedSize, selectedColor.name, quantity);
 
     if (isBuyNow) {
       location.href = './cart.html';
-    } else {
-      Utils.showToast('장바구니에 담겼습니다 🛍', 'success');
     }
   };
 
