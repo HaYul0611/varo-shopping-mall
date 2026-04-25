@@ -1,4 +1,4 @@
-﻿/* 경로: styles/main.css */
+/* 경로: styles/main.css */
 /* VARO 2026 — 공통 레이아웃, 헤더, 푸터, 버튼, 카드, 토스트 */
 
 /* ── 컨테이너 ─────────────────────────────────────── */
@@ -194,26 +194,29 @@
   position: relative;
 }
 
-.cart-badge {
+.cart-badge,
+.wishlist-badge {
   position: absolute;
-  top: 1px;
-  right: 1px;
-  min-width: 15px;
-  height: 15px;
-  background: var(--color-accent);
-  color: var(--color-white);
-  font-size: 9px;
-  font-weight: var(--font-weight-black);
-  border-radius: var(--radius-full);
+  top: -2px;
+  right: -6px;
+  min-width: 16px;
+  height: 16px;
+  background: #D96B3C;
+  color: #FFF;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 3px;
+  padding: 0 4px;
   line-height: 1;
   pointer-events: none;
+  z-index: 10;
 }
 
-.cart-badge:empty {
+.cart-badge:empty,
+.wishlist-badge:empty {
   display: none;
 }
 
@@ -875,6 +878,7 @@
   margin: 4px 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -970,6 +974,7 @@
   margin-top: 2px;
   display: -webkit-box;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -1576,8 +1581,13 @@ img[loading="lazy"] {
 }
 
 @keyframes ticker {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
 .site-footer {
@@ -1585,10 +1595,37 @@ img[loading="lazy"] {
 }
 
 /* 헤더 아바타 스타일 */
-.header-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; vertical-align: middle; border: 1px solid rgba(0,0,0,0.05); }
-.user-info-group { display: flex !important; align-items: center !important; gap: 8px !important; }
-.profile-avatar-link { display: inline-flex; align-items: center; justify-content: center; overflow: hidden; width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ebebeb; }
-.profile-avatar-link img { width: 100%; height: 100%; object-fit: cover; }
+.header-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  vertical-align: middle;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.user-info-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.profile-avatar-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #ebebeb;
+}
+
+.profile-avatar-link img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .badge-hybrid {
   display: inline-flex;
@@ -1611,10 +1648,12 @@ img[loading="lazy"] {
   gap: 8px;
   margin-bottom: 8px;
 }
+
 .input-with-btn .form-input {
   flex: 1;
   margin-bottom: 0 !important;
 }
+
 .btn--search {
   background: var(--color-black, #111) !important;
   color: #fff !important;
@@ -1627,6 +1666,7 @@ img[loading="lazy"] {
   cursor: pointer;
   transition: all 0.2s;
 }
+
 .btn--search:hover {
   background: var(--color-accent, #f08060) !important;
 }

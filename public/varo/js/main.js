@@ -9,9 +9,12 @@
       document.documentElement.classList.add('is-' + user.grade.toLowerCase());
     }
     const protectedPages = ['mypage.html', 'checkout.html'];
+    const params = new URLSearchParams(window.location.search);
     if (protectedPages.some(page => window.location.pathname.includes(page)) && !user) {
-      alert('로그인이 필요한 페이지입니다.');
-      window.location.replace('./login.html');
+      if (!(window.location.pathname.includes('mypage.html') && params.get('tab') === 'wishlist')) {
+        alert('로그인이 필요한 페이지입니다.');
+        window.location.replace('./login.html');
+      }
     }
   } catch (e) { }
 })();

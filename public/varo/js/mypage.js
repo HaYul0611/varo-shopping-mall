@@ -49,14 +49,40 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const updateProfileUI = () => {
-        const user = JSON.parse(localStorage.getItem('varo_user') || '{}');
+        const userRaw = localStorage.getItem('varo_user');
+        const user = JSON.parse(userRaw || '{}');
         const userNameLabel = document.getElementById('userNameLabel');
         const userGradeLabel = document.getElementById('userGradeLabel');
         const avatarImg = document.getElementById('userAvatarImg');
         const avatarDefault = document.getElementById('userAvatarDefault');
+        const btnLogout = document.getElementById('btnLogout');
 
         const profileEmail = document.getElementById('profileEmail');
         const profileName = document.getElementById('profileName');
+
+        if (!userRaw) {
+            // 비회원 사이드바 메뉴 필터링 (위시리스트, 로그인 제외 숨김)
+            const navLinks = document.querySelectorAll('.mypage-nav__link');
+            navLinks.forEach(link => {
+                const target = link.getAttribute('data-target');
+                // section-wishlist가 아니고, 로그아웃/로그인 버튼이 아닌 경우 숨김
+                if (target && target !== 'section-wishlist') {
+                    link.parentElement.style.display = 'none';
+                }
+            });
+
+            if (userNameLabel) userNameLabel.textContent = '비회원';
+            if (userGradeLabel) {
+                userGradeLabel.textContent = 'GUEST';
+                userGradeLabel.className = 'user-grade is-guest';
+            }
+            if (btnLogout) {
+                btnLogout.textContent = '로그인';
+                btnLogout.href = './login.html';
+                btnLogout.classList.remove('mypage-nav__link--logout');
+            }
+            return;
+        }
 
         if (userNameLabel && user.name) {
             userNameLabel.textContent = user.name;
@@ -292,7 +318,13 @@ document.addEventListener('DOMContentLoaded', () => {
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
+            const user = localStorage.getItem('varo_user');
             const targetId = link.getAttribute('data-target');
+            if (!user && targetId !== 'section-wishlist') {
+                alert('로그인이 필요한 메뉴입니다.');
+                location.href = './login.html';
+                return;
+            }
             activateTab(targetId);
             // URL 업데이트 (뒤로가기 지원)
             history.replaceState(null, null, `?tab=${targetId.replace('section-', '')}`);
@@ -504,6 +536,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnLogout = document.getElementById('btnLogout');
     if (btnLogout) {
         btnLogout.addEventListener('click', (e) => {
+            const user = localStorage.getItem('varo_user');
+            if (!user) {
+                location.href = './login.html';
+                return;
+            }
+
             e.preventDefault();
             if (confirm('로그아웃 하시겠습니까?')) {
                 localStorage.removeItem('varo_user');
@@ -512,13 +550,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }    /* ── 위시리스트 & 문의내역 렌더링 ──────────────────── */
-    const renderWishlist = () => {
+    function renderWishlist() {
+        window.renderWishlist = renderWishlist;
         const grid = document.querySelector('.wishlist-grid');
         if (!grid) return;
 
-        const wishlistIds = JSON.parse(localStorage.getItem('varo_wishlist') || '[]');
+        let wishlist = JSON.parse(localStorage.getItem('varo_wishlist') || '[]');
         const allProducts = (window.VARO_DATA && window.VARO_DATA.PRODUCTS) || [];
-        const wishProducts = allProducts.filter(p => wishlistIds.includes(p.id));
+
+        // 데이터 정제: 객체 배열이든 ID 배열이든 ID 추출
+        let wishIds = wishlist.map(item => {
+            if (typeof item === 'object' && item !== null) return String(item.id || '');
+            return String(item);
+        }).filter(id => id);
+
+        let wishProducts = allProducts.filter(p => wishIds.includes(String(p.id)));
+        if (wishProducts.length === 0 && wishlist.length > 0 && typeof wishlist[0] === 'object') {
+            wishProducts = wishlist;
+        }
 
         if (wishProducts.length === 0) {
             grid.innerHTML = `
@@ -530,19 +579,34 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        grid.innerHTML = wishProducts.map(p => `
-            <div class="wishlist-item" style="border: 1px solid #F0F0F0; border-radius: 4px; overflow: hidden; background: #fff;">
-                <div class="wishlist-item__img" style="aspect-ratio: 3/4; overflow: hidden;">
-                    <img src="${p.mainImg}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover;">
+        grid.innerHTML = wishProducts.map(p => {
+            // 진짜 상품(data.js에 존재)이면 mainImg 그대로 사용
+            let img = p.mainImg || '';
+            const isRealProduct = allProducts.some(real => String(real.id) === String(p.id));
+
+            if (!isRealProduct) {
+                if (p.name && (p.name.includes('데님') || p.name.includes('팬츠') || p.name.includes('슬랙스'))) {
+                    img = './assets/products/P037_main.jpg';
+                } else if (p.name && (p.name.includes('셔츠') || p.name.includes('티'))) {
+                    img = './assets/products/P011_main.jpg';
+                }
+            }
+
+            return `
+                <div class="wishlist-item">
+                    <button class="btn-wishlist-delete" onclick="event.stopPropagation(); if(confirm('위시리스트에서 삭제하시겠습니까?')){ window.App.Wishlist.toggle('${p.id}'); renderWishlist(); }" aria-label="삭제">×</button>
+                    <div class="wishlist-item__img" style="aspect-ratio: 3/4; overflow: hidden;">
+                        <img src="${img}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="wishlist-item__info" style="padding: 15px;">
+                        <p class="wishlist-item__brand" style="font-size: 11px; color: #AAA; margin-bottom: 4px;">${p.brand || 'VARO'}</p>
+                        <p class="wishlist-item__name" style="font-size: 13px; font-weight: 600; color: #1C1A16; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</p>
+                        <p class="wishlist-item__price" style="font-size: 14px; font-weight: 700; color: #D96B3C;">${(p.price || 0).toLocaleString()}원</p>
+                        <button class="btn btn--outline btn--sm" style="width: 100%; margin-top: 15px; font-size: 11px;" onclick="location.href='./product.html?id=${p.id}'">상품보기</button>
+                    </div>
                 </div>
-                <div class="wishlist-item__info" style="padding: 15px;">
-                    <p class="wishlist-item__brand" style="font-size: 11px; color: #AAA; margin-bottom: 4px;">${p.brand}</p>
-                    <p class="wishlist-item__name" style="font-size: 13px; font-weight: 600; color: #1C1A16; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</p>
-                    <p class="wishlist-item__price" style="font-size: 14px; font-weight: 700; color: #D96B3C;">${p.price.toLocaleString()}원</p>
-                    <button class="btn btn--outline btn--sm" style="width: 100%; margin-top: 15px; font-size: 11px;" onclick="location.href='./product-detail.html?id=${p.id}'">상품보기</button>
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     };
 
     const renderUserInquiries = () => {

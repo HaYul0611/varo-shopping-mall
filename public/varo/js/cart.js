@@ -9,6 +9,57 @@
 
 // Utils는 utils.js에서 window.Utils로 전역 할당됨
 
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('#cartDeleteSelected');
+  if (!btn) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const checkboxes = Array.from(document.querySelectorAll('.item-checkbox'));
+  const indicesToRemove = checkboxes
+    .filter(cb => cb.checked)
+    .map(cb => parseInt(cb.dataset.index))
+    .sort((a, b) => b - a);
+
+  if (indicesToRemove.length === 0) {
+    if (window.Utils?.showToast) window.Utils.showToast('삭제할 상품을 선택해 주세요.', 'error');
+    else alert('삭제할 상품을 선택해 주세요.');
+    return;
+  }
+
+  const showCustomConfirm = (message, onConfirm) => {
+    const modal = document.createElement('div');
+    modal.className = 'varo-modal-overlay';
+    modal.innerHTML = `
+      <div class="varo-modal-content">
+        <p class="varo-modal-text">${message}</p>
+        <div class="varo-modal-btns">
+          <button type="button" id="confirmCancel" class="varo-modal-btn varo-modal-btn--cancel">취소</button>
+          <button type="button" id="confirmOk" class="varo-modal-btn varo-modal-btn--confirm">확인</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.querySelector('#confirmOk').onclick = () => {
+      modal.remove();
+      onConfirm();
+    };
+    modal.querySelector('#confirmCancel').onclick = () => {
+      modal.remove();
+    };
+    modal.onclick = (e) => {
+      if (e.target === modal) modal.remove();
+    };
+  };
+
+  showCustomConfirm('선택한 상품을 삭제하시겠습니까?', () => {
+    window.App.Cart.removeSelected(indicesToRemove);
+    location.reload();
+  });
+}, true);
+
 const CartPage = (() => {
   const { VARO_CONFIG } = window;
 
@@ -60,14 +111,14 @@ const CartPage = (() => {
     const items = window.App?.Cart.getItems() || [];
 
     if (items.length === 0) {
-      refs.empty.hidden = false;
-      refs.layout.hidden = true;
+      refs.empty.style.display = 'block';
+      refs.layout.style.display = 'none';
       renderRecommendations();
       return;
     }
 
-    refs.empty.hidden = true;
-    refs.layout.hidden = false;
+    refs.empty.style.display = 'none';
+    refs.layout.style.display = 'grid';
 
     // 리스트 렌더링 (New Trendy Structure)
     refs.list.innerHTML = items.map((item, idx) => `
@@ -200,27 +251,7 @@ const CartPage = (() => {
       refs.list.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = checked);
     });
 
-    // 선택 삭제
-    refs.deleteSelected?.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      const checkboxes = Array.from(refs.list.querySelectorAll('.item-checkbox'));
-      const indicesToRemove = checkboxes
-        .filter(cb => cb.checked)
-        .map(cb => parseInt(cb.dataset.index));
-
-      if (indicesToRemove.length === 0) {
-        Utils.showToast('삭제할 상품을 선택해 주세요.', 'error');
-        return;
-      }
-
-      if (confirm('선택한 상품을 삭제하시겠습니까?')) {
-        // 인덱스가 큰 것부터 삭제해야 배열 꼬임이 없음 (App.Cart.removeSelected가 내부적으로 처리하겠지만 명시적 보장)
-        window.App.Cart.removeSelected(indicesToRemove);
-        render();
-      }
-    });
+    // 선택 삭제 (전역 리스너로 통합됨)
 
     // 쿠폰 적용
     refs.applyCoupon?.addEventListener('click', () => {

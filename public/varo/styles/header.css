@@ -201,7 +201,7 @@
 .header-main__actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   /* 간격 소폭 확대 */
 }
 
@@ -216,6 +216,7 @@
   align-items: center;
   justify-content: center;
   transition: color 0.15s;
+  position: relative;
 }
 
 .header-main__actions .icon-btn:hover {
@@ -252,8 +253,27 @@
   position: relative;
 }
 
-.header-main__actions .cart-badge:empty {
+.header-main__actions .cart-badge:empty,
+.header-main__actions .wishlist-badge:empty {
   display: none;
+}
+
+.header-main__actions .wishlist-badge {
+  background: #D96B3C !important;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  min-width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  padding: 0 3px;
+  pointer-events: none;
 }
 
 /* 멤버십 등급 버튼 */

@@ -13,7 +13,8 @@
   <script>
     (function () {
       const user = localStorage.getItem('varo_user');
-      if (!user) {
+      const params = new URLSearchParams(location.search);
+      if (!user && params.get('tab') !== 'wishlist') {
         alert('로그인이 필요한 페이지입니다. 로그인 페이지로 이동합니다.');
         location.replace('./login.html');
       }
