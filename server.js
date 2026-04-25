@@ -24,6 +24,9 @@ app.use('/api/users', require('./routes/users'));
 app.use('/api/reviews', require('./routes/reviews'));
 app.use('/api/wishlist', require('./routes/wishlist'));
 app.use('/api/checkout', require('./routes/checkout'));
+app.use('/api/banners', require('./routes/banners'));
+app.use('/api/categories', require('./routes/categories'));
+app.use('/api/addresses', require('./routes/addresses'));
 
 /* ── 헬스 체크 ───────────────────────────── */
 app.get('/api/health', (req, res) => {

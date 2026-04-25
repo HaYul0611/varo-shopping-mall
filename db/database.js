@@ -279,6 +279,51 @@ const initDB = async () => {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
 
+    // Categories Table [NEW]
+    await setupConn.query(`
+      CREATE TABLE IF NOT EXISTS categories (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        name        VARCHAR(100) NOT NULL,
+        slug        VARCHAR(100) NOT NULL UNIQUE,
+        sort_order  INT NOT NULL DEFAULT 0,
+        is_active   TINYINT NOT NULL DEFAULT 1,
+        created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // Banners Table [NEW]
+    await setupConn.query(`
+      CREATE TABLE IF NOT EXISTS banners (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        title       VARCHAR(255),
+        img_url     VARCHAR(255) NOT NULL,
+        link_url    VARCHAR(255),
+        sort_order  INT NOT NULL DEFAULT 0,
+        is_active   TINYINT NOT NULL DEFAULT 1,
+        created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // User Addresses Table [NEW]
+    await setupConn.query(`
+      CREATE TABLE IF NOT EXISTS user_addresses (
+        id               INT AUTO_INCREMENT PRIMARY KEY,
+        user_id          INT NOT NULL,
+        address_name     VARCHAR(100) NOT NULL, -- 예: 집, 회사
+        recipient_name   VARCHAR(100) NOT NULL,
+        recipient_phone  VARCHAR(255) NOT NULL, -- 암호화
+        zipcode          VARCHAR(20) NOT NULL,
+        address          VARCHAR(255) NOT NULL,
+        address_detail   VARCHAR(255),
+        is_default       TINYINT NOT NULL DEFAULT 0,
+        created_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
     // Admin Logs Table
     await setupConn.query(`
       CREATE TABLE IF NOT EXISTS admin_logs (

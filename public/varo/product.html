@@ -32,7 +32,7 @@
   <main id="main-content">
 
     <!-- ── BREADCRUMB ──────────────────────────── -->
-    <div class="container container--refined" style="padding-top: 30px;">
+    <div class="container container--refined product-breadcrumb-container">
       <nav class="breadcrumb product-breadcrumb" aria-label="페이지 경로" id="productBreadcrumb">
         <a href="./index.html">홈</a>
         <span aria-hidden="true">/</span>
@@ -119,7 +119,7 @@
       <!-- 사이즈 가이드 패널 -->
       <div class="tab-panel" role="tabpanel" id="tabSize" aria-labelledby="tabBtnSize" hidden>
         <!-- [스마트 사이즈 추천 (탭 본문으로 이동됨)] -->
-        <div class="ai-size-recommend" id="aiSizeRecommend" style="margin-bottom: 30px;">
+        <div class="ai-size-recommend" id="aiSizeRecommend">
           <div class="ai-size-recommend__header">
             <span class="ai-badge">AI 추천</span>
             <h4>사이즈 가이드</h4>
@@ -188,21 +188,23 @@
     </div>
 
     <!-- ── 관련 상품 ──────────────────────────── -->
-    <section class="section related-products container" aria-labelledby="relatedTitle">
-      <div class="section-header">
-        <h2 class="section-title" id="relatedTitle">관련 상품</h2>
-        <a href="./shop.html" class="section-more">전체보기 →</a>
-      </div>
-      <div class="product-grid" id="relatedGrid">
-        <!-- JS로 채워짐 -->
+    <section class="section related-products" aria-labelledby="relatedTitle">
+      <div class="container container--refined">
+        <div class="section-header">
+          <h2 class="section-title" id="relatedTitle">관련 상품</h2>
+          <a href="./shop.html" class="section-more">전체보기 →</a>
+        </div>
+        <div class="product-grid" id="relatedGrid">
+          <!-- JS로 채워짐 -->
+        </div>
       </div>
     </section>
 
     <!-- 스타일링 제안 (How To Wear) -->
     <section class="styling-section" id="stylingSection">
-      <div class="container">
-        <div class="section-header">
-          <h2 class="section-title">이렇게 입어요 (SET STYLING)</h2>
+      <div class="container container--refined">
+        <div class="section-header section-header--vertical">
+          <h2 class="section-title">이렇게 입어요</h2>
           <p class="section-desc">VARO가 제안하는 완벽한 밸런스의 세트 코디</p>
         </div>
         <div class="styling-grid" id="stylingGrid">

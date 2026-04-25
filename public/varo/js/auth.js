@@ -143,6 +143,118 @@ const Auth = (() => {
           termsAll.checked = allChecked;
         });
       });
+
+      // 약관 상세 보기 이벤트 바인딩
+      document.querySelectorAll('.terms-detail').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const type = btn.dataset.term;
+          openTermsModal(type);
+        });
+      });
+    }
+
+    const openTermsModal = (type) => {
+      const modal = document.getElementById('termsModal');
+      const title = modal?.querySelector('.varo-modal__title');
+      const body = document.getElementById('termsModalBody');
+      const closeBtn = modal?.querySelector('.varo-modal__close');
+      const overlay = modal?.querySelector('.varo-modal__overlay');
+
+      if (!modal || !body) return;
+
+      const content = {
+        service: {
+          title: '이용 약관',
+          text: `[제1장 총칙]
+제1조(목적)
+이 약관은 VARO(이하 "회사"라 함)가 운영하는 VARO 쇼핑몰(이하 "몰"이라 함)에서 제공하는 인터넷 관련 서비스(이하 "서비스"라 함)를 이용함에 있어 몰과 이용자의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.
+
+제2조(정의)
+1. "몰"이란 회사가 재화 또는 용역을 이용자에게 제공하기 위하여 컴퓨터 등 정보통신설비를 이용하여 재화 등을 거래할 수 있도록 설정한 가상의 영업장을 말하며, 아울러 사이버몰을 운영하는 사업자의 의미로도 사용합니다.
+2. "이용자"란 "몰"에 접속하여 이 약관에 따라 "몰"이 제공하는 서비스를 받는 회원 및 비회원을 말합니다.
+3. "회원"이라 함은 "몰"에 개인정보를 제공하여 회원등록을 한 자로서, "몰"의 정보를 지속적으로 제공받으며, "몰"이 제공하는 서비스를 계속적으로 이용할 수 있는 자를 말합니다.
+
+[제2장 서비스 이용계약]
+제3조(약관의 명시와 개정)
+1. "몰"은 이 약관의 내용과 상호, 영업소 소재지 주소, 대표자의 성명, 사업자등록번호, 연락처 등을 이용자가 알 수 있도록 사이트의 초기 서비스화면(전면)에 게시합니다.
+2. "몰"은 약관의 규제에 관한 법률, 전자거래기본법, 전자서명법, 정보통신망 이용촉진 등에 관한 법률, 방문판매 등에 관한 법률, 소비자보호법 등 관련법을 위배하지 않는 범위에서 이 약관을 개정할 수 있습니다.`
+        },
+        privacy: {
+          title: '개인정보처리방침',
+          text: `VARO(이하 "회사")는 고객님의 개인정보를 소중하게 생각하며, "정보통신망 이용촉진 및 정보보호"에 관한 법률을 준수하고 있습니다.
+
+1. 수집하는 개인정보 항목
+회사는 회원가입, 상담, 서비스 신청 등등을 위해 아래와 같은 개인정보를 수집하고 있습니다.
+- 수집항목 : 이름, 로그인ID, 비밀번호, 자택 전화번호, 자택 주소, 휴대전화번호, 이메일, 쿠키, 결제기록
+- 개인정보 수집방법 : 홈페이지(회원가입)
+
+2. 개인정보의 수집 및 이용목적
+회사는 수집한 개인정보를 다음의 목적을 위해 활용합니다.
+- 서비스 제공에 관한 계약 이행 및 서비스 제공에 따른 요금정산: 콘텐츠 제공, 구매 및 요금 결제, 물품배송 또는 청구지 등 발송
+- 회원 관리: 회원제 서비스 이용에 따른 본인확인, 개인 식별, 불량회원의 부정 이용 방지와 비인가 사용 방지, 가입 의사 확인, 불만처리 등 민원처리, 고지사항 전달
+
+3. 개인정보의 보유 및 이용기간
+원칙적으로, 개인정보 수집 및 이용목적이 달성된 후에는 해당 정보를 지체 없이 파기합니다. 단, 관계법령의 규정에 의하여 보존할 필요가 있는 경우 회사는 아래와 같이 관계법령에서 정한 일정한 기간 동안 회원정보를 보관합니다.
+- 보존 항목 : 결제 기록, 서비스 이용 기록
+- 보존 근거 : 전자상거래 등에서의 소비자보호에 관한 법률
+- 보존 기간 : 5년`
+        }
+      };
+
+      const data = content[type] || content.service;
+      if (title) title.textContent = data.title;
+      body.innerHTML = `<div style="white-space: pre-wrap; line-height: 1.6; color: #555; font-size: 13px; max-height: 400px; overflow-y: auto; padding-right: 10px;">${data.text}</div>`;
+
+      modal.classList.add('is-active');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+
+      const close = () => {
+        modal.classList.remove('is-active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      };
+
+      closeBtn?.addEventListener('click', close, { once: true });
+      overlay?.addEventListener('click', close, { once: true });
+    };
+
+    // 소셜 로그인 버튼 시뮬레이션 (하이브리드 모드)
+    document.querySelectorAll('.social-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const provider = btn.classList.contains('social-btn--kakao') ? '카카오' :
+          btn.classList.contains('social-btn--naver') ? '네이버' : '구글';
+
+        // 하이브리드 연동 알림 (데모용)
+        const toast = document.createElement('div');
+        toast.className = 'toast toast--info is-visible';
+        toast.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:9999; background:#333; color:#fff; padding:12px 24px; border-radius:8px; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+        toast.innerHTML = `<span>[Hybrid API] ${provider} 계정 연동을 시작합니다...</span>`;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          toast.classList.remove('is-visible');
+          setTimeout(() => toast.remove(), 500);
+        }, 2000);
+
+        console.log(`[Hybrid API] ${provider} OAuth flow initiated.`);
+      });
+    });
+
+    // 주소 검색 (하이브리드 API 연동)
+    const addrSearchBtn = document.getElementById('signupAddrSearch');
+    if (addrSearchBtn) {
+      addrSearchBtn.addEventListener('click', () => {
+        if (typeof daum === 'undefined') return alert('주소 서비스를 로드할 수 없습니다.');
+        new daum.Postcode({
+          oncomplete: (data) => {
+            document.getElementById('signupZipcode').value = data.zonecode;
+            document.getElementById('signupAddress').value = data.roadAddress || data.jibunAddress;
+            document.getElementById('signupAddressDetail').focus();
+          }
+        }).open();
+      });
     }
 
     // 비밀번호 강도 표시기 연동

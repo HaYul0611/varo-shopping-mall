@@ -876,8 +876,10 @@ textarea.form-control {
 
 .chart-x-axis {
     display: flex;
-    gap: 6px;
+    gap: 0;
     padding: 0;
+    margin-top: 8px;
+    border-top: 1px solid var(--gray-100);
 }
 
 .chart-x-label {
@@ -885,6 +887,10 @@ textarea.form-control {
     text-align: center;
     font-size: 10px;
     color: var(--gray-400);
+    padding-top: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ── PRODUCT THUMB ── */

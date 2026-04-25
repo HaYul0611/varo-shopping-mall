@@ -28,6 +28,44 @@ const CommunityPageV2 = (() => {
     history.replaceState(null, '', url);
   };
 
+  /* ── 공지사항 아코디언 ─────────────────────────────── */
+  const initNotice = () => {
+    const noticeList = document.getElementById('noticeList');
+    if (!noticeList) return;
+
+    noticeList.addEventListener('click', (e) => {
+      const header = e.target.closest('.notice-header');
+      const item = header ? header.closest('.notice-item') : e.target.closest('.notice-item');
+      if (!item) return;
+
+      // 링크(a) 클릭 시 기본 동작(페이지 상단 점프) 방지
+      if (e.target.tagName === 'A' || e.target.closest('a')) {
+        e.preventDefault();
+      }
+
+      const isOpen = item.classList.contains('is-open');
+
+      // 다른 공지사항 모두 닫기 (선택 사항, 여기서는 토글 방식으로 유지)
+      noticeList.querySelectorAll('.notice-item.is-open').forEach(i => {
+        if (i !== item) {
+          i.classList.remove('is-open');
+          const c = i.querySelector('.notice-content');
+          if (c) c.style.display = 'none';
+        }
+      });
+
+      if (isOpen) {
+        item.classList.remove('is-open');
+        const content = item.querySelector('.notice-content');
+        if (content) content.style.display = 'none';
+      } else {
+        item.classList.add('is-open');
+        const content = item.querySelector('.notice-content');
+        if (content) content.style.display = 'block';
+      }
+    });
+  };
+
   /* ── FAQ 아코디언 ─────────────────────────────────── */
   const initFAQ = () => {
     const faqList = document.getElementById('faqList');
@@ -454,6 +492,7 @@ const CommunityPageV2 = (() => {
       btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
 
+    initNotice();
     initFAQ();
     renderReviews();
     loadQNA();

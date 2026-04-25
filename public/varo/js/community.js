@@ -125,13 +125,16 @@ const CommunityPage = (() => {
     if (!list || !COMMUNITY_NOTICES) return;
 
     list.innerHTML = COMMUNITY_NOTICES.map(notice => `
-      <div class="notice-item ${notice.isImportant ? 'notice-item--important' : ''}">
-        <div class="notice-item__info">
-          <span class="notice-item__tag">${notice.isImportant ? '공지' : '소식'}</span>
-          <h3 class="notice-item__title">${notice.title}</h3>
+      <li class="notice-item ${notice.isImportant ? 'notice-item--pinned' : ''}">
+        <div class="notice-header">
+          <span class="notice-badge ${notice.isImportant ? 'notice-badge--pin' : ''}">${notice.isImportant ? '공지' : notice.category || '소식'}</span>
+          <span class="notice-title">${notice.title}</span>
+          <span class="notice-date">${notice.date}</span>
         </div>
-        <span class="notice-item__date">${notice.date}</span>
-      </div>
+        <div class="notice-content">
+          <p>${notice.content || '안녕하세요, VARO입니다.<br><br>공지사항 상세 내용이 준비 중입니다.'}</p>
+        </div>
+      </li>
     `).join('');
   };
 
@@ -172,6 +175,18 @@ const CommunityPage = (() => {
     document.getElementById('postModalOverlay')?.addEventListener('click', closePostModal);
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && state.isModalOpen) closePostModal();
+    });
+
+    // 공지사항 아코디언 이벤트 위임
+    document.addEventListener('click', (e) => {
+      const item = e.target.closest('.notice-item');
+      if (item) {
+        // a 태그나 버튼 클릭 시 기본 이동/이벤트 방지
+        if (e.target.tagName === 'A' || e.target.closest('a')) {
+          e.preventDefault();
+        }
+        item.classList.toggle('is-open');
+      }
     });
 
     console.log('VARO: Community Page Initialized.');

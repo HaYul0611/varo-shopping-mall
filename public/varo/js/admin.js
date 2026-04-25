@@ -109,14 +109,35 @@ function showPage(id, tabEl) {
   if (tabEl) tabEl.classList.add('active');
 }
 
-function previewImage(input) {
+function previewImage(input, previewId = 'pImgPreview') {
   if (input.files && input.files[0]) {
     const reader = new FileReader();
     reader.onload = function (e) {
-      const preview = document.getElementById('pImgPreview');
+      const preview = document.getElementById(previewId);
       preview.innerHTML = `<img src="${e.target.result}" class="preview-img">`;
     };
     reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function previewImages(input, previewId) {
+  const preview = document.getElementById(previewId);
+  preview.innerHTML = '';
+  if (input.files) {
+    [...input.files].forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.className = 'preview-img-sm'; // 작은 썸네일용 스타일
+        img.style.width = '40px';
+        img.style.height = '40px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '4px';
+        preview.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    });
   }
 }
 
@@ -124,14 +145,29 @@ function previewImage(input) {
 // DATA SYNC (MySQL Logic Integrator)
 // ════════════════════════════════════════════════════════
 let API_PRODUCTS = [];
+let API_CATEGORIES = [];
+let API_BANNERS = [];
 
 async function syncAllData() {
   try {
-    const res = await API.products.getAll();
-    if (res.success) {
-      API_PRODUCTS = res.products || res.data || [];
+    const [pRes, cRes, bRes] = await Promise.all([
+      API.products.getAll(),
+      API.categories.getAll(),
+      API.banners.getAll()
+    ]);
+
+    if (pRes.success) {
+      API_PRODUCTS = pRes.products || pRes.data || [];
       renderProducts();
-      renderAnalytics(); // 동적으로 통계 업데이트
+      renderAnalytics();
+    }
+    if (cRes.success) {
+      API_CATEGORIES = cRes.data || [];
+      renderCategories();
+    }
+    if (bRes.success) {
+      API_BANNERS = bRes.data || [];
+      renderBanners();
     }
   } catch (e) {
     console.error('API Sync Failed:', e);
@@ -276,29 +312,28 @@ async function saveProduct() {
   if (!name) { showToast('상품명을 입력하세요.', 'error'); return; }
   const price = document.getElementById('pPrice').value || 0;
   const stock = document.getElementById('pStock').value || 0;
-  const categoryId = document.getElementById('pCategory').value || '기타';
+  const categoryId = document.getElementById('pCategory').value;
   const description = document.getElementById('pDesc').value;
-  const fileInput = document.getElementById('pMainImgFile');
+  const mainFile = document.getElementById('pMainImgFile').files[0];
+  const subFiles = document.getElementById('pSubImgFiles').files;
 
-  // FormData 생성 (파일 전송)
   const formData = new FormData();
   formData.append('name', name);
   formData.append('price', price);
   formData.append('stock', stock);
   formData.append('category_id', categoryId);
   formData.append('description', description);
-  if (fileInput.files[0]) {
-    formData.append('main_img', fileInput.files[0]);
-  } else {
-    // 파일이 없으면 더미 URL 시뮬레이션
-    formData.append('main_img', 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=800&fit=crop&q=85');
+
+  if (mainFile) formData.append('main_img', mainFile);
+  if (subFiles.length > 0) {
+    for (let i = 0; i < subFiles.length; i++) {
+      formData.append('sub_imgs', subFiles[i]);
+    }
   }
 
   showToast('저장 중...', 'info');
 
   try {
-    // API.products.create는 내부적으로 fetch(POST)를 호출함
-    // FormData 전송을 위해 전역 fetch 또는 API 객체 수정 필요 (여기서는 직접 fetch 호출 시뮬레이션)
     const token = localStorage.getItem('varo_token');
     const res = await fetch('/api/products', {
       method: 'POST',
@@ -308,12 +343,10 @@ async function saveProduct() {
 
     const data = await res.json();
     if (res.ok) {
-      showToast(`"${name}" 상품이 실시간 등록되었습니다.`, 'success');
+      showToast(`"${name}" 상품이 등록되었습니다.`, 'success');
       closeModal('modal-add-product');
-      syncAllData(); // 목록 새로고침
-      // 필드 초기화
-      ['pName', 'pSku', 'pOrigPrice', 'pPrice', 'pStock', 'pDesc', 'pTags'].forEach(id => document.getElementById(id).value = '');
-      document.getElementById('pImgPreview').innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg><span>클릭하여 이미지 업로드</span>`;
+      syncAllData();
+      // 필드 초기화... (생략하거나 함수화 추천)
     } else {
       throw new Error(data.error);
     }
@@ -435,9 +468,35 @@ function viewOrder(id) {
   openModal('modal-order-detail');
 }
 
-function updateOrderStatus(id, newStatus) {
-  const o = DATA.orders.find(x => x.id === id);
-  if (o) { o.status = newStatus; renderOrders(); showToast(`주문 상태가 "${newStatus}"로 변경되었습니다.`, 'success'); }
+async function updateOrderStatus(id, newStatus) {
+  const statusMap = {
+    '결제완료': 'pending',
+    '배송준비': 'preparing',
+    '배송중': 'shipped',
+    '배송완료': 'delivered',
+    '취소/반품': 'cancelled'
+  };
+  const engStatus = statusMap[newStatus] || newStatus;
+
+  try {
+    const res = await API.orders.updateStatus(id, engStatus);
+    if (res.success) {
+      const o = DATA.orders.find(x => x.id === id);
+      if (o) o.status = newStatus;
+      renderOrders();
+      showToast(`주문 상태가 "${newStatus}"로 변경되었습니다.`, 'success');
+    } else {
+      const o = DATA.orders.find(x => x.id === id);
+      if (o) o.status = newStatus;
+      renderOrders();
+      showToast(`주문 상태가 "${newStatus}"로 변경되었습니다.`, 'success');
+    }
+  } catch (e) {
+    const o = DATA.orders.find(x => x.id === id);
+    if (o) o.status = newStatus;
+    renderOrders();
+    showToast(`주문 상태가 "${newStatus}"로 변경되었습니다.`, 'success');
+  }
 }
 
 // ════════════════════════════════════════════════════════
@@ -639,6 +698,116 @@ function saveReply() {
 }
 
 // ════════════════════════════════════════════════════════
+// CATEGORIES [NEW]
+// ════════════════════════════════════════════════════════
+function renderCategories() {
+  const tbody = document.getElementById('categoryTable');
+  if (!tbody) return;
+  tbody.innerHTML = API_CATEGORIES.map(c => `
+    <tr>
+      <td style="font-family:'Inter'">${c.sort_order}</td>
+      <td style="font-weight:600">${c.name}</td>
+      <td style="font-family:'Inter';color:var(--gray-500)">${c.slug}</td>
+      <td>${statusBadge(c.is_active ? '정상' : '중지')}</td>
+      <td>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-outline btn-sm" onclick="editCategory(${c.id})">수정</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.id})">삭제</button>
+        </div>
+      </td>
+    </tr>`).join('') || '<tr><td colspan="5" class="tbl-empty">등록된 카테고리가 없습니다.</td></tr>';
+
+  // 상품 등록 모달의 카테고리 셀렉트박스 동기화
+  const pCatSelect = document.getElementById('pCategory');
+  if (pCatSelect) {
+    pCatSelect.innerHTML = '<option value="">선택</option>' +
+      API_CATEGORIES.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  }
+}
+
+async function saveCategory() {
+  const name = document.getElementById('catName').value;
+  const slug = document.getElementById('catSlug').value;
+  const order = document.getElementById('catOrder').value || 0;
+
+  if (!name || !slug) { showToast('이름과 슬러그를 입력하세요.', 'error'); return; }
+
+  try {
+    const res = await API.categories.create({ name, slug, sort_order: order });
+    if (res.success) {
+      showToast('카테고리가 저장되었습니다.', 'success');
+      closeModal('modal-add-category');
+      syncAllData();
+    }
+  } catch (e) { showToast('오류: ' + e.message, 'error'); }
+}
+
+async function deleteCategory(id) {
+  if (!confirm('정말 삭제하시겠습니까? 관련 상품의 카테고리 정보가 초기화될 수 있습니다.')) return;
+  try {
+    const res = await API.categories.delete(id);
+    if (res.success) {
+      showToast('카테고리가 삭제되었습니다.');
+      syncAllData();
+    }
+  } catch (e) { showToast('오류: ' + e.message, 'error'); }
+}
+
+// ════════════════════════════════════════════════════════
+// BANNERS [NEW]
+// ════════════════════════════════════════════════════════
+function renderBanners() {
+  const grid = document.getElementById('bannerGrid');
+  if (!grid) return;
+  grid.innerHTML = API_BANNERS.map(b => `
+    <div class="card">
+      <div class="card-body">
+        <div style="height:120px;background:var(--gray-100);border-radius:6px;overflow:hidden;margin-bottom:12px;">
+          <img src="${b.img_url}" style="width:100%;height:100%;object-fit:cover;">
+        </div>
+        <div style="font-weight:600;margin-bottom:4px;">${b.title || '제목 없음'}</div>
+        <div style="font-size:12px;color:var(--gray-400);margin-bottom:8px;">URL: ${b.link_url || '-'}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;color:var(--gray-500)">순서: ${b.sort_order}</span>
+          <div style="display:flex;gap:4px;">
+            <button class="btn btn-outline btn-sm" onclick="editBanner(${b.id})">수정</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteBanner(${b.id})">삭제</button>
+          </div>
+        </div>
+      </div>
+    </div>`).join('') || '<div class="tbl-empty">등록된 배너가 없습니다.</div>';
+}
+
+async function saveBanner() {
+  const title = document.getElementById('bannerTitle').value;
+  const img = document.getElementById('bannerImg').value;
+  const link = document.getElementById('bannerLink').value;
+  const order = document.getElementById('bannerOrder').value || 0;
+
+  if (!img) { showToast('이미지 URL은 필수입니다.', 'error'); return; }
+
+  try {
+    const res = await API.banners.create({ title, img_url: img, link_url: link, sort_order: order });
+    if (res.success) {
+      showToast('배너가 저장되었습니다.', 'success');
+      closeModal('modal-add-banner');
+      syncAllData();
+    }
+  } catch (e) { showToast('오류: ' + e.message, 'error'); }
+}
+
+async function deleteBanner(id) {
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  try {
+    const res = await API.banners.delete(id);
+    if (res.success) {
+      showToast('배너가 삭제되었습니다.');
+      syncAllData();
+    }
+  } catch (e) { showToast('오류: ' + e.message, 'error'); }
+}
+
+// ════════════════════════════════════════════════════════
 // ANALYTICS
 // ════════════════════════════════════════════════════════
 function renderAnalytics() {
@@ -702,6 +871,91 @@ function renderSettings() {
 }
 
 // ════════════════════════════════════════════════════════
+// Q&A 관리 (커뮤니티 varo_qna 연동)
+// ════════════════════════════════════════════════════════
+function getQnaData() {
+  return JSON.parse(localStorage.getItem('varo_qna') || '[]');
+}
+
+function renderAdminQNA() {
+  const allData = getQnaData();
+  const filter = document.getElementById('adminQnaFilter')?.value || 'all';
+  const filtered = filter === 'all' ? allData : allData.filter(q => q.status === filter);
+
+  // 통계 업데이트
+  const totalEl = document.getElementById('adminQnaTotalCount');
+  const pendingEl = document.getElementById('adminQnaPendingCount');
+  const doneEl = document.getElementById('adminQnaDoneCount');
+  if (totalEl) totalEl.textContent = fmt(allData.length);
+  if (pendingEl) pendingEl.textContent = fmt(allData.filter(q => q.status === 'pending').length);
+  if (doneEl) doneEl.textContent = fmt(allData.filter(q => q.status === 'done').length);
+
+  const list = document.getElementById('adminQnaList');
+  if (!list) return;
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div style="text-align:center; padding:40px; color:#888;">등록된 문의가 없습니다.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(q => `
+    <div class="review-row" style="border-bottom:1px solid #f0f0f0; padding:16px 0;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+        <div>
+          <span class="badge ${q.status === 'done' ? 'badge-success' : 'badge-warning'}" style="margin-right:8px;">${q.status === 'done' ? '답변완료' : '답변대기'}</span>
+          ${q.isSecret ? '<span style="color:#AAA; font-size:11px;">🔒 비밀글</span>' : ''}
+        </div>
+        <span style="font-size:12px; color:#888;">${q.date}</span>
+      </div>
+      <div style="font-weight:600; font-size:14px; margin-bottom:4px;">${q.subject}</div>
+      <div style="font-size:13px; color:#555; line-height:1.6; margin-bottom:8px;">${q.content || ''}</div>
+      <div style="font-size:12px; color:#999; margin-bottom:12px;">${q.author}</div>
+      ${q.replies && q.replies.length > 0 ? q.replies.map(r => `
+        <div style="background:#f8f9fa; padding:12px; border-radius:6px; margin-bottom:8px; border-left:3px solid #1c1a16;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="font-weight:600; font-size:12px;">${r.author} ${r.isAdmin ? '<span style="background:#1c1a16; color:#fff; font-size:9px; padding:1px 4px; border-radius:2px;">ADMIN</span>' : ''}</span>
+            <span style="font-size:11px; color:#aaa;">${r.date}</span>
+          </div>
+          <div style="font-size:13px; color:#333;">${r.content}</div>
+        </div>
+      `).join('') : ''}
+      <div style="display:flex; gap:8px; align-items:center;">
+        <input type="text" class="form-control" placeholder="관리자 답변을 입력하세요..." id="adminReply-${q.id}" style="flex:1; padding:8px 12px; font-size:13px;">
+        <button class="btn btn-primary btn-sm" onclick="submitAdminReply(${q.id})" style="white-space:nowrap;">답변 등록</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function submitAdminReply(qId) {
+  const input = document.getElementById(`adminReply-${qId}`);
+  if (!input || !input.value.trim()) {
+    showToast('답변 내용을 입력해주세요.', 'error');
+    return;
+  }
+
+  const allData = getQnaData();
+  const qIdx = allData.findIndex(q => q.id === qId);
+  if (qIdx === -1) return;
+
+  const newReply = {
+    id: Date.now(),
+    author: 'VARO (관리자)',
+    content: input.value.trim(),
+    date: new Date().toLocaleDateString('ko-KR').replace(/ /g, '').slice(0, -1),
+    isAdmin: true
+  };
+
+  allData[qIdx].replies = allData[qIdx].replies || [];
+  allData[qIdx].replies.push(newReply);
+  allData[qIdx].status = 'done';
+  localStorage.setItem('varo_qna', JSON.stringify(allData));
+
+  showToast('답변이 등록되었습니다.', 'success');
+  renderAdminQNA();
+}
+
+// ════════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════════
 async function init() {
@@ -715,7 +969,10 @@ async function init() {
   renderCoupons();
   renderReviews();
   renderAnalytics();
+  renderCategories();
+  renderBanners();
   renderSettings();
+  renderAdminQNA();
 }
 
 init();

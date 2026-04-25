@@ -40,6 +40,13 @@ const IndexPage = (() => {
           ${imgPanels.map((src, i) => `
             <img src="${src}" alt="배너 이미지 ${i + 1}" loading="${idx === 0 ? 'eager' : 'lazy'}">
           `).join('')}
+          ${data.title || data.desc ? `
+          <div class="main-slider__overlay" style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.4), transparent); display:flex; flex-direction:column; justify-content:center; padding:0 120px; color:#fff; text-shadow:0 2px 10px rgba(0,0,0,0.2);">
+            <span style="font-size:14px; font-weight:700; letter-spacing:0.2em; margin-bottom:15px; text-transform:uppercase; opacity:0.8;">${data.tag || ''}</span>
+            <h2 class="main-slider__title" style="margin-bottom:20px; word-break:keep-all;">${data.title || ''}</h2>
+            <p style="font-size:18px; opacity:0.9; word-break:keep-all;">${data.desc || ''}</p>
+          </div>
+          ` : ''}
         </a>
       `;
       track.appendChild(slide);

@@ -29,6 +29,29 @@ const App = (() => {
       this.updateBadge();
       if (window.Utils?.showToast) window.Utils.showToast('장바구니에 추가되었습니다 🛍', 'success');
     },
+    updateQty(index, delta) {
+      const items = this.getItems();
+      if (!items[index]) return;
+      items[index].qty = Math.max(1, items[index].qty + delta);
+      localStorage.setItem(this.KEY, JSON.stringify(items));
+      this.updateBadge();
+    },
+    removeItem(index) {
+      const items = this.getItems();
+      items.splice(index, 1);
+      localStorage.setItem(this.KEY, JSON.stringify(items));
+      this.updateBadge();
+    },
+    removeSelected(indices) {
+      let items = this.getItems();
+      items = items.filter((_, idx) => !indices.includes(idx));
+      localStorage.setItem(this.KEY, JSON.stringify(items));
+      this.updateBadge();
+    },
+    clear() {
+      localStorage.removeItem(this.KEY);
+      this.updateBadge();
+    },
     updateBadge() {
       const count = this.getItems().reduce((sum, i) => sum + i.qty, 0);
       document.querySelectorAll('.header-btn__badge, .cart-badge').forEach(badge => {

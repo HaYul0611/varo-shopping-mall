@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="./styles/mega-menu.css">
   <link rel="stylesheet" href="./styles/modal.css">
   <link rel="stylesheet" href="./styles/components.css">
+  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" defer></script>
 </head>
 
 <body class="auth-body">
@@ -145,6 +146,19 @@
             <p class="form-error" id="pwConfirmError" role="alert" aria-live="polite"></p>
           </div>
 
+          <!-- 주소 (하이브리드 모드 시연) -->
+          <div class="form-group" id="addressGroup">
+            <label class="form-label">주소</label>
+            <div class="input-with-btn">
+              <input type="text" class="form-input" id="signupZipcode" name="zipcode" placeholder="우편번호" readonly>
+              <button type="button" class="btn--search" id="signupAddrSearch">주소 검색</button>
+            </div>
+            <input type="text" class="form-input" id="signupAddress" name="address" placeholder="기본 주소" readonly
+              style="margin-top: 8px;">
+            <input type="text" class="form-input" id="signupAddressDetail" name="addressDetail" placeholder="상세 주소"
+              style="margin-top: 8px;">
+          </div>
+
           <!-- 약관 동의 -->
           <div class="terms-wrap" id="termsWrap">
             <label class="form-check terms-all">
@@ -155,14 +169,12 @@
               <label class="form-check">
                 <input type="checkbox" id="terms1" name="terms1" required aria-required="true">
                 <span>[필수] 이용약관 동의</span>
-                <a href="#" class="terms-detail" target="_blank" rel="noopener noreferrer"
-                  aria-label="이용약관 상세 보기">보기</a>
+                <a href="javascript:void(0)" class="terms-detail" data-term="service" aria-label="이용약관 상세 보기">보기</a>
               </label>
               <label class="form-check">
                 <input type="checkbox" id="terms2" name="terms2" required aria-required="true">
                 <span>[필수] 개인정보처리방침 동의</span>
-                <a href="#" class="terms-detail" target="_blank" rel="noopener noreferrer"
-                  aria-label="개인정보처리방침 상세 보기">보기</a>
+                <a href="javascript:void(0)" class="terms-detail" data-term="privacy" aria-label="개인정보처리방침 상세 보기">보기</a>
               </label>
               <label class="form-check">
                 <input type="checkbox" id="terms3" name="terms3">
@@ -209,6 +221,7 @@
     </div>
   </div>
 
+  <script src="./js/risk-mitigation.js"></script>
   <script src="./js/api.js"></script>
   <script src="./js/data.js"></script>
   <script type="module" src="./js/utils.js"></script>

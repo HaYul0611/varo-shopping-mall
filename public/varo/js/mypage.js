@@ -222,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (targetId === 'section-wishlist') renderWishlist();
             if (targetId === 'section-inquiry') renderUserInquiries();
             if (targetId === 'section-membership') renderMembershipInfo();
+            if (targetId === 'section-address') renderAddresses();
             if (targetId === 'section-activity') renderAdminActivity();
         }
     };
@@ -592,6 +593,165 @@ document.addEventListener('DOMContentLoaded', () => {
 
         container.innerHTML = titleHtml + `<div class="mypage-inquiry-list">${listHtml}</div>`;
     };
+
+    /* ── 배송지 관리 (CRUD) ─────────────────────────── */
+    const renderAddresses = async () => {
+        const list = document.getElementById('addressList');
+        if (!list) return;
+
+        let addresses = [];
+        try {
+            const res = await window.API.addresses.getAll();
+            if (res.success && res.data && res.data.length > 0) {
+                addresses = res.data;
+            } else {
+                throw new Error('No data or failed');
+            }
+        } catch (err) {
+            console.warn('[Address] API 호출 실패, LocalStorage 폴백 사용.');
+            addresses = JSON.parse(localStorage.getItem('varo_addresses') || '[]');
+        }
+
+        // 만약 데이터가 아예 없다면 기본 목업 하나 생성
+        if (addresses.length === 0) {
+            const user = JSON.parse(localStorage.getItem('varo_user') || '{}');
+            addresses = [{
+                id: 'addr_default',
+                address_name: '기본 배송지 (집)',
+                recipient_name: user.name || '홍길동',
+                recipient_phone: user.phone || '010-1234-5678',
+                zipcode: '06159',
+                address: '서울 강남구 테헤란로 521',
+                address_detail: '30층',
+                is_default: 1
+            }];
+            localStorage.setItem('varo_addresses', JSON.stringify(addresses));
+        }
+
+        list.innerHTML = addresses.map(addr => `
+            <div class="address-item" style="border: 1px solid #eee; padding: 20px; border-radius: 8px; background: #fff; position: relative; ${addr.is_default ? 'border-color: #000; box-shadow: 0 4px 12px rgba(0,0,0,0.05);' : ''}">
+                ${addr.is_default ? '<span style="position: absolute; top: 15px; right: 15px; font-size: 10px; background: #000; color: #fff; padding: 2px 6px; border-radius: 2px;">기본 배송지</span>' : ''}
+                <strong style="display: block; font-size: 14px; margin-bottom: 5px;">${addr.address_name}</strong>
+                <p style="font-size: 13px; color: #333; margin-bottom: 5px;">${addr.recipient_name} | ${addr.recipient_phone}</p>
+                <p style="font-size: 13px; color: #666; line-height: 1.4;">(${addr.zipcode}) ${addr.address} ${addr.address_detail || ''}</p>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button class="btn btn--outline btn--sm" onclick='editAddress(${JSON.stringify(addr)})'>수정</button>
+                    <button class="btn btn--outline btn--sm" style="color: #ff4d4f; border-color: #ff4d4f;" onclick="deleteAddress('${addr.id}')">삭제</button>
+                </div>
+            </div>
+        `).join('');
+    };
+
+    window.openAddressModal = (data = null) => {
+        const modal = document.getElementById('addressModal');
+        const form = document.getElementById('addressForm');
+        if (!modal || !form) return;
+
+        form.reset();
+        document.getElementById('addrId').value = data ? data.id : '';
+        document.getElementById('addressModalTitle').textContent = data ? '배송지 수정' : '새 배송지 추가';
+
+        if (data) {
+            document.getElementById('addrName').value = data.address_name;
+            document.getElementById('addrRecipient').value = data.recipient_name || '';
+            document.getElementById('addrPhone').value = data.recipient_phone || '';
+            document.getElementById('addrZipcode').value = data.zipcode;
+            document.getElementById('addrBase').value = data.address;
+            document.getElementById('addrDetail').value = data.address_detail || '';
+            document.getElementById('addrDefault').checked = !!data.is_default;
+        }
+        modal.classList.add('is-active');
+    };
+
+    window.editAddress = (data) => window.openAddressModal(data);
+
+    window.deleteAddress = async (id) => {
+        if (!confirm('배송지를 삭제하시겠습니까?')) return;
+        try {
+            await window.API.addresses.delete(id);
+        } catch (err) { console.warn(err); }
+
+        let addresses = JSON.parse(localStorage.getItem('varo_addresses') || '[]');
+        addresses = addresses.filter(addr => String(addr.id) !== String(id));
+        localStorage.setItem('varo_addresses', JSON.stringify(addresses));
+
+        if (window.Utils?.showToast) window.Utils.showToast('배송지가 삭제되었습니다.', 'success');
+        renderAddresses();
+    };
+
+    window.searchPostcode = (type) => {
+        if (typeof daum === 'undefined') return alert('주소 검색 서비스를 불러올 수 없습니다.');
+        new daum.Postcode({
+            oncomplete: (data) => {
+                if (type === 'addr') {
+                    document.getElementById('addrZipcode').value = data.zonecode;
+                    document.getElementById('addrBase').value = data.address;
+                    document.getElementById('addrDetail').focus();
+                }
+            }
+        }).open();
+    };
+
+    const addressForm = document.getElementById('addressForm');
+    if (addressForm) {
+        addressForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('addrId').value;
+            const data = {
+                address_name: document.getElementById('addrName').value,
+                recipient_name: document.getElementById('addrRecipient').value,
+                recipient_phone: document.getElementById('addrPhone').value,
+                zipcode: document.getElementById('addrZipcode').value,
+                address: document.getElementById('addrBase').value,
+                address_detail: document.getElementById('addrDetail').value,
+                is_default: document.getElementById('addrDefault').checked ? 1 : 0
+            };
+
+            try {
+                id ? await window.API.addresses.update(id, data) : await window.API.addresses.create(data);
+            } catch (err) { console.warn(err); }
+
+            let addresses = JSON.parse(localStorage.getItem('varo_addresses') || '[]');
+            if (id) {
+                const idx = addresses.findIndex(addr => String(addr.id) === String(id));
+                if (idx !== -1) {
+                    addresses[idx] = { ...addresses[idx], ...data };
+                }
+            } else {
+                data.id = 'addr_' + Date.now();
+                addresses.push(data);
+            }
+
+            if (data.is_default) {
+                addresses.forEach(addr => {
+                    if (String(addr.id) !== String(data.id)) addr.is_default = 0;
+                });
+            }
+
+            localStorage.setItem('varo_addresses', JSON.stringify(addresses));
+
+            if (window.Utils?.showToast) window.Utils.showToast('배송지가 저장되었습니다.', 'success');
+            document.getElementById('addressModal').classList.remove('is-active');
+            renderAddresses();
+        });
+    }
+
+    // 주문 취소 기능
+    window.cancelOrder = (btn) => {
+        if (!confirm('이 주문을 취소하시겠습니까?')) return;
+        const cell = btn.closest('.order-status-cell') || btn.parentElement;
+        if (cell) {
+            cell.innerHTML = '<span style="font-weight:600; color:#ff4d4f;">취소완료</span>';
+            if (window.Utils?.showToast) window.Utils.showToast('주문이 정상적으로 취소되었습니다.', 'success');
+        }
+    };
+
+    // 모달 닫기 버튼 공통 처리 (Address Modal 포함)
+    document.querySelectorAll('.varo-modal__close, .varo-modal__overlay').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('addressModal')?.classList.remove('is-active');
+        });
+    });
 
     // 타 창 동기화를 위한 이벤트 리스너
     window.addEventListener('storage', (e) => {

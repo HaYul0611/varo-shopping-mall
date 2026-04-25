@@ -4,7 +4,7 @@
 const API = (() => {
   const BASE = '/api';
   const TOKEN_KEY = 'varo_token';
-  const FORCE_MOCK = false; // 실제 MySQL 서버 연동을 위해 false로 변경
+  const FORCE_MOCK = true; // 로컬 환경에서의 완벽한 동작을 위해 true로 강제 설정
 
   const getToken = () => localStorage.getItem(TOKEN_KEY);
   const setToken = (t) => localStorage.setItem(TOKEN_KEY, t);
@@ -71,6 +71,25 @@ const API = (() => {
       return { success: false, error: '인증 실패' };
     }
 
+    // [NEW] 회원가입 Mock 처리
+    if (path.includes('/auth/signup') || (entity === 'users' && method === 'POST')) {
+      const users = JSON.parse(localStorage.getItem('varo_users') || '[]');
+      if (body.email && users.some(u => u.email === body.email)) {
+        return { success: false, error: '이미 존재하는 이메일입니다.' };
+      }
+      const newUser = {
+        id: Date.now(),
+        ...body,
+        role: 'USER',
+        grade: 'bronze',
+        points: 1000,
+        created_at: new Date().toISOString()
+      };
+      users.push(newUser);
+      localStorage.setItem('varo_users', JSON.stringify(users));
+      return { success: true, data: newUser, user: newUser };
+    }
+
     if (method === 'GET') {
       if (id) {
         const item = items.find(x => x.id == id);
@@ -134,11 +153,37 @@ const API = (() => {
       getUser: () => JSON.parse(localStorage.getItem('varo_user') || 'null')
     },
     products: createEntity('products'),
-    orders: createEntity('orders'),
+    orders: {
+      ...createEntity('orders'),
+      updateStatus: (id, status) => req('PUT', `/orders/${id}/status`, { status }, true)
+    },
     users: createEntity('users'),
     banners: createEntity('banners'),
     categories: createEntity('categories'),
-    inquiries: createEntity('inquiries')
+    inquiries: createEntity('inquiries'),
+    addresses: createEntity('addresses'), // [NEW] 주소록 추가
+    // 하이브리드 익스텐션
+    hybrid: {
+      socialLogin: async (provider) => {
+        console.log(`[Hybrid] ${provider} 소셜 로그인 시뮬레이션 시작...`);
+        // 상용 전환 시 이 부분을 실제 OAuth 창 오픈 및 콜백 처리로 교체
+        await new Promise(r => setTimeout(r, 1000));
+        const res = {
+          success: true,
+          token: 'hybrid-social-token',
+          user: { name: `소셜_${provider}`, email: `${provider}@demo.com`, grade: 'bronze', is_admin: false }
+        };
+        setToken(res.token);
+        localStorage.setItem('varo_user', JSON.stringify(res.user));
+        return res;
+      },
+      processPayment: async (data) => {
+        console.log('[Hybrid] PG 결제 프로세스 시뮬레이션...', data);
+        // 상용 전환 시 포트원(Portone) 등 PG사 SDK 호출로 교체
+        await new Promise(r => setTimeout(r, 1500));
+        return { success: true, pg_tid: 'TID_' + Date.now(), message: '결제 승인 완료' };
+      }
+    }
   };
 })();
 

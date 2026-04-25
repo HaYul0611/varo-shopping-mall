@@ -7,7 +7,7 @@
  * - 쿠폰(VARO10) 할인 로직 적용
  */
 
-import Utils from './utils.js';
+// Utils는 utils.js에서 window.Utils로 전역 할당됨
 
 const CartPage = (() => {
   const { VARO_CONFIG } = window;
@@ -17,41 +17,44 @@ const CartPage = (() => {
     appliedCoupon: null
   };
 
-  const refs = {
-    list: document.getElementById('cartList'),
-    empty: document.getElementById('cartEmpty'),
-    layout: document.getElementById('cartLayout'),
-
-    // Summary
-    prodTotal: document.getElementById('summaryProductTotal'),
-    shipping: document.getElementById('summaryShipping'),
-    discount: document.getElementById('summaryDiscount'),
-    discountRow: document.getElementById('discountRow'),
-    finalTotal: document.getElementById('summaryFinalTotal'),
-
-    // Tools
-    checkAll: document.getElementById('cartCheckAll'),
-    deleteSelected: document.getElementById('cartDeleteSelected'),
-    checkoutBtn: document.getElementById('cartCheckout'),
-
-    // Coupon
-    couponInput: document.getElementById('couponInput'),
-    applyCoupon: document.getElementById('applyCoupon'),
-    couponMsg: document.getElementById('couponMessage'),
-
-    // Free Shipping Progress
-    freeShipBar: document.getElementById('freeShipBar'),
-    freeShipText: document.getElementById('freeShipText'),
-
-    // Empty state recommends
-    emptyRecommend: document.getElementById('emptyRecommendGrid'),
-  };
+  let refs = {};
 
   const init = () => {
+    refs = {
+      list: document.getElementById('cartList'),
+      empty: document.getElementById('cartEmpty'),
+      layout: document.getElementById('cartLayout'),
+
+      // Summary
+      prodTotal: document.getElementById('summaryProductTotal'),
+      shipping: document.getElementById('summaryShipping'),
+      discount: document.getElementById('summaryDiscount'),
+      discountRow: document.getElementById('discountRow'),
+      finalTotal: document.getElementById('summaryFinalTotal'),
+
+      // Tools
+      checkAll: document.getElementById('cartCheckAll'),
+      deleteSelected: document.getElementById('cartDeleteSelected'),
+      checkoutBtn: document.getElementById('cartCheckout'),
+
+      // Coupon
+      couponInput: document.getElementById('couponInput'),
+      applyCoupon: document.getElementById('applyCoupon'),
+      couponMsg: document.getElementById('couponMessage'),
+
+      // Free Shipping Progress
+      freeShipBar: document.getElementById('freeShipBar'),
+      freeShipText: document.getElementById('freeShipText'),
+
+      // Empty state recommends
+      emptyRecommend: document.getElementById('emptyRecommendGrid'),
+    };
+
     if (!refs.list) return;
     render();
     bindEvents();
   };
+
 
   const render = () => {
     const items = window.App?.Cart.getItems() || [];
@@ -82,7 +85,7 @@ const CartPage = (() => {
               <span>${item.qty}</span>
               <button data-action="plus" data-index="${idx}">+</button>
             </div>
-            <button class="cart-item__remove btn-text u-ml-10" data-index="${idx}">REMOVE</button>
+            <button class="cart-item__remove btn-text u-ml-10" data-index="${idx}">삭제</button>
           </div>
         </div>
         <div class="cart-item__price-block">
@@ -116,8 +119,30 @@ const CartPage = (() => {
     const items = window.App?.Cart.getItems() || [];
     const subtotal = items.reduce((acc, cur) => acc + (cur.price * cur.qty), 0);
 
-    const shipping = subtotal >= VARO_CONFIG.FREE_SHIP_THRESHOLD ? 0 : VARO_CONFIG.DELIVERY_FEE;
-    const discount = Math.floor(subtotal * state.discountRate);
+    // 유저 등급 확인 및 혜택 계산
+    const user = JSON.parse(localStorage.getItem('varo_user') || '{}');
+    let gradeDiscountRate = 0;
+    let isFreeShippingByGrade = false;
+
+    if (user.grade === 'DIA') {
+      gradeDiscountRate = 0.15;
+      isFreeShippingByGrade = true;
+    } else if (user.grade === 'GOLD') {
+      gradeDiscountRate = 0.1;
+      isFreeShippingByGrade = true;
+    } else if (user.grade === 'SILVER') {
+      gradeDiscountRate = 0.05;
+    }
+
+    // 쿠폰 할인과 등급 할인 중 더 높은 혜택 적용
+    const finalDiscountRate = Math.max(state.discountRate, gradeDiscountRate);
+
+    let shipping = subtotal >= VARO_CONFIG.FREE_SHIP_THRESHOLD ? 0 : VARO_CONFIG.DELIVERY_FEE;
+    if (isFreeShippingByGrade) {
+      shipping = 0; // 등급 혜택으로 무료배송
+    }
+
+    const discount = Math.floor(subtotal * finalDiscountRate);
     const total = subtotal - discount + shipping;
 
     refs.prodTotal.textContent = Utils.formatPrice(subtotal);
@@ -126,6 +151,12 @@ const CartPage = (() => {
     if (discount > 0) {
       refs.discountRow.style.display = 'flex';
       refs.discount.textContent = `-${Utils.formatPrice(discount)}`;
+
+      if (gradeDiscountRate > 0 && finalDiscountRate === gradeDiscountRate && refs.couponMsg) {
+        refs.couponMsg.textContent = `[${user.grade}] 등급 혜택 ${gradeDiscountRate * 100}% 할인 적용 중 ✨`;
+        refs.couponMsg.className = 'coupon-message success';
+        refs.couponMsg.hidden = false;
+      }
     } else {
       refs.discountRow.style.display = 'none';
     }
@@ -133,10 +164,10 @@ const CartPage = (() => {
     refs.finalTotal.textContent = Utils.formatPrice(total);
 
     // 무료배송 진행 바 업데이트
-    const progress = Math.min((subtotal / VARO_CONFIG.FREE_SHIP_THRESHOLD) * 100, 100);
+    const progress = isFreeShippingByGrade ? 100 : Math.min((subtotal / VARO_CONFIG.FREE_SHIP_THRESHOLD) * 100, 100);
     refs.freeShipBar.style.width = `${progress}%`;
-    if (subtotal >= VARO_CONFIG.FREE_SHIP_THRESHOLD) {
-      refs.freeShipText.textContent = '🎉 현재 무료배송 혜택을 받고 있습니다!';
+    if (isFreeShippingByGrade || subtotal >= VARO_CONFIG.FREE_SHIP_THRESHOLD) {
+      refs.freeShipText.textContent = isFreeShippingByGrade ? `[${user.grade}] 등급 무료배송 혜택 적용 중!` : '현재 무료배송 혜택을 받고 있습니다!';
     } else {
       const remaining = VARO_CONFIG.FREE_SHIP_THRESHOLD - subtotal;
       refs.freeShipText.textContent = `${Utils.formatPrice(remaining)}원 추가 시 무료배송`;
@@ -151,7 +182,7 @@ const CartPage = (() => {
 
       const index = parseInt(btn.dataset.index);
 
-      if (btn.classList.contains('qty-btn')) {
+      if (btn.dataset.action === 'plus' || btn.dataset.action === 'minus') {
         const delta = btn.dataset.action === 'plus' ? 1 : -1;
         window.App.Cart.updateQty(index, delta);
         render();

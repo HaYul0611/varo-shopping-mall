@@ -1589,3 +1589,44 @@ img[loading="lazy"] {
 .user-info-group { display: flex !important; align-items: center !important; gap: 8px !important; }
 .profile-avatar-link { display: inline-flex; align-items: center; justify-content: center; overflow: hidden; width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ebebeb; }
 .profile-avatar-link img { width: 100%; height: 100%; object-fit: cover; }
+
+.badge-hybrid {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 4px;
+  margin-left: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(110, 142, 251, 0.3);
+}
+
+/* UI 보완: 주소 검색 레이아웃 및 버튼 스타일 */
+.input-with-btn {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.input-with-btn .form-input {
+  flex: 1;
+  margin-bottom: 0 !important;
+}
+.btn--search {
+  background: var(--color-black, #111) !important;
+  color: #fff !important;
+  padding: 0 20px !important;
+  height: 48px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn--search:hover {
+  background: var(--color-accent, #f08060) !important;
+}

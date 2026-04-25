@@ -18,8 +18,7 @@
 
 'use strict';
 
-import GuestManager from './guestManager.js';
-import CartManager from './cartManager.js';
+// GuestManager, CartManager는 전역(window)으로 노출되어 있음
 
 // ── 전역 상태 ────────────────────────────────────────────────────
 let previewData = null;
@@ -134,22 +133,55 @@ const renderOrderItems = (items) => {
 const renderSummary = (data) => {
   const set = (id, val) => { const el = $(id); if (el) el.textContent = val; };
 
+  // 유저 등급 확인 및 혜택 재계산
+  const user = JSON.parse(localStorage.getItem('varo_user') || '{}');
+  let gradeDiscountRate = 0;
+  let isFreeShippingByGrade = false;
+  let earnRate = 0.01; // 기본 1%
+
+  if (user.grade === 'DIA') {
+    gradeDiscountRate = 0.15;
+    isFreeShippingByGrade = true;
+    earnRate = 0.07;
+  } else if (user.grade === 'GOLD') {
+    gradeDiscountRate = 0.1;
+    isFreeShippingByGrade = true;
+    earnRate = 0.05;
+  } else if (user.grade === 'SILVER') {
+    gradeDiscountRate = 0.05;
+    earnRate = 0.03;
+  }
+
+  // 등급 할인율이 더 높다면 교체
+  const finalDiscountRate = Math.max(data.discountRate || 0, gradeDiscountRate);
+  data.discountRate = finalDiscountRate;
+  data.discountAmount = Math.floor(data.totalAmount * finalDiscountRate);
+
+  if (isFreeShippingByGrade) {
+    data.shippingFee = 0;
+  }
+
+  data.finalAmount = data.totalAmount - data.discountAmount + data.shippingFee - (data.pointsUsed || 0);
+  data.pointsEarned = Math.floor(data.finalAmount * earnRate);
+
   set('#summary-total', `${fmt(data.totalAmount)}원`);
   set('#summary-discount', data.discountAmount > 0 ? `-${fmt(data.discountAmount)}원` : '0원');
   set('#summary-shipping', data.shippingFee === 0 ? '무료' : `${fmt(data.shippingFee)}원`);
   set('#summary-points', data.pointsUsed > 0 ? `-${fmt(data.pointsUsed)}원` : '0원');
   set('#summary-final', `${fmt(data.finalAmount)}원`);
 
-  if (data.discountRate > 0) {
-    const badge = $('#discount-badge');
-    if (badge) {
-      badge.textContent = `${(data.discountRate * 100).toFixed(0)}% 멤버십 할인 적용`;
+  const badge = $('#discount-badge');
+  if (badge) {
+    if (data.discountRate > 0) {
+      badge.textContent = `[${user.grade || 'BASIC'}] 등급 ${fmt(data.discountRate * 100)}% 할인 적용 ✨`;
       badge.style.display = 'inline-flex';
+    } else {
+      badge.style.display = 'none';
     }
   }
 
   if (data.pointsEarned > 0) {
-    set('#points-earned', `이 주문으로 ${fmt(data.pointsEarned)}P 적립 예정`);
+    set('#points-earned', `이 주문으로 ${fmt(data.pointsEarned)}P 적립 예정 (${fmt(earnRate * 100)}%)`);
   }
 };
 
@@ -297,6 +329,21 @@ const handleSubmit = async () => {
   }
 
   try {
+    // [HYBRID] 외부 API 연동 시뮬레이션 (결제창 팝업 등)
+    // 무통장입금이 아닌 경우에만 PG사 연동 팝업 시뮬레이션 실행
+    if (payload.payment.method !== 'vbank') {
+      const paymentRes = await API.hybrid.simulatePayment({
+        method: payload.payment.method,
+        amount: previewData.finalAmount,
+        orderName: rawItems.length > 1 ? `${rawItems[0].product_name} 외 ${rawItems.length - 1}건` : rawItems[0].product_name
+      });
+
+      if (!paymentRes.success) {
+        showError('결제가 취소되었습니다.');
+        return;
+      }
+    }
+
     const res = await GuestManager.apiFetch('/api/checkout', {
       method: 'POST',
       body: JSON.stringify(payload),

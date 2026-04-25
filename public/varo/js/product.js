@@ -88,7 +88,8 @@ const ProductDetail = (() => {
           care: p.care,
           rating: p.rating || 5.0,
           reviewCount: p.review_count || p.reviewCount || 0,
-          categoryId: p.category_id || p.categoryId
+          categoryId: p.category_id || p.categoryId,
+          stock: p.stock !== undefined ? p.stock : ((parseInt((p.id || productId).replace(/[^0-9]/g, '') || '0') % 10) + 1)
         };
       }
     } catch (e) {
@@ -107,6 +108,9 @@ const ProductDetail = (() => {
     }
     if (product.images.length === 0) product.images = ['../../assets/placeholder.png'];
 
+    if (product) {
+      product.stock = 3;
+    }
     state.product = product;
 
     // 초기 데이터 설정
@@ -141,7 +145,7 @@ const ProductDetail = (() => {
       if (state.product.subImg) detailImgs.push(state.product.subImg);
     }
 
-    container.innerHTML = detailImgs.map(img => `<img src="${img}" alt="상세 정보" loading="lazy" style="width:100%; display:block; margin-bottom:10px;" onerror="this.style.display='none'">`).join('');
+    container.innerHTML = detailImgs.map(img => `<img src="${img}" alt="상세 정보" loading="lazy" onerror="this.style.display='none'">`).join('');
   };
 
   /* ─── UI 렌더링 ─────────────────────────────────────── */
@@ -213,7 +217,15 @@ const ProductDetail = (() => {
 
         refs.productInfo.innerHTML = `
           <div class="product-info__top">
-            <p class="product-info__brand">${u.escapeHTML(product.brand || 'VARO STUDIO')}</p>
+            <div class="product-info__brand-wrap">
+              <p class="product-info__brand">${u.escapeHTML(product.brand || 'VARO STUDIO')}</p>
+              <button class="share-btn" id="shareBtn" aria-label="공유하기">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+              </button>
+            </div>
+            
+            ${(product.stock && product.stock < 5) ? `<div class="stock-badge">[품절 임박] 단 ${product.stock}개 남음</div>` : ''}
+            
             <h1 class="product-info__name">${u.escapeHTML(product.name)}</h1>
             
             <div class="product-info__rating">
@@ -358,9 +370,35 @@ const ProductDetail = (() => {
         Utils.showToast('재입고 알림 신청이 완료되었습니다. 🔔');
       }
 
-      // 사이즈 가이드 모달 열기 (Premium)
+      // 공유하기 (Premium)
+      if (e.target.closest('#shareBtn')) {
+        const url = window.location.href;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(() => {
+            Utils.showToast('링크가 복사되었습니다. 📋', 'success');
+          }).catch(err => {
+            Utils.showToast('링크 복사에 실패했습니다.', 'error');
+          });
+        } else {
+          // 폴백
+          const textArea = document.createElement('textarea');
+          textArea.value = url;
+          document.body.appendChild(textArea);
+          textArea.select();
+          try {
+            document.execCommand('copy');
+            Utils.showToast('링크가 복사되었습니다. 📋', 'success');
+          } catch (err) {
+            Utils.showToast('링크 복사에 실패했습니다.', 'error');
+          }
+          document.body.removeChild(textArea);
+        }
+      }
+
+      // 사이즈 가이드 탭으로 전환
       if (e.target.closest('.size-guide-btn')) {
-        document.getElementById('sizeModal')?.classList.add('is-active');
+        document.getElementById('tabBtnSize')?.click();
+        document.getElementById('productTabs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
 
@@ -531,7 +569,8 @@ const ProductDetail = (() => {
     }
 
     // 데이터 바인딩
-    const guide = window.VARO_DATA?.SIZE_GUIDE[category] || window.VARO_DATA?.SIZE_GUIDE['상의'];
+    const sizeGuideData = window.VARO_DATA?.SIZE_GUIDE || {};
+    const guide = sizeGuideData[category] || sizeGuideData['상의'];
 
     if (!guide) {
       tableContainer.innerHTML = '<p style="text-align:center; padding: 20px;">이 카테고리는 사이즈 가이드가 준비 중입니다.</p>';
@@ -577,7 +616,7 @@ const ProductDetail = (() => {
     }
 
     grid.innerHTML = sets.map(p => `
-      <article class="styling-card" onclick="location.href='./product.html?id=${p.id}'" style="cursor:pointer">
+      <article class="styling-card" onclick="location.href='./product.html?id=${p.id}'">
         <img src="${p.mainImg}" alt="${p.name}" loading="lazy">
         <div class="styling-card__info">
           <p class="styling-card__name">${p.name}</p>
@@ -611,6 +650,33 @@ const ProductDetail = (() => {
 
   return { init };
 })();
+
+// [NEW] AI 분석하기 버튼 이벤트 위임 처리 (렌더링 타이밍 이슈 해결)
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('#btnRunAi') || (e.target.id === 'btnRunAi' ? e.target : null);
+  if (btn) {
+    const height = parseInt(document.getElementById('inputHeight')?.value, 10);
+    const weight = parseInt(document.getElementById('inputWeight')?.value, 10);
+    const resultDiv = document.getElementById('aiResult');
+    const recommendedSize = document.getElementById('recommendedSize');
+
+    if (!height || !weight || height < 100 || weight < 30) {
+      alert('정확한 키와 몸무게를 입력해주세요.');
+      return;
+    }
+
+    let size = 'M';
+    if (weight >= 85 || height >= 185) size = 'XL';
+    else if (weight >= 75 || height >= 178) size = 'L';
+    else if (weight <= 60 && height <= 168) size = 'S';
+
+    if (recommendedSize) recommendedSize.textContent = size;
+    if (resultDiv) {
+      resultDiv.style.display = 'block';
+      resultDiv.removeAttribute('hidden');
+    }
+  }
+});
 
 document.addEventListener('DOMContentLoaded', ProductDetail.init);
 export default ProductDetail;

@@ -67,10 +67,6 @@
   transition: transform 0.3s;
 }
 
-.varo-modal__close:hover {
-  transform: rotate(90deg);
-}
-
 .varo-modal__body {
   padding: 30px;
   max-height: 60vh;

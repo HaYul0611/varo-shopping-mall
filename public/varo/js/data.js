@@ -402,25 +402,60 @@ const PRODUCTS = [
 ];
 
 const HERO_SLIDES = [
-  { id: 'H_JAN', tag: '01 JANUARY', panels: ['./assets/lookbook/lookbook_1.png'] },
-  { id: 'H_FEB', tag: '02 FEBRUARY', panels: ['./assets/lookbook/lookbook_2.png'] },
-  { id: 'H_MAR', tag: '03 MARCH', panels: ['./assets/lookbook/lookbook_3.png'] },
-  { id: 'H_APR', tag: '04 APRIL', panels: ['./assets/lookbook/lookbook_4.png'] },
-  { id: 'H_MAY', tag: '05 MAY', panels: ['./assets/lookbook/lookbook_5.png'] },
-  { id: 'H_JUN', tag: '06 JUNE', panels: ['./assets/lookbook/lookbook_6.png'] },
-  { id: 'H_JUL', tag: '07 JULY', panels: ['./assets/lookbook/lookbook_7.png'] },
-  { id: 'H_AUG', tag: '08 AUGUST', panels: ['./assets/lookbook/lookbook_8.png'] },
-  { id: 'H_SEP', tag: '09 SEPTEMBER', panels: ['./assets/lookbook/lookbook_9.png'] },
-  { id: 'H_OCT', tag: '10 OCTOBER', panels: ['./assets/lookbook/lookbook_10.png'] },
-  { id: 'H_NOV', tag: '11 NOVEMBER', panels: ['./assets/lookbook/lookbook_11.png'] },
-  { id: 'H_DEC', tag: '12 DECEMBER', panels: ['./assets/lookbook/lookbook_12.png'] },
+  { id: 'H_JAN', panels: ['./assets/lookbook/lookbook_1.png'] },
+  { id: 'H_FEB', panels: ['./assets/lookbook/lookbook_2.png'] },
+  { id: 'H_MAR', panels: ['./assets/lookbook/lookbook_3.png'] },
+  { id: 'H_APR', panels: ['./assets/lookbook/lookbook_4.png'] },
+  { id: 'H_MAY', panels: ['./assets/lookbook/lookbook_5.png'] },
+  { id: 'H_JUN', panels: ['./assets/lookbook/lookbook_6.png'] },
+  { id: 'H_JUL', panels: ['./assets/lookbook/lookbook_7.png'] },
+  { id: 'H_AUG', panels: ['./assets/lookbook/lookbook_8.png'] },
+  { id: 'H_SEP', panels: ['./assets/lookbook/lookbook_9.png'] },
+  { id: 'H_OCT', panels: ['./assets/lookbook/lookbook_10.png'] },
+  { id: 'H_NOV', panels: ['./assets/lookbook/lookbook_11.png'] },
+  { id: 'H_DEC', panels: ['./assets/lookbook/lookbook_12.png'] },
 ];
 
 const REVIEWS = {};
 const MARQUEE_ITEMS = ['PREMIUM ESSENTIALS FOR MEN', 'FREE SHIPPING OVER 50,000 KRW', '2026 VARO STUDIO COLLECTION'];
 const SORT_OPTIONS = [{ value: 'newest', label: '신상품순' }, { value: 'popular', label: '인기순' }];
 
+const SIZE_GUIDE = {
+  'outer': [
+    { size: 'S', shoulder: '46', chest: '54', length: '68' },
+    { size: 'M', shoulder: '48', chest: '56', length: '70' },
+    { size: 'L', shoulder: '50', chest: '58', length: '72' },
+    { size: 'XL', shoulder: '52', chest: '60', length: '74' }
+  ],
+  'top': [
+    { size: 'S', shoulder: '44', chest: '50', length: '66' },
+    { size: 'M', shoulder: '46', chest: '52', length: '68' },
+    { size: 'L', shoulder: '48', chest: '54', length: '70' },
+    { size: 'XL', shoulder: '50', chest: '56', length: '72' }
+  ],
+  'shirt': [
+    { size: 'M', shoulder: '47', chest: '55', length: '75' },
+    { size: 'L', shoulder: '49', chest: '57', length: '77' },
+    { size: 'XL', shoulder: '51', chest: '59', length: '79' }
+  ],
+  'bottom': [
+    { size: 'S', waist: '38', hip: '50', length: '102' },
+    { size: 'M', waist: '40', hip: '52', length: '104' },
+    { size: 'L', waist: '42', hip: '54', length: '106' },
+    { size: 'XL', waist: '44', hip: '56', length: '108' }
+  ],
+  'shoes': [
+    { size: '250', kr: '250', eu: '40', uk: '6' },
+    { size: '260', kr: '260', eu: '41', uk: '7' },
+    { size: '270', kr: '270', eu: '42', uk: '8' },
+    { size: '280', kr: '280', eu: '43', uk: '9' }
+  ],
+  'acc': [
+    { size: 'Free', description: 'One Size fits all' }
+  ]
+};
+
 if (typeof window !== 'undefined') {
-  window.VARO_DATA = { CATEGORIES, PRODUCTS, WEEKLY_BEST, HERO_SLIDES, MARQUEE_ITEMS, REVIEWS, SORT_OPTIONS };
+  window.VARO_DATA = { CATEGORIES, PRODUCTS, WEEKLY_BEST, HERO_SLIDES, MARQUEE_ITEMS, REVIEWS, SORT_OPTIONS, SIZE_GUIDE };
   window.VARO_CONFIG = VARO_CONFIG;
 }
