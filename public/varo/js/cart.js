@@ -73,7 +73,7 @@ const CartPage = (() => {
     refs.list.innerHTML = items.map((item, idx) => `
       <li class="cart-item" data-index="${idx}">
         <div class="cart-item__check">
-          <input type="checkbox" checked class="item-checkbox">
+          <input type="checkbox" checked class="item-checkbox" data-index="${idx}">
         </div>
         <img class="cart-item__img" src="${item.mainImg}" alt="${item.name}" onclick="location.href='./product.html?id=${item.productId}'">
         <div class="cart-item__info">
@@ -153,7 +153,7 @@ const CartPage = (() => {
       refs.discount.textContent = `-${Utils.formatPrice(discount)}`;
 
       if (gradeDiscountRate > 0 && finalDiscountRate === gradeDiscountRate && refs.couponMsg) {
-        refs.couponMsg.textContent = `[${user.grade}] 등급 혜택 ${gradeDiscountRate * 100}% 할인 적용 중 ✨`;
+        refs.couponMsg.textContent = `[${user.grade}] 등급 혜택 ${gradeDiscountRate * 100}% 할인 적용 중`;
         refs.couponMsg.className = 'coupon-message success';
         refs.couponMsg.hidden = false;
       }
@@ -204,10 +204,11 @@ const CartPage = (() => {
     refs.deleteSelected?.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
+      e.stopImmediatePropagation();
       const checkboxes = Array.from(refs.list.querySelectorAll('.item-checkbox'));
       const indicesToRemove = checkboxes
-        .map((cb, idx) => cb.checked ? idx : -1)
-        .filter(idx => idx !== -1);
+        .filter(cb => cb.checked)
+        .map(cb => parseInt(cb.dataset.index));
 
       if (indicesToRemove.length === 0) {
         Utils.showToast('삭제할 상품을 선택해 주세요.', 'error');
@@ -215,6 +216,7 @@ const CartPage = (() => {
       }
 
       if (confirm('선택한 상품을 삭제하시겠습니까?')) {
+        // 인덱스가 큰 것부터 삭제해야 배열 꼬임이 없음 (App.Cart.removeSelected가 내부적으로 처리하겠지만 명시적 보장)
         window.App.Cart.removeSelected(indicesToRemove);
         render();
       }

@@ -84,10 +84,19 @@ const App = (() => {
         active = true;
       }
       localStorage.setItem(this.KEY, JSON.stringify(items));
+      this.updateBadge();
+      window.dispatchEvent(new CustomEvent('varo:wishlistChange', { detail: { items } }));
       if (window.Utils?.showToast) {
         window.Utils.showToast(active ? '관심 상품에 추가되었습니다 ♡' : '관심 상품에서 제외되었습니다.', active ? 'success' : 'info');
       }
       return active;
+    },
+    updateBadge() {
+      const count = this.getItems().length;
+      document.querySelectorAll('.wishlist-badge').forEach(badge => {
+        badge.textContent = count;
+        badge.style.display = count === 0 ? 'none' : 'flex';
+      });
     }
   };
 
@@ -167,14 +176,14 @@ const App = (() => {
   const init = () => {
     if (document.body.dataset.initialized === 'true') return;
     Cart.updateBadge();
+    Wishlist.updateBadge();
     syncAuthState();
     if (window.API?.syncUI) window.API.syncUI();
     document.body.dataset.initialized = 'true';
 
-    // 장바구니 변경 이벤트 리스너 추가
-    window.addEventListener('varo:cartChange', () => {
-      Cart.updateBadge();
-    });
+    // 장바구니/위시리스트 변경 이벤트 리스너 추가
+    window.addEventListener('varo:cartChange', () => Cart.updateBadge());
+    window.addEventListener('varo:wishlistChange', () => Wishlist.updateBadge());
 
     console.log('[App] Initialized');
 

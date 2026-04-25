@@ -89,12 +89,15 @@
   aspect-ratio: 3/4;
   object-fit: cover;
   background: var(--color-light);
+  border-radius: 4px;
+  padding: 4px;
 }
 
 .cart-item__info {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
+  padding-left: 10px;
 }
 
 .cart-item__name {
