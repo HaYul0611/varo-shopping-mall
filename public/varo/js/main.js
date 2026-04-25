@@ -46,11 +46,13 @@ const App = (() => {
       window.dispatchEvent(new CustomEvent('varo:cartChange', { detail: { items } }));
     },
     removeSelected(indices) {
-      let items = this.getItems();
-      items = items.filter((_, idx) => !indices.includes(idx));
-      localStorage.setItem(this.KEY, JSON.stringify(items));
+      const items = this.getItems();
+      // 인덱스 타입 일치를 위해 Number로 변환 후 필터링
+      const targetIndices = indices.map(Number);
+      const newItems = items.filter((_, idx) => !targetIndices.includes(idx));
+      localStorage.setItem(this.KEY, JSON.stringify(newItems));
       this.updateBadge();
-      window.dispatchEvent(new CustomEvent('varo:cartChange', { detail: { items } }));
+      window.dispatchEvent(new CustomEvent('varo:cartChange', { detail: { items: newItems } }));
     },
     clear() {
       localStorage.removeItem(this.KEY);

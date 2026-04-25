@@ -117,7 +117,6 @@
 .cart-item__qty {
   display: flex;
   align-items: center;
-  gap: 12px;
   margin-top: 10px;
   width: fit-content;
 }
@@ -150,12 +149,14 @@
   height: 30px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 0;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: 0 12px;
   width: auto;
-  min-width: 40px;
   background: none;
-  border: none;
+  border: 1px solid var(--color-border);
+  border-left: none;
+  line-height: 1;
 }
 
 .cart-item__remove:hover {
