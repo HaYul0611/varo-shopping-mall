@@ -85,7 +85,7 @@ const CartPage = (() => {
               <span>${item.qty}</span>
               <button data-action="plus" data-index="${idx}">+</button>
             </div>
-            <button class="cart-item__remove btn-text u-ml-10" data-index="${idx}">삭제</button>
+            <button type="button" class="cart-item__remove btn-text u-ml-10" data-index="${idx}">삭제</button>
           </div>
         </div>
         <div class="cart-item__price-block">
@@ -201,7 +201,9 @@ const CartPage = (() => {
     });
 
     // 선택 삭제
-    refs.deleteSelected?.addEventListener('click', () => {
+    refs.deleteSelected?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       const checkboxes = Array.from(refs.list.querySelectorAll('.item-checkbox'));
       const indicesToRemove = checkboxes
         .map((cb, idx) => cb.checked ? idx : -1)

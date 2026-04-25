@@ -145,6 +145,12 @@
 .cart-item__remove {
   color: #bbb;
   cursor: pointer;
+  font-size: 11px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
 }
 
 .cart-item__remove:hover {
