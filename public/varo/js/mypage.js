@@ -724,17 +724,130 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.is_default) {
                 addresses.forEach(addr => {
-                    if (String(addr.id) !== String(data.id)) addr.is_default = 0;
+                    if (String(addr.id) !== String(id || data.id)) addr.is_default = 0;
                 });
             }
 
             localStorage.setItem('varo_addresses', JSON.stringify(addresses));
 
-            if (window.Utils?.showToast) window.Utils.showToast('배송지가 저장되었습니다.', 'success');
+            window.Utils.showToast('배송지가 저장되었습니다.', 'success');
             document.getElementById('addressModal').classList.remove('is-active');
             renderAddresses();
         });
     }
+
+    // ════════════════════════════════════════════════════════
+    // 교환/반품 / 구매확정 / 배송추적 기능
+    // ════════════════════════════════════════════════════════
+
+    // 1. 교환/반품 신청
+    window.openReturnModal = (productName, price) => {
+        const modal = document.getElementById('returnModal');
+        document.getElementById('returnProductName').value = productName;
+        document.getElementById('returnProductLabel').textContent = `신청 상품: ${productName}`;
+        modal.classList.add('is-active');
+    };
+
+    const returnForm = document.getElementById('returnForm');
+    if (returnForm) {
+        returnForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const type = document.getElementById('returnType').value === 'exchange' ? '교환' : '반품';
+            const productName = document.getElementById('returnProductName').value;
+
+            // 실무 시뮬레이션: 주문 내역 상태 업데이트 (데모용)
+            window.Utils.showToast(`${productName} 상품의 ${type} 신청이 접수되었습니다.`, 'success');
+            document.getElementById('returnModal').classList.remove('is-active');
+
+            // 실제 상용 환경에서는 API를 통해 주문 상태를 '교환접수'/'반품접수'로 변경해야 함
+            console.log(`[VARO] ${type} 접수 완료: ${productName}`);
+        });
+    }
+
+    // 2. 구매확정 및 리뷰 연동
+    window.confirmPurchase = (btn, productName) => {
+        if (!confirm(`'${productName}' 상품을 구매확정 하시겠습니까?\n구매확정 후에는 교환/반품 신청이 불가하며, 리뷰 작성이 가능합니다.`)) return;
+
+        // 상태 변경 UI 피드백
+        const cell = btn.closest('.order-status-cell');
+        if (cell) {
+            cell.innerHTML = '<span style="font-weight:600; color:#555;">구매확정</span>';
+        }
+
+        window.Utils.showToast('구매확정이 완료되었습니다. 리뷰를 작성해 보세요!', 'success');
+
+        // 리뷰 모달 오픈
+        setTimeout(() => {
+            const modal = document.getElementById('reviewModal');
+            document.getElementById('reviewProductName').value = productName;
+            document.getElementById('reviewProductLabel').textContent = `상품: ${productName}`;
+            modal.classList.add('is-active');
+        }, 800);
+    };
+
+    // 별점 선택 로직
+    const stars = document.querySelectorAll('#reviewStars span');
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            const rating = star.dataset.star;
+            document.getElementById('reviewRating').value = rating;
+            stars.forEach(s => {
+                s.style.color = s.dataset.star <= rating ? '#FFB800' : '#ddd';
+            });
+        });
+    });
+
+    const reviewForm = document.getElementById('reviewForm');
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const rating = document.getElementById('reviewRating').value;
+            const content = document.getElementById('reviewContent').value.trim();
+
+            if (rating === '0') return alert('별점을 선택해 주세요.');
+            if (!content) return alert('한줄평을 입력해 주세요.');
+
+            // 리뷰 저장 시뮬레이션 (varo_reviews가 아닌 qna와 유사한 구조로 통합 관리 가능)
+            window.Utils.showToast('리뷰가 성공적으로 등록되었습니다. 500 적립금이 지급되었습니다!', 'success');
+            document.getElementById('reviewModal').classList.remove('is-active');
+
+            // 초기화
+            document.getElementById('reviewRating').value = '0';
+            document.getElementById('reviewContent').value = '';
+            stars.forEach(s => s.style.color = '#ddd');
+        });
+    }
+
+    // 3. 배송 추적 시뮬레이션
+    window.openTrackingModal = (productName) => {
+        const modal = document.getElementById('trackingModal');
+        document.getElementById('trackingProductName').textContent = productName;
+
+        const timeline = document.getElementById('trackingTimeline');
+        const steps = [
+            { date: '2026-04-20 14:22', status: '상품접수', location: 'VARO 물류센터', done: true },
+            { date: '2026-04-20 18:05', status: '상품인수', location: '용인Hub', done: true },
+            { date: '2026-04-21 02:40', status: '간선하차', location: '고양Hub', done: true },
+            { date: '2026-04-21 09:15', status: '배달출발', location: '서울 강남구 일원동', done: true },
+            { date: '-', status: '배달완료', location: '-', done: false }
+        ];
+
+        timeline.innerHTML = steps.map((s, idx) => `
+            <div style="margin-bottom: 25px; position: relative; padding-left: 10px;">
+                <div style="position: absolute; left: -28px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: ${s.done ? '#000' : '#ddd'}; z-index: 2;"></div>
+                ${idx < steps.length - 1 ? `<div style="position: absolute; left: -24px; top: 10px; width: 2px; height: 35px; background: ${s.done ? '#000' : '#eee'}; z-index: 1;"></div>` : ''}
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div style="font-size: 13px; font-weight: ${s.done && !steps[idx + 1]?.done ? '700' : '500'};">
+                        <div style="margin-bottom: 4px;">${s.status}</div>
+                        <div style="font-size: 11px; color: #888;">${s.location}</div>
+                    </div>
+                    <div style="font-size: 11px; color: #aaa;">${s.date}</div>
+                </div>
+            </div>
+        `).join('');
+
+        modal.classList.add('is-active');
+    };
 
     // 주문 취소 기능
     window.cancelOrder = (btn) => {

@@ -907,16 +907,16 @@ function renderAdminQNA() {
         </div>
         <span style="font-size:12px; color:#888;">${q.date}</span>
       </div>
-      <div style="font-weight:600; font-size:14px; margin-bottom:4px;">${q.subject}</div>
-      <div style="font-size:13px; color:#555; line-height:1.6; margin-bottom:8px;">${q.content || ''}</div>
-      <div style="font-size:12px; color:#999; margin-bottom:12px;">${q.author}</div>
+      <div style="font-weight:600; font-size:14px; margin-bottom:4px;">${window.Utils.escapeHTML(q.subject)}</div>
+      <div style="font-size:13px; color:#555; line-height:1.6; margin-bottom:8px;">${window.Utils.escapeHTML(q.content || '')}</div>
+      <div style="font-size:12px; color:#999; margin-bottom:12px;">${window.Utils.escapeHTML(q.author)}</div>
       ${q.replies && q.replies.length > 0 ? q.replies.map(r => `
         <div style="background:#f8f9fa; padding:12px; border-radius:6px; margin-bottom:8px; border-left:3px solid #1c1a16;">
           <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span style="font-weight:600; font-size:12px;">${r.author} ${r.isAdmin ? '<span style="background:#1c1a16; color:#fff; font-size:9px; padding:1px 4px; border-radius:2px;">ADMIN</span>' : ''}</span>
+            <span style="font-weight:600; font-size:12px;">${window.Utils.escapeHTML(r.author)} ${r.isAdmin ? '<span style="background:#1c1a16; color:#fff; font-size:9px; padding:1px 4px; border-radius:2px;">ADMIN</span>' : ''}</span>
             <span style="font-size:11px; color:#aaa;">${r.date}</span>
           </div>
-          <div style="font-size:13px; color:#333;">${r.content}</div>
+          <div style="font-size:13px; color:#333;">${window.Utils.escapeHTML(r.content)}</div>
         </div>
       `).join('') : ''}
       <div style="display:flex; gap:8px; align-items:center;">

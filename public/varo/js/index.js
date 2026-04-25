@@ -386,12 +386,39 @@ const IndexPage = (() => {
     filtered.forEach(p => grid.appendChild(buildCard(p)));
   };
 
+  // 최근 본 상품 렌더링
+  const renderRecentlyViewed = () => {
+    const section = document.getElementById('recentlyViewedSection');
+    const grid = document.getElementById('recentlyViewedGrid');
+    if (!section || !grid) return;
+
+    const list = JSON.parse(localStorage.getItem('varo_recently_viewed') || '[]');
+    if (list.length === 0) {
+      section.hidden = true;
+      return;
+    }
+
+    const products = getProducts();
+    const items = list.map(id => products.find(p => String(p.id) === String(id))).filter(Boolean);
+
+    if (items.length === 0) {
+      section.hidden = true;
+      return;
+    }
+
+    section.hidden = false;
+    grid.innerHTML = '';
+    items.forEach(p => grid.appendChild(buildCard(p)));
+  };
+
   const renderAll = () => {
     renderFlashSale();
     renderWeeklyBest(document.querySelector('.lookple-tab-btn.is-active')?.dataset.category || 'best');
     renderNewProduct();
     renderLookpleBest();
+    renderRecentlyViewed();
   };
+
 
   // 탭 네비게이션 초기화
   const initLookpleTabs = () => {

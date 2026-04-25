@@ -112,14 +112,14 @@ const CommunityPageV2 = (() => {
       <li class="review-card-comm">
         <div class="review-card-comm__header">
           <span class="review-card-comm__stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
-          <span class="review-card-comm__user">${r.user}</span>
+          <span class="review-card-comm__user">${Utils.escapeHTML(r.user)}</span>
           <span class="review-card-comm__date">${r.date}</span>
         </div>
-        <p class="review-card-comm__product">${r.product}</p>
-        <p class="review-card-comm__body">${r.body}</p>
+        <p class="review-card-comm__product">${Utils.escapeHTML(r.product)}</p>
+        <p class="review-card-comm__body">${Utils.escapeHTML(r.body)}</p>
         <div style="display:flex;gap:10px;align-items:center;">
           ${r.img ? `<div class="review-card-comm__img"><img src="${r.img}" alt="리뷰 이미지" loading="lazy"></div>` : ''}
-          <span style="font-size:11px;color:#AAA">${r.sizeInfo}</span>
+          <span style="font-size:11px;color:#AAA">${Utils.escapeHTML(r.sizeInfo)}</span>
         </div>
       </li>
     `).join('');
@@ -197,9 +197,9 @@ const CommunityPageV2 = (() => {
           <div class="qna-q-row">
             <span class="qna-badge qna-badge--q">Q</span>
             <div class="qna-q-content">
-              <p class="qna-subject">${q.isSecret ? '<span style="color:#AAA">🔒 비밀글입니다. </span>' : ''}${q.subject}</p>
-              <p class="qna-meta" style="margin-top:8px; line-height:1.6; color:#555;">${q.content}</p>
-              <p class="qna-meta" style="margin-top:8px;"><span class="qna-author">${q.author}</span> · ${q.date}</p>
+              <p class="qna-subject">${q.isSecret ? '<span style="color:#AAA">🔒 비밀글입니다. </span>' : ''}${Utils.escapeHTML(q.subject)}</p>
+              <p class="qna-meta" style="margin-top:8px; line-height:1.6; color:#555;">${Utils.escapeHTML(q.content)}</p>
+              <p class="qna-meta" style="margin-top:8px;"><span class="qna-author">${Utils.escapeHTML(q.author)}</span> · ${q.date}</p>
             </div>
             <span class="qna-status qna-status--${q.status}">${q.status === 'done' ? '답변완료' : '답변대기'}</span>
           </div>
@@ -215,7 +215,7 @@ const CommunityPageV2 = (() => {
                 <div class="qna-reply-item" id="reply-${r.id}">
                   <div class="qna-reply-header">
                     <div style="display:flex; gap:8px; align-items:center;">
-                      <span class="qna-reply-user">${r.author}</span>
+                      <span class="qna-reply-user">${Utils.escapeHTML(r.author)}</span>
                       ${r.isAdmin ? '<span class="admin-mark" style="font-size:9px; background:#1C1A16; color:#FFF; padding:1px 4px; border-radius:2px;">ADMIN</span>' : ''}
                       <span class="qna-reply-date">${r.date}</span>
                     </div>
@@ -229,14 +229,14 @@ const CommunityPageV2 = (() => {
                   
                   ${isEditing ? `
                     <div class="qna-reply-edit-wrap" style="margin-top:8px;">
-                      <textarea id="editReplyInput-${r.id}" class="qna-reply-input" style="width:100%; min-height:60px; padding:8px; font-size:13px;">${r.content}</textarea>
+                      <textarea id="editReplyInput-${r.id}" class="qna-reply-input" style="width:100%; min-height:60px; padding:8px; font-size:13px;">${Utils.escapeHTML(r.content)}</textarea>
                       <div style="display:flex; gap:5px; margin-top:5px; justify-content:flex-end;">
                         <button type="button" class="btn btn--outline btn--xs" onclick="CommunityPageV2.cancelEditReply()" style="padding:4px 8px; font-size:11px;">취소</button>
                         <button type="button" class="btn btn--primary btn--xs" onclick="CommunityPageV2.saveEditedReply(${q.id}, ${r.id})" style="padding:4px 8px; font-size:11px;">저장</button>
                       </div>
                     </div>
                   ` : `
-                    <div class="qna-reply-body">${r.content}</div>
+                    <div class="qna-reply-body">${Utils.escapeHTML(r.content)}</div>
                   `}
                 </div>
                 `;
@@ -254,7 +254,7 @@ const CommunityPageV2 = (() => {
             <span class="qna-badge qna-badge--q" style="background:#EEE; color:#AAA;">Q</span>
             <div class="qna-q-content">
               <p class="qna-subject" style="color:#888;">🔒 비밀글입니다. <span style="font-size:11px; font-weight:400;">(클릭하여 비밀번호 입력)</span></p>
-              <p class="qna-meta"><span class="qna-author">${q.author}</span> · ${q.date}</p>
+              <p class="qna-meta"><span class="qna-author">${Utils.escapeHTML(q.author)}</span> · ${q.date}</p>
             </div>
             <span class="qna-status qna-status--pending" style="background:#F5F5F5; color:#999;">비밀글</span>
           </div>

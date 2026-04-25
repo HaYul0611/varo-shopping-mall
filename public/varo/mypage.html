@@ -63,6 +63,7 @@
               <li><a href="#" class="mypage-nav__link" data-target="section-wishlist">위시리스트</a></li>
               <li><a href="#" class="mypage-nav__link" data-target="section-inquiry">내 문의내역</a></li>
               <li><a href="#" class="mypage-nav__link" data-target="section-address">배송지 관리</a></li>
+              <li><a href="#" class="mypage-nav__link" data-target="section-coupon">쿠폰함</a></li>
               <li><a href="#" class="mypage-nav__link" data-target="section-membership">멤버십 현황</a></li>
               <li><a href="#" class="mypage-nav__link" data-target="section-profile">프로필 수정</a></li>
               <li><a href="#" id="btnLogout" class="mypage-nav__link mypage-nav__link--logout">로그아웃</a></li>
@@ -101,22 +102,25 @@
                     <td>2026.04.20</td>
                     <td>VARO 와이드 데님 팬츠 외 1건</td>
                     <td>89,000원</td>
-                    <td>
+                    <td class="order-status-cell">
                       <span style="font-weight:600; color:#1B2B4B;">배송중</span>
                       <button class="btn btn--outline"
                         style="padding: 4px 8px; font-size: 11px; margin-left: 5px; border-radius: 4px;"
-                        onclick="window.Utils.showToast('택배사(CJ대한통운) API 트래킹 연동 심사 중입니다 (하이브리드 모드).', 'info')">배송조회</button>
+                        onclick="openTrackingModal('VARO 와이드 데님 팬츠 외 1건')">배송조회</button>
                     </td>
                   </tr>
                   <tr>
                     <td>2026.04.22</td>
                     <td>해링턴 코튼 블루종</td>
                     <td>128,000원</td>
-                    <td>
+                    <td class="order-status-cell">
                       <span style="font-weight:600; color:#888;">배송완료</span>
                       <button class="btn btn--primary"
                         style="padding: 4px 8px; font-size: 11px; margin-left: 5px; border-radius: 4px;"
-                        onclick="window.Utils.showToast('리뷰 작성 및 적립금 지급 시스템 점검 중입니다 (하이브리드 모드).', 'info')">구매확정</button>
+                        onclick="confirmPurchase(this, '해링턴 코튼 블루종')">구매확정</button>
+                      <button class="btn btn--outline"
+                        style="padding: 4px 8px; font-size: 11px; margin-left: 5px; border-radius: 4px;"
+                        onclick="openReturnModal('해링턴 코튼 블루종', 128000)">교환/반품</button>
                     </td>
                   </tr>
                 </tbody>
@@ -209,6 +213,26 @@
               <div class="empty-row"
                 style="grid-column: 1/-1; padding: 40px 0; text-align: center; color: #888; background: #fafafa; border-radius: 8px;">
                 등록된 배송지가 없습니다.</div>
+            </div>
+          </section>
+
+          <section class="mypage-section" id="section-coupon" style="display: none;">
+            <h2 class="mypage-section__title">쿠폰함</h2>
+
+            <div class="coupon-register"
+              style="background:#f8f9fa; padding:20px; border-radius:8px; margin-bottom:30px; display:flex; gap:10px; align-items:flex-end;">
+              <div style="flex:1;">
+                <label style="font-size:12px; font-weight:600; color:#666; display:block; margin-bottom:8px;">쿠폰 번호
+                  등록</label>
+                <input type="text" id="couponCodeInput" placeholder="쿠폰 번호를 입력해 주세요 (예: VARO2026)"
+                  style="width:100%; padding:12px; border:1px solid #ddd; border-radius:4px; font-size:13px;">
+              </div>
+              <button class="btn btn--primary" style="height:44px; padding:0 30px; border-radius:4px;"
+                onclick="registerCoupon()">등록하기</button>
+            </div>
+
+            <div id="couponList" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+              <!-- JS에서 렌더링 -->
             </div>
           </section>
 
@@ -459,6 +483,130 @@
           <button type="submit"
             style="width: 100%; padding: 15px; background: #000; color: #fff; border: none; border-radius: 4px; font-weight: 700; cursor: pointer;">저장하기</button>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 교환/반품 신청 모달 ═══ -->
+  <div class="varo-modal" id="returnModal" aria-hidden="true">
+    <div class="varo-modal__overlay"></div>
+    <div class="varo-modal__container" style="max-width: 520px;">
+      <div class="varo-modal__header">
+        <h3 class="varo-modal__title" id="returnModalTitle">교환/반품 신청</h3>
+        <button class="varo-modal__close"
+          onclick="document.getElementById('returnModal').classList.remove('is-active')">&times;</button>
+      </div>
+      <form id="returnForm" style="padding: 20px;">
+        <input type="hidden" id="returnProductName">
+        <p id="returnProductLabel" style="font-weight:700; font-size:14px; margin-bottom:15px;"></p>
+        <div style="margin-bottom:15px;">
+          <label style="font-size:13px; font-weight:600; display:block; margin-bottom:5px;">신청 유형 *</label>
+          <select id="returnType"
+            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; font-size:13px;">
+            <option value="exchange">교환 (동일 상품 사이즈/색상 변경)</option>
+            <option value="return">반품 (환불)</option>
+          </select>
+        </div>
+        <div style="margin-bottom:15px;">
+          <label style="font-size:13px; font-weight:600; display:block; margin-bottom:5px;">사유 선택 *</label>
+          <select id="returnReason"
+            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; font-size:13px;">
+            <option value="size">사이즈가 맞지 않음</option>
+            <option value="color">색상이 상이함</option>
+            <option value="defect">상품 불량/파손</option>
+            <option value="wrong">오배송 (잘못된 상품 수령)</option>
+            <option value="mind">단순 변심</option>
+            <option value="other">기타</option>
+          </select>
+        </div>
+        <div style="margin-bottom:15px;">
+          <label style="font-size:13px; font-weight:600; display:block; margin-bottom:5px;">상세 사유</label>
+          <textarea id="returnDetail" rows="3" placeholder="상세 사유를 입력해 주세요."
+            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; font-size:13px; resize:vertical;"></textarea>
+        </div>
+        <div style="margin-bottom:15px;">
+          <label style="font-size:13px; font-weight:600; display:block; margin-bottom:5px;">반송 방법 *</label>
+          <select id="returnMethod"
+            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; font-size:13px;">
+            <option value="pickup">자택 수거 요청 (택배사 방문)</option>
+            <option value="direct">직접 반송 (지정 주소로 발송)</option>
+          </select>
+        </div>
+        <div
+          style="background:#f8f8f8; border-radius:6px; padding:12px; margin-bottom:20px; font-size:12px; color:#666; line-height:1.6;">
+          <strong style="color:#333;">📌 교환/반품 안내</strong><br>
+          · 상품 수령 후 7일 이내 신청 가능합니다.<br>
+          · 고객 변심에 의한 반품 시 왕복 배송비(6,000원)가 차감됩니다.<br>
+          · 상품 불량/오배송의 경우 배송비는 VARO가 부담합니다.
+        </div>
+        <button type="submit"
+          style="width:100%; padding:14px; background:#000; color:#fff; border:none; border-radius:4px; font-weight:700; cursor:pointer; font-size:14px;">신청하기</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══ 리뷰 작성 모달 ═══ -->
+  <div class="varo-modal" id="reviewModal" aria-hidden="true">
+    <div class="varo-modal__overlay"></div>
+    <div class="varo-modal__container" style="max-width: 480px;">
+      <div class="varo-modal__header">
+        <h3 class="varo-modal__title">상품 리뷰 작성</h3>
+        <button class="varo-modal__close"
+          onclick="document.getElementById('reviewModal').classList.remove('is-active')">&times;</button>
+      </div>
+      <form id="reviewForm" style="padding: 20px;">
+        <input type="hidden" id="reviewProductName">
+        <p id="reviewProductLabel" style="font-weight:700; font-size:14px; margin-bottom:15px;"></p>
+        <div style="margin-bottom:15px;">
+          <label style="font-size:13px; font-weight:600; display:block; margin-bottom:8px;">별점을 선택해 주세요 *</label>
+          <div id="reviewStars" style="display:flex; gap:6px; font-size:28px; cursor:pointer; color:#ddd;">
+            <span data-star="1">★</span><span data-star="2">★</span><span data-star="3">★</span><span
+              data-star="4">★</span><span data-star="5">★</span>
+          </div>
+          <input type="hidden" id="reviewRating" value="0">
+        </div>
+        <div style="margin-bottom:15px;">
+          <label style="font-size:13px; font-weight:600; display:block; margin-bottom:5px;">한줄평 *</label>
+          <textarea id="reviewContent" rows="4" placeholder="상품에 대한 솔직한 후기를 남겨 주세요."
+            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; font-size:13px; resize:vertical;"></textarea>
+        </div>
+        <div
+          style="background:#f0f7ff; border-radius:6px; padding:12px; margin-bottom:20px; font-size:12px; color:#4A7FA5; line-height:1.6;">
+          🎁 리뷰 작성 시 <strong>500 적립금</strong>이 지급됩니다.
+        </div>
+        <button type="submit"
+          style="width:100%; padding:14px; background:#000; color:#fff; border:none; border-radius:4px; font-weight:700; cursor:pointer; font-size:14px;">리뷰
+          등록</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══ 배송 추적 모달 ═══ -->
+  <div class="varo-modal" id="trackingModal" aria-hidden="true">
+    <div class="varo-modal__overlay"></div>
+    <div class="varo-modal__container" style="max-width: 480px;">
+      <div class="varo-modal__header">
+        <h3 class="varo-modal__title">배송 추적</h3>
+        <button class="varo-modal__close"
+          onclick="document.getElementById('trackingModal').classList.remove('is-active')">&times;</button>
+      </div>
+      <div style="padding: 20px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:13px;">
+          <span style="color:#888;">택배사</span>
+          <strong>CJ대한통운</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:13px;">
+          <span style="color:#888;">운송장 번호</span>
+          <strong id="trackingWaybill">640-1234-5678</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:13px;">
+          <span style="color:#888;">상품명</span>
+          <strong id="trackingProductName"></strong>
+        </div>
+        <hr style="border:none; border-top:1px solid #eee; margin-bottom:20px;">
+        <div id="trackingTimeline" style="position:relative; padding-left:24px;">
+          <!-- JS에서 렌더링 -->
+        </div>
       </div>
     </div>
   </div>
