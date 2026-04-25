@@ -256,7 +256,11 @@ const CartPage = (() => {
       IMP.init('imp14397622');
 
       // 2. 결제창 호출
-      Utils.showToast('결제 모듈을 띄웁니다...', 'success');
+      const user = JSON.parse(localStorage.getItem('varo_user') || '{}');
+      const addresses = JSON.parse(localStorage.getItem('varo_addresses') || '[]');
+      const defaultAddr = addresses.find(a => a.is_default) || addresses[0] || {};
+
+      Utils.showToast('결제 창으로 이동합니다.', 'success');
 
       IMP.request_pay({
         pg: 'tosspayments',           // 테스트용 토스페이먼츠
@@ -264,11 +268,11 @@ const CartPage = (() => {
         merchant_uid: 'VARO_ORDER_' + new Date().getTime(),
         name: orderName,
         amount: totalAmount,
-        buyer_email: window.App?.Auth?.getUser()?.email || 'customer@varo.com',
-        buyer_name: window.App?.Auth?.getUser()?.customer || '바로서버고객',
-        buyer_tel: '010-0000-0000',
-        buy_addr: '서울특별시 강남구 테헤란로 123',
-        buyer_postcode: '06236'
+        buyer_email: user.email || '',
+        buyer_name: user.name || '',
+        buyer_tel: user.phone || '010-0000-0000',
+        buyer_addr: defaultAddr.address ? `${defaultAddr.address} ${defaultAddr.address_detail || ''}`.trim() : '배송지 정보 없음',
+        buyer_postcode: defaultAddr.zipcode || '00000'
       }, function (rsp) {
         if (rsp.success) {
           // 결제 성공 로직
