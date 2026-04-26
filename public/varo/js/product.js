@@ -61,7 +61,10 @@ const ProductDetail = (() => {
     // 지연 로딩 대응: window.VARO_DATA에서 직접 추출하여 클로저 변수에 할당
     const VD = window.VARO_DATA || { PRODUCTS: [], REVIEWS: {} };
     PRODUCTS = VD.PRODUCTS || [];
-    REVIEWS = VD.REVIEWS || {};
+
+    // 로컬 스토리지 리뷰 데이터 병합 (하이브리드)
+    const localReviews = JSON.parse(localStorage.getItem('varo_reviews') || '{}');
+    REVIEWS = { ...(VD.REVIEWS || {}), ...localReviews };
 
     // 하이브리드 데이터 로드 (Static -> API)
     let product = PRODUCTS.find(p => p.id === productId);
@@ -367,7 +370,7 @@ const ProductDetail = (() => {
 
       // 재입고 알림 신청 (Premium)
       if (e.target.closest('#restockApplyBtn')) {
-        Utils.showToast('재입고 알림 신청이 완료되었습니다. 🔔');
+        Utils.showToast('재입고 알림 신청이 완료되었습니다.');
       }
 
       // 공유하기 (Premium)
@@ -375,7 +378,7 @@ const ProductDetail = (() => {
         const url = window.location.href;
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(url).then(() => {
-            Utils.showToast('링크가 복사되었습니다. 📋', 'success');
+            Utils.showToast('링크가 복사되었습니다.', 'success');
           }).catch(err => {
             Utils.showToast('링크 복사에 실패했습니다.', 'error');
           });
@@ -387,7 +390,7 @@ const ProductDetail = (() => {
           textArea.select();
           try {
             document.execCommand('copy');
-            Utils.showToast('링크가 복사되었습니다. 📋', 'success');
+            Utils.showToast('링크가 복사되었습니다.', 'success');
           } catch (err) {
             Utils.showToast('링크 복사에 실패했습니다.', 'error');
           }
@@ -427,6 +430,50 @@ const ProductDetail = (() => {
         if (panel) panel.hidden = false;
       });
     });
+
+    // 리뷰 등록
+    const submitBtn = document.getElementById('btnSubmitReview');
+    if (submitBtn) {
+      submitBtn.addEventListener('click', () => {
+        const user = JSON.parse(localStorage.getItem('varo_user') || 'null');
+        if (!user) {
+          alert('로그인 후 리뷰를 작성할 수 있습니다.');
+          location.href = './login.html';
+          return;
+        }
+
+        const rating = document.getElementById('reviewRating').value;
+        const content = document.getElementById('reviewContent').value.trim();
+
+        if (content.length < 10) {
+          alert('리뷰 내용을 10자 이상 입력해주세요.');
+          return;
+        }
+
+        const newReview = {
+          id: Date.now(),
+          user: user.name || '회원',
+          rating: parseInt(rating),
+          date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
+          body: content
+        };
+
+        if (!REVIEWS[state.product.id]) REVIEWS[state.product.id] = [];
+        REVIEWS[state.product.id].unshift(newReview);
+
+        localStorage.setItem('varo_reviews', JSON.stringify(REVIEWS));
+
+        // 포인트 지급
+        let points = parseInt(user.points || 0) + 500;
+        user.points = points;
+        localStorage.setItem('varo_user', JSON.stringify(user));
+
+        alert('리뷰가 등록되었습니다! 500P가 적립되었습니다.');
+
+        document.getElementById('reviewContent').value = '';
+        renderReviews();
+      });
+    }
   };
 
   /* ─── 앱 로직 ──────────────────────────────────────── */
@@ -438,7 +485,7 @@ const ProductDetail = (() => {
     }
 
     const { product, selectedColor, selectedSize, quantity } = state;
-    
+
     // 공통 Cart 모듈 사용 (실시간 배지 업데이트 포함)
     window.App.Cart.addItem(product, selectedSize, selectedColor.name, quantity);
 

@@ -3,7 +3,7 @@
 
 <head>
   <link rel="icon"
-    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z'/><line x1='3' y1='6' x2='21' y2='6'/><path d='M16 10a4 4 0 0 1-8 0'/></svg>">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="VARO 상품 상세 — 제품 정보를 확인하세요.">
@@ -156,6 +156,26 @@
         </div>
         <div class="review-gallery" id="reviewGallery">
           <!-- JS로 커뮤니티 데이터 연동 -->
+        </div>
+
+        <div class="review-write-form" id="reviewWriteForm">
+          <h4>리뷰 작성하기 (포인트 적립)</h4>
+          <div class="form-group">
+            <label>평점</label>
+            <select id="reviewRating">
+              <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+              <option value="4">⭐⭐⭐⭐ (4/5)</option>
+              <option value="3">⭐⭐⭐ (3/5)</option>
+              <option value="2">⭐⭐ (2/5)</option>
+              <option value="1">⭐ (1/5)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>내용</label>
+            <textarea id="reviewContent" rows="4" placeholder="상품에 대한 솔직한 리뷰를 남겨주세요 (10자 이상)"></textarea>
+          </div>
+          <button type="button" class="btn btn--primary" id="btnSubmitReview">리뷰 등록</button>
+          <p class="hint">* 텍스트 리뷰 작성 시 500P가 적립됩니다.</p>
         </div>
 
         <div class="review-section" id="reviewSection">

@@ -197,7 +197,7 @@ const CommunityPageV2 = (() => {
           <div class="qna-q-row">
             <span class="qna-badge qna-badge--q">Q</span>
             <div class="qna-q-content">
-              <p class="qna-subject">${q.isSecret ? '<span style="color:#AAA">🔒 비밀글입니다. </span>' : ''}${Utils.escapeHTML(q.subject)}</p>
+              <p class="qna-subject">${q.isSecret ? '<span style="color:#AAA; display: inline-flex; align-items: center; gap: 4px; vertical-align: middle;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> 비밀글입니다. </span>' : ''}${Utils.escapeHTML(q.subject)}</p>
               <p class="qna-meta" style="margin-top:8px; line-height:1.6; color:#555;">${Utils.escapeHTML(q.content)}</p>
               <p class="qna-meta" style="margin-top:8px;"><span class="qna-author">${Utils.escapeHTML(q.author)}</span> · ${q.date}</p>
             </div>
@@ -253,7 +253,7 @@ const CommunityPageV2 = (() => {
           <div class="qna-q-row qna-q-row--locked" style="cursor:pointer;" onclick="CommunityPageV2.handleSecretClick(${q.id})">
             <span class="qna-badge qna-badge--q" style="background:#EEE; color:#AAA;">Q</span>
             <div class="qna-q-content">
-              <p class="qna-subject" style="color:#888;">🔒 비밀글입니다. <span style="font-size:11px; font-weight:400;">(클릭하여 비밀번호 입력)</span></p>
+              <p class="qna-subject" style="color:#888; display: inline-flex; align-items: center; gap: 4px;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> 비밀글입니다. <span style="font-size:11px; font-weight:400;">(클릭하여 비밀번호 입력)</span></p>
               <p class="qna-meta"><span class="qna-author">${Utils.escapeHTML(q.author)}</span> · ${q.date}</p>
             </div>
             <span class="qna-status qna-status--pending" style="background:#F5F5F5; color:#999;">비밀글</span>

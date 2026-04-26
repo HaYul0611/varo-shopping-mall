@@ -95,29 +95,29 @@
 }
 
 .header-top__badge.is-bronze {
-  background: #A87C6C;
+  background: #A87C6C !important;
 }
 
 .header-top__badge.is-silver {
-  background: #A0A0A0;
+  background: #A0A0A0 !important;
 }
 
 .header-top__badge.is-gold {
-  background: #D4AF37;
+  background: #D4AF37 !important;
 }
 
 .header-top__badge.is-dia {
-  background: #00D1FF;
-  color: #111;
+  background: #00D1FF !important;
+  color: #111 !important;
 }
 
 .header-top__badge.is-manager {
-  background: #D1D1FF;
-  color: #111;
+  background: #D1D1FF !important;
+  color: #111 !important;
 }
 
 .header-top__badge.is-admin {
-  background: #1B2B4B;
+  background: #1B2B4B !important;
 }
 
 .header-top__util a {

@@ -3,7 +3,7 @@
 
 <head>
   <link rel="icon"
-    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>">
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z'/><line x1='3' y1='6' x2='21' y2='6'/><path d='M16 10a4 4 0 0 1-8 0'/></svg>">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VARO — 마이페이지</title>
@@ -94,9 +94,9 @@
                     <td>65,000원</td>
                     <td class="order-status-cell">
                       <span style="font-weight:600; color:#D96B3C;">주문완료</span>
-                      <button class="btn btn--outline btn-cancel-order"
-                        style="padding: 4px 8px; font-size: 11px; margin-left: 5px; border-radius: 4px; color: #ff4d4f; border-color: #ff4d4f;"
-                        onclick="cancelOrder(this)">주문취소</button>
+                      <button type="button"
+                        class="btn btn--outline btn-order-action btn-track-delivery-custom">배송조회</button>
+                      <button type="button" class="btn btn--outline btn-order-action btn-cancel-order">주문취소</button>
                     </td>
                   </tr>
                   <tr>
@@ -105,9 +105,7 @@
                     <td>89,000원</td>
                     <td class="order-status-cell">
                       <span style="font-weight:600; color:#1B2B4B;">배송중</span>
-                      <button class="btn btn--outline"
-                        style="padding: 4px 8px; font-size: 11px; margin-left: 5px; border-radius: 4px;"
-                        onclick="openTrackingModal('VARO 와이드 데님 팬츠 외 1건')">배송조회</button>
+                      <button type="button" class="btn btn--outline btn-order-action btn-track-delivery">배송조회</button>
                     </td>
                   </tr>
                   <tr>
@@ -116,12 +114,8 @@
                     <td>128,000원</td>
                     <td class="order-status-cell">
                       <span style="font-weight:600; color:#888;">배송완료</span>
-                      <button class="btn btn--primary"
-                        style="padding: 4px 8px; font-size: 11px; margin-left: 5px; border-radius: 4px;"
-                        onclick="confirmPurchase(this, '해링턴 코튼 블루종')">구매확정</button>
-                      <button class="btn btn--outline"
-                        style="padding: 4px 8px; font-size: 11px; margin-left: 5px; border-radius: 4px;"
-                        onclick="openReturnModal('해링턴 코튼 블루종', 128000)">교환/반품</button>
+                      <button type="button" class="btn btn--primary btn-order-action btn-confirm-purchase">구매확정</button>
+                      <button type="button" class="btn btn--outline btn-order-action btn-return-order">교환/반품</button>
                     </td>
                   </tr>
                 </tbody>
@@ -491,7 +485,7 @@
   <!-- ═══ 교환/반품 신청 모달 ═══ -->
   <div class="varo-modal" id="returnModal" aria-hidden="true">
     <div class="varo-modal__overlay"></div>
-    <div class="varo-modal__container" style="max-width: 520px;">
+    <div class="varo-modal__content" style="max-width: 520px;">
       <div class="varo-modal__header">
         <h3 class="varo-modal__title" id="returnModalTitle">교환/반품 신청</h3>
         <button class="varo-modal__close"
@@ -535,7 +529,13 @@
         </div>
         <div
           style="background:#f8f8f8; border-radius:6px; padding:12px; margin-bottom:20px; font-size:12px; color:#666; line-height:1.6;">
-          <strong style="color:#333;">📌 교환/반품 안내</strong><br>
+          <strong style="color:#333; display: flex; align-items: center; gap: 4px;"><svg
+              xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="17" x2="12" y2="22" />
+              <path
+                d="M5 17h14v-1.76a2 2 0 0 0-.59-1.41l-2.17-2.18C15.46 10.88 15 9.7 15 8.5V4h-6v4.5c0 1.2-.46 2.38-1.24 3.15l-2.17 2.18A2 2 0 0 0 5 15.24V17z" />
+            </svg>교환/반품 안내</strong>
           · 상품 수령 후 7일 이내 신청 가능합니다.<br>
           · 고객 변심에 의한 반품 시 왕복 배송비(6,000원)가 차감됩니다.<br>
           · 상품 불량/오배송의 경우 배송비는 VARO가 부담합니다.
@@ -549,7 +549,7 @@
   <!-- ═══ 리뷰 작성 모달 ═══ -->
   <div class="varo-modal" id="reviewModal" aria-hidden="true">
     <div class="varo-modal__overlay"></div>
-    <div class="varo-modal__container" style="max-width: 480px;">
+    <div class="varo-modal__content" style="max-width: 480px;">
       <div class="varo-modal__header">
         <h3 class="varo-modal__title">상품 리뷰 작성</h3>
         <button class="varo-modal__close"
@@ -572,8 +572,16 @@
             style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; font-size:13px; resize:vertical;"></textarea>
         </div>
         <div
-          style="background:#f0f7ff; border-radius:6px; padding:12px; margin-bottom:20px; font-size:12px; color:#4A7FA5; line-height:1.6;">
-          🎁 리뷰 작성 시 <strong>500 적립금</strong>이 지급됩니다.
+          style="background:#f0f7ff; border-radius:6px; padding:12px; margin-bottom:20px; font-size:12px; color:#4A7FA5; line-height:1.6; display: flex; align-items: center; gap: 6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 12 20 22 4 22 4 12" />
+            <rect x="2" y="7" width="20" height="5" />
+            <line x1="12" y1="22" x2="12" y2="7" />
+            <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+            <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+          </svg>
+          <span>리뷰 작성 시 <strong>500 적립금</strong>이 지급됩니다.</span>
         </div>
         <button type="submit"
           style="width:100%; padding:14px; background:#000; color:#fff; border:none; border-radius:4px; font-weight:700; cursor:pointer; font-size:14px;">리뷰
@@ -585,7 +593,7 @@
   <!-- ═══ 배송 추적 모달 ═══ -->
   <div class="varo-modal" id="trackingModal" aria-hidden="true">
     <div class="varo-modal__overlay"></div>
-    <div class="varo-modal__container" style="max-width: 480px;">
+    <div class="varo-modal__content" style="max-width: 480px;">
       <div class="varo-modal__header">
         <h3 class="varo-modal__title">배송 추적</h3>
         <button class="varo-modal__close"
@@ -620,6 +628,55 @@
   <script src="./js/main.js"></script>
   <script src="./js/mega-menu.js"></script>
   <script src="./js/mypage.js"></script>
+
+  <!-- Virtual Delivery Tracking Modal -->
+  <div id="deliveryTrackingModal" class="delivery-modal-overlay" role="dialog" aria-modal="true">
+    <div class="delivery-modal-content">
+      <div class="delivery-modal-header">
+        <h3>CJ대한통운 배송조회 (하이브리드 시뮬레이션)</h3>
+        <span class="close" onclick="closeDeliveryModal()">&times;</span>
+      </div>
+      <div class="delivery-modal-body">
+        <div class="delivery-modal-info">
+          <label>운송장 번호</label>
+          <strong id="tracking-number">68429301582</strong>
+        </div>
+
+        <!-- Timeline -->
+        <div class="delivery-timeline">
+          <div class="delivery-timeline-line"></div>
+
+          <div class="delivery-timeline-step">
+            <div id="step-1-dot" class="delivery-timeline-dot is-active">✓</div>
+            <div class="delivery-timeline-text is-active">
+              <h4>상품인수</h4>
+              <p>2026.04.25 14:20 | 용인허브</p>
+            </div>
+          </div>
+
+          <div class="delivery-timeline-step">
+            <div id="step-2-dot" class="delivery-timeline-dot">2</div>
+            <div class="delivery-timeline-text">
+              <h4 id="step-2-text">배송중</h4>
+              <p id="step-2-time">-</p>
+            </div>
+          </div>
+
+          <div class="delivery-timeline-step">
+            <div id="step-3-dot" class="delivery-timeline-dot">3</div>
+            <div class="delivery-timeline-text">
+              <h4 id="step-3-text">배송완료</h4>
+              <p id="step-3-time">-</p>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn--primary btn--full"
+          style="margin-top: 30px; background: #D96B3C; border-color: #D96B3C;"
+          onclick="closeDeliveryModal()">닫기</button>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>

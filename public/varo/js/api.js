@@ -166,22 +166,59 @@ const API = (() => {
     hybrid: {
       socialLogin: async (provider) => {
         console.log(`[Hybrid] ${provider} 소셜 로그인 시뮬레이션 시작...`);
-        // 상용 전환 시 이 부분을 실제 OAuth 창 오픈 및 콜백 처리로 교체
         await new Promise(r => setTimeout(r, 1000));
         const res = {
           success: true,
           token: 'hybrid-social-token',
           user: { name: `소셜_${provider}`, email: `${provider}@demo.com`, grade: 'bronze', is_admin: false }
         };
-        setToken(res.token);
+        localStorage.setItem('varo_token', res.token);
         localStorage.setItem('varo_user', JSON.stringify(res.user));
         return res;
       },
       processPayment: async (data) => {
         console.log('[Hybrid] PG 결제 프로세스 시뮬레이션...', data);
-        // 상용 전환 시 포트원(Portone) 등 PG사 SDK 호출로 교체
         await new Promise(r => setTimeout(r, 1500));
         return { success: true, pg_tid: 'TID_' + Date.now(), message: '결제 승인 완료' };
+      },
+      simulatePayment: async (data) => {
+        console.log('[Hybrid] PG 결제 시뮬레이션 시작...', data);
+        return new Promise((resolve) => {
+          const modal = document.getElementById('pgPaymentModal');
+          const amountEl = document.getElementById('pg-final-amount');
+          const btnConfirm = document.getElementById('btnPgConfirm');
+          const spinner = document.getElementById('pgSpinner');
+
+          if (!modal || !amountEl || !btnConfirm) {
+            console.warn('[Hybrid] 결제 모달을 찾을 수 없어 자동 승인 처리합니다.');
+            resolve({ success: true });
+            return;
+          }
+
+          if (spinner) spinner.style.display = 'none';
+          btnConfirm.disabled = false;
+          amountEl.textContent = `${Number(data.amount).toLocaleString('ko-KR')}원`;
+
+          modal.style.display = 'flex';
+          modal.classList.remove('u-hidden');
+
+          btnConfirm.onclick = () => {
+            if (spinner) spinner.style.display = 'block';
+            btnConfirm.disabled = true;
+
+            setTimeout(() => {
+              modal.style.display = 'none';
+              modal.classList.add('u-hidden');
+              resolve({ success: true });
+            }, 2000);
+          };
+
+          window.closePgModal = () => {
+            modal.style.display = 'none';
+            modal.classList.add('u-hidden');
+            resolve({ success: false });
+          };
+        });
       }
     }
   };

@@ -15,8 +15,8 @@
 
 'use strict';
 
-const GUEST_ID_KEY     = 'varo_guest_id';
-const AUTH_TOKEN_KEY   = 'varo_token';
+const GUEST_ID_KEY = 'varo_guest_id';
+const AUTH_TOKEN_KEY = 'varo_token';
 
 const GuestManager = (() => {
 
@@ -46,7 +46,7 @@ const GuestManager = (() => {
 
   // ── 인증 토큰 조회 ────────────────────────────────────────────────
   const getAuthToken = () => localStorage.getItem(AUTH_TOKEN_KEY);
-  const isLoggedIn   = () => !!getAuthToken();
+  const isLoggedIn = () => !!getAuthToken();
 
   /**
    * 공통 fetch 래퍼
@@ -85,36 +85,62 @@ const GuestManager = (() => {
    */
   const mergeAfterLogin = async (token) => {
     const guestId = getGuestId();
-    // 로컬에 guestId가 없으면 병합 불필요
     if (!guestId) return;
 
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    };
-
     try {
-      // 장바구니 병합
-      await fetch('/api/cart/merge', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ guest_id: guestId }),
-      });
+      // [HYBRID] 로컬 스토리지 기반 비회원 데이터 병합 (Mock 환경 호환)
+      const guestCart = JSON.parse(localStorage.getItem(`varo_cart_${guestId}`) || '[]');
+      const guestWish = JSON.parse(localStorage.getItem(`varo_wishlist_${guestId}`) || '[]');
 
-      // 위시리스트 병합
-      await fetch('/api/wishlist/merge', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ guest_id: guestId }),
-      });
+      if (guestCart.length > 0) {
+        const userCart = JSON.parse(localStorage.getItem('varo_cart') || '[]');
+        guestCart.forEach(gItem => {
+          const exists = userCart.find(uItem => uItem.product_id === gItem.product_id && uItem.size === gItem.size && uItem.color === gItem.color);
+          if (exists) {
+            exists.quantity += gItem.quantity;
+          } else {
+            userCart.push(gItem);
+          }
+        });
+        localStorage.setItem('varo_cart', JSON.stringify(userCart));
+        localStorage.removeItem(`varo_cart_${guestId}`);
+      }
 
-      // 병합 완료 후 비회원 ID 제거
+      if (guestWish.length > 0) {
+        const userWish = JSON.parse(localStorage.getItem('varo_wishlist') || '[]');
+        guestWish.forEach(gItem => {
+          const exists = userWish.find(uItem => uItem.id === gItem.id);
+          if (!exists) userWish.push(gItem);
+        });
+        localStorage.setItem('varo_wishlist', JSON.stringify(userWish));
+        localStorage.removeItem(`varo_wishlist_${guestId}`);
+      }
+
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      };
+
+      try {
+        await fetch('/api/cart/merge', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ guest_id: guestId }),
+        });
+
+        await fetch('/api/wishlist/merge', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ guest_id: guestId }),
+        });
+      } catch (apiErr) {
+        // Mock 환경 대응
+      }
+
       clearGuestId();
-
       console.info('[GuestManager] 비회원 데이터 병합 완료');
     } catch (err) {
-      console.warn('[GuestManager] 병합 중 오류 (무시됨):', err.message);
-      // 병합 실패는 UX를 막지 않음 — 사용자는 로그인 정상 처리
+      console.warn('[GuestManager] 병합 중 오류:', err.message);
     }
   };
 

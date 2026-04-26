@@ -259,7 +259,7 @@ const CartPage = (() => {
       if (code === 'VARO10') {
         state.discountRate = 0.1;
         state.appliedCoupon = code;
-        refs.couponMsg.textContent = '10% 할인이 적용되었습니다. 🏷';
+        refs.couponMsg.innerHTML = '10% 할인이 적용되었습니다. <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-flex; vertical-align: middle; margin-left: 4px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>';
         refs.couponMsg.className = 'coupon-message success';
         refs.couponMsg.hidden = false;
         updateSummary();

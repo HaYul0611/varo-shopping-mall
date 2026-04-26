@@ -31,7 +31,7 @@ const App = (() => {
       localStorage.setItem(this.KEY, JSON.stringify(items));
       this.updateBadge();
       window.dispatchEvent(new CustomEvent('varo:cartChange', { detail: { items } }));
-      if (window.Utils?.showToast) window.Utils.showToast('장바구니에 추가되었습니다 🛍', 'success');
+      if (window.Utils?.showToast) window.Utils.showToast('장바구니에 추가되었습니다.', 'success');
     },
     updateQty(index, delta) {
       const items = this.getItems();
@@ -119,7 +119,7 @@ const App = (() => {
         };
         let displayGrade = gradeMap[user.grade] || user.grade || 'BRONZE';
 
-        const gradeClass = `is-${(user.grade || 'bronze').toLowerCase()}`;
+        const gradeClass = `is-${displayGrade.toLowerCase()}`;
 
         // 아바타가 없을 경우 기본 아이콘 표시 (마이페이지와 동일하게 처리)
         const avatarHtml = user.avatar

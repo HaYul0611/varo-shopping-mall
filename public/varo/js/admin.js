@@ -187,14 +187,51 @@ const salesData = [28.4, 31.2, 26.8, 35.1, 38.7, 42.3, 39.9, 44.2, 41.0, 45.8, 4
 const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
 
 function renderSalesChart() {
-  const chart = document.getElementById('salesChart');
-  const xAxis = document.getElementById('chartXAxis');
-  const max = Math.max(...salesData);
-  chart.innerHTML = salesData.map((v, i) => `
-    <div class="chart-col">
-      <div class="chart-bar${i === 11 ? ' active' : ''}" style="height:${(v / max) * 100}%;" title="${months[i]}: ₩${v}M"></div>
-    </div>`).join('');
-  xAxis.innerHTML = `<div class="chart-x-axis">${months.map(m => `<div class="chart-x-label">${m}</div>`).join('')}</div>`;
+  const ctx = document.getElementById('salesChartCanvas');
+  if (!ctx) return;
+
+  if (window.mySalesChart) {
+    window.mySalesChart.destroy();
+  }
+
+  window.mySalesChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [{
+        label: '월별 매출 (₩M)',
+        data: salesData,
+        borderColor: '#D96B3C',
+        backgroundColor: 'rgba(217, 107, 60, 0.1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              return ' ₩' + context.raw + 'M';
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: { color: '#F0F0F0' }
+        },
+        x: {
+          grid: { display: false }
+        }
+      }
+    }
+  });
 }
 
 const categories = [

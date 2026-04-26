@@ -5,7 +5,239 @@
  * - 사진 업로드 및 변경
  * - 로그아웃 처리
  */
+// ════════════════════════════════════════════════════════
+// 전역 함수 정의 (타이밍 이슈 방지)
+// ════════════════════════════════════════════════════════
+
+// 1. 교환/반품 신청
+window.openReturnModal = (productName, price) => {
+    const modal = document.getElementById('returnModal');
+    if (!modal) return;
+    const nameInput = document.getElementById('returnProductName');
+    const nameLabel = document.getElementById('returnProductLabel');
+    if (nameInput) nameInput.value = productName;
+    if (nameLabel) nameLabel.textContent = `신청 상품: ${productName}`;
+    modal.classList.add('is-active');
+};
+
+// 2. 구매확정 및 리뷰 연동
+window.confirmPurchase = (btn, productName) => {
+    try {
+        if (!confirm(`'${productName}' 상품을 구매확정 하시겠습니까?\n구매확정 후에는 교환/반품 신청이 불가하며, 리뷰 작성이 가능합니다.`)) return;
+
+        const cell = btn.closest('.order-status-cell');
+        if (cell) {
+            // 버튼들을 숨기고 상태 텍스트만 변경 (DOM 파괴 방지)
+            const statusSpan = cell.querySelector('span');
+            if (statusSpan) {
+                statusSpan.textContent = '구매확정';
+                statusSpan.style.color = '#555';
+            }
+            cell.querySelectorAll('button').forEach(b => b.style.display = 'none');
+        }
+
+        if (window.Utils && typeof window.Utils.showToast === 'function') {
+            window.Utils.showToast('구매확정이 완료되었습니다. 리뷰를 작성해 보세요!', 'success');
+        }
+
+        // 리뷰 모달 오픈
+        setTimeout(() => {
+            const modal = document.getElementById('reviewModal');
+            if (!modal) return;
+            const nameInput = document.getElementById('reviewProductName');
+            const nameLabel = document.getElementById('reviewProductLabel');
+            if (nameInput) nameInput.value = productName;
+            if (nameLabel) nameLabel.textContent = `상품: ${productName}`;
+            modal.classList.add('is-active');
+        }, 800);
+    } catch (error) {
+        console.error('[VARO] confirmPurchase Error:', error);
+    }
+};
+
+// 3. 배송 추적 시뮬레이션
+window.openTrackingModal = (productName) => {
+    try {
+        const modal = document.getElementById('trackingModal');
+        if (!modal) return;
+
+        const nameLabel = document.getElementById('trackingProductName');
+        if (nameLabel) nameLabel.textContent = productName;
+
+        const timeline = document.getElementById('trackingTimeline');
+        if (!timeline) return;
+
+        const steps = [
+            { date: '2026-04-20 14:22', status: '상품접수', location: 'VARO 물류센터', done: true, current: false },
+            { date: '2026-04-20 18:05', status: '상품인수', location: '용인Hub', done: true, current: false },
+            { date: '2026-04-21 02:40', status: '간선하차', location: '고양Hub', done: true, current: false },
+            { date: '2026-04-21 09:15', status: '배달출발', location: '서울 강남구 일원동', done: true, current: true },
+            { date: '-', status: '배달완료', location: '-', done: false, current: false }
+        ];
+
+        timeline.className = 'tracking-timeline';
+        timeline.innerHTML = steps.map((s, idx) => `
+            <div class="tracking-step ${s.done ? 'is-done' : ''} ${s.current ? 'is-current' : ''}">
+                <div class="tracking-dot"></div>
+                <div class="tracking-content">
+                    <div class="tracking-info">
+                        <div class="tracking-status">${s.status}</div>
+                        <div class="tracking-location">${s.location}</div>
+                    </div>
+                    <div class="tracking-date">${s.date}</div>
+                </div>
+            </div>
+        `).join('');
+
+        modal.classList.add('is-active');
+    } catch (error) {
+        console.error('[VARO] openTrackingModal Error:', error);
+    }
+};
+
+// 4. 주문 취소 기능
+window.cancelOrder = (btn) => {
+    try {
+        if (!confirm('이 주문을 취소하시겠습니까?')) return;
+        const cell = btn.closest('.order-status-cell') || btn.parentElement;
+        if (cell) {
+            const statusSpan = cell.querySelector('span');
+            if (statusSpan) {
+                statusSpan.textContent = '취소완료';
+                statusSpan.style.color = '#ff4d4f';
+            }
+            cell.querySelectorAll('button').forEach(b => b.style.display = 'none');
+
+            if (window.Utils && typeof window.Utils.showToast === 'function') {
+                window.Utils.showToast('주문이 정상적으로 취소되었습니다.', 'success');
+            }
+        }
+    } catch (error) {
+        console.error('[VARO] cancelOrder Error:', error);
+    }
+};
+
+// 5. 가상 배송 추적 모달 제어 (하이브리드 API)
+window.openDeliveryModal = () => {
+    const modal = document.getElementById('deliveryTrackingModal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+    modal.classList.remove('u-hidden');
+
+    const dot2 = document.getElementById('step-2-dot');
+    const text2 = document.getElementById('step-2-text');
+    const time2 = document.getElementById('step-2-time');
+
+    const dot3 = document.getElementById('step-3-dot');
+    const text3 = document.getElementById('step-3-text');
+    const time3 = document.getElementById('step-3-time');
+
+    if (dot2) {
+        dot2.style.background = '#EEE';
+        dot2.style.boxShadow = '0 0 0 1px #CCC';
+        dot2.style.color = '#999';
+        dot2.textContent = '2';
+    }
+    if (text2) text2.style.color = '#999';
+    if (time2) time2.textContent = '-';
+
+    if (dot3) {
+        dot3.style.background = '#EEE';
+        dot3.style.boxShadow = '0 0 0 1px #CCC';
+        dot3.style.color = '#999';
+        dot3.textContent = '3';
+    }
+    if (text3) text3.style.color = '#999';
+    if (time3) time3.textContent = '-';
+
+    setTimeout(() => {
+        const m = document.getElementById('deliveryTrackingModal');
+        if (m && !m.classList.contains('u-hidden')) {
+            if (dot2) {
+                dot2.style.background = '#D96B3C';
+                dot2.style.boxShadow = '0 0 0 1px #D96B3C';
+                dot2.style.color = '#FFF';
+                dot2.textContent = '✓';
+            }
+            if (text2) text2.style.color = '#333';
+            if (time2) time2.textContent = '2026.04.25 18:50 | 옥천HUB';
+        }
+    }, 1500);
+
+    setTimeout(() => {
+        const m = document.getElementById('deliveryTrackingModal');
+        if (m && !m.classList.contains('u-hidden')) {
+            if (dot3) {
+                dot3.style.background = '#D96B3C';
+                dot3.style.boxShadow = '0 0 0 1px #D96B3C';
+                dot3.style.color = '#FFF';
+                dot3.textContent = '✓';
+            }
+            if (text3) text3.style.color = '#333';
+            if (time3) time3.textContent = '2026.04.26 10:30 | 배송완료 (문 앞)';
+        }
+    }, 3000);
+};
+
+window.closeDeliveryModal = () => {
+    const modal = document.getElementById('deliveryTrackingModal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.add('u-hidden');
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+    // ════════════════════════════════════════════════════════
+    // 순수 JS 이벤트 바인딩 (인라인 onclick 제거 대응)
+    // ════════════════════════════════════════════════════════
+
+    // 1. 주문취소
+    document.querySelectorAll('.btn-cancel-order').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (window.cancelOrder) window.cancelOrder(btn);
+        });
+    });
+
+    // 2. 구매확정
+    document.querySelectorAll('.btn-confirm-purchase').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const row = btn.closest('tr');
+            const productName = row ? row.cells[1].textContent.trim() : '상품';
+            if (window.confirmPurchase) window.confirmPurchase(btn, productName);
+        });
+    });
+
+    // 3. 배송조회 (일반)
+    document.querySelectorAll('.btn-track-delivery').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const row = btn.closest('tr');
+            const productName = row ? row.cells[1].textContent.trim() : '상품';
+            if (window.openTrackingModal) window.openTrackingModal(productName);
+        });
+    });
+
+    // 4. 배송조회 (커스텀 모달)
+    document.querySelectorAll('.btn-track-delivery-custom').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (window.openDeliveryModal) window.openDeliveryModal();
+        });
+    });
+
+    // 5. 교환/반품
+    document.querySelectorAll('.btn-return-order').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const row = btn.closest('tr');
+            const productName = row ? row.cells[1].textContent.trim() : '상품';
+            if (window.openReturnModal) window.openReturnModal(productName, 0);
+        });
+    });
 
     const applyAdminLayout = () => {
         const user = JSON.parse(localStorage.getItem('varo_user') || '{}');
@@ -98,8 +330,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const displayGrade = gradeMap[user.grade] || user.grade || 'BRONZE';
             userGradeLabel.textContent = displayGrade;
 
-            // 등급별 색상 클래스 추가
-            userGradeLabel.className = `user-grade is-${(user.grade || 'bronze').toLowerCase()}`;
+            // 등급별 색상 클래스 추가 (매핑된 displayGrade 기준)
+            userGradeLabel.className = `user-grade is-${displayGrade.toLowerCase()}`;
         }
 
         if (avatarImg && avatarDefault) {
@@ -572,7 +804,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (wishProducts.length === 0) {
             grid.innerHTML = `
                 <div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 60px 0; color: #888;">
-                    <p style="font-size: 40px; margin-bottom: 15px; opacity: 0.3;">🖤</p>
+                    <p style="margin-bottom: 15px; display: flex; justify-content: center;"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.3;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></p>
                     <p>위시리스트에 담긴 상품이 없습니다.</p>
                 </div>
             `;
@@ -621,7 +853,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userQnas.length === 0) {
             container.innerHTML = titleHtml + `
                 <div class="empty-state" style="text-align: center; padding: 60px 0; color: #888; background: #FAFAFA; border: 1px dashed #E0E0E0; border-radius: 8px;">
-                    <p style="font-size: 40px; margin-bottom: 15px; opacity: 0.3;">✉️</p>
+                    <p style="margin-bottom: 15px; display: flex; justify-content: center;"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.3;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></p>
                     <p>등록된 문의 내역이 없습니다.</p>
                 </div>
             `;
@@ -634,7 +866,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="qna-status qna-status--${q.status}" style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 2px; ${q.status === 'done' ? 'background:#EAF3FF; color:#4A7FA5;' : 'background:#FEF0E8; color:#D96B3C;'}">${q.status === 'done' ? '답변완료' : '답변대기'}</span>
                     <span style="font-size: 11px; color: #AAA;">${q.date}</span>
                 </div>
-                <p style="font-size: 14px; font-weight: 600; color: #1C1A16; margin-bottom: 8px;">${q.isSecret ? '🔒 ' : ''}${q.subject}</p>
+                <p style="font-size: 14px; font-weight: 600; color: #1C1A16; margin-bottom: 8px; display: flex; align-items: center; gap: 4px;">${q.isSecret ? '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' : ''}${q.subject}</p>
                 <div style="font-size: 13px; color: #666; line-height: 1.6; background: #F9F9F9; padding: 12px; border-radius: 4px;">
                     ${q.content}
                 </div>
@@ -803,15 +1035,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ════════════════════════════════════════════════════════
     // 교환/반품 / 구매확정 / 배송추적 기능
     // ════════════════════════════════════════════════════════
-
-    // 1. 교환/반품 신청
-    window.openReturnModal = (productName, price) => {
-        const modal = document.getElementById('returnModal');
-        document.getElementById('returnProductName').value = productName;
-        document.getElementById('returnProductLabel').textContent = `신청 상품: ${productName}`;
-        modal.classList.add('is-active');
-    };
-
+    // 리뷰 및 반품 폼 로직
+    // ════════════════════════════════════════════════════════
     const returnForm = document.getElementById('returnForm');
     if (returnForm) {
         returnForm.addEventListener('submit', (e) => {
@@ -819,47 +1044,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const type = document.getElementById('returnType').value === 'exchange' ? '교환' : '반품';
             const productName = document.getElementById('returnProductName').value;
 
-            // 실무 시뮬레이션: 주문 내역 상태 업데이트 (데모용)
-            window.Utils.showToast(`${productName} 상품의 ${type} 신청이 접수되었습니다.`, 'success');
+            if (window.Utils?.showToast) window.Utils.showToast(`${productName} 상품의 ${type} 신청이 접수되었습니다.`, 'success');
             document.getElementById('returnModal').classList.remove('is-active');
-
-            // 실제 상용 환경에서는 API를 통해 주문 상태를 '교환접수'/'반품접수'로 변경해야 함
-            console.log(`[VARO] ${type} 접수 완료: ${productName}`);
         });
     }
 
-    // 2. 구매확정 및 리뷰 연동
-    window.confirmPurchase = (btn, productName) => {
-        if (!confirm(`'${productName}' 상품을 구매확정 하시겠습니까?\n구매확정 후에는 교환/반품 신청이 불가하며, 리뷰 작성이 가능합니다.`)) return;
-
-        // 상태 변경 UI 피드백
-        const cell = btn.closest('.order-status-cell');
-        if (cell) {
-            cell.innerHTML = '<span style="font-weight:600; color:#555;">구매확정</span>';
-        }
-
-        window.Utils.showToast('구매확정이 완료되었습니다. 리뷰를 작성해 보세요!', 'success');
-
-        // 리뷰 모달 오픈
-        setTimeout(() => {
-            const modal = document.getElementById('reviewModal');
-            document.getElementById('reviewProductName').value = productName;
-            document.getElementById('reviewProductLabel').textContent = `상품: ${productName}`;
-            modal.classList.add('is-active');
-        }, 800);
-    };
-
-    // 별점 선택 로직
     const stars = document.querySelectorAll('#reviewStars span');
-    stars.forEach(star => {
-        star.addEventListener('click', () => {
-            const rating = star.dataset.star;
-            document.getElementById('reviewRating').value = rating;
-            stars.forEach(s => {
-                s.style.color = s.dataset.star <= rating ? '#FFB800' : '#ddd';
+    if (stars.length) {
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const rating = star.dataset.star;
+                document.getElementById('reviewRating').value = rating;
+                stars.forEach(s => {
+                    s.style.color = s.dataset.star <= rating ? '#FFB800' : '#ddd';
+                });
             });
         });
-    });
+    }
 
     const reviewForm = document.getElementById('reviewForm');
     if (reviewForm) {
@@ -871,64 +1072,37 @@ document.addEventListener('DOMContentLoaded', () => {
             if (rating === '0') return alert('별점을 선택해 주세요.');
             if (!content) return alert('한줄평을 입력해 주세요.');
 
-            // 리뷰 저장 시뮬레이션 (varo_reviews가 아닌 qna와 유사한 구조로 통합 관리 가능)
-            window.Utils.showToast('리뷰가 성공적으로 등록되었습니다. 500 적립금이 지급되었습니다!', 'success');
+            if (window.Utils?.showToast) window.Utils.showToast('리뷰가 성공적으로 등록되었습니다. 500 적립금이 지급되었습니다!', 'success');
             document.getElementById('reviewModal').classList.remove('is-active');
 
-            // 초기화
             document.getElementById('reviewRating').value = '0';
             document.getElementById('reviewContent').value = '';
             stars.forEach(s => s.style.color = '#ddd');
         });
     }
 
-    // 3. 배송 추적 시뮬레이션
-    window.openTrackingModal = (productName) => {
-        const modal = document.getElementById('trackingModal');
-        document.getElementById('trackingProductName').textContent = productName;
+    // 1. 교환/반품 신청
 
-        const timeline = document.getElementById('trackingTimeline');
-        const steps = [
-            { date: '2026-04-20 14:22', status: '상품접수', location: 'VARO 물류센터', done: true },
-            { date: '2026-04-20 18:05', status: '상품인수', location: '용인Hub', done: true },
-            { date: '2026-04-21 02:40', status: '간선하차', location: '고양Hub', done: true },
-            { date: '2026-04-21 09:15', status: '배달출발', location: '서울 강남구 일원동', done: true },
-            { date: '-', status: '배달완료', location: '-', done: false }
-        ];
 
-        timeline.innerHTML = steps.map((s, idx) => `
-            <div style="margin-bottom: 25px; position: relative; padding-left: 10px;">
-                <div style="position: absolute; left: -28px; top: 0; width: 10px; height: 10px; border-radius: 50%; background: ${s.done ? '#000' : '#ddd'}; z-index: 2;"></div>
-                ${idx < steps.length - 1 ? `<div style="position: absolute; left: -24px; top: 10px; width: 2px; height: 35px; background: ${s.done ? '#000' : '#eee'}; z-index: 1;"></div>` : ''}
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div style="font-size: 13px; font-weight: ${s.done && !steps[idx + 1]?.done ? '700' : '500'};">
-                        <div style="margin-bottom: 4px;">${s.status}</div>
-                        <div style="font-size: 11px; color: #888;">${s.location}</div>
-                    </div>
-                    <div style="font-size: 11px; color: #aaa;">${s.date}</div>
-                </div>
-            </div>
-        `).join('');
-
-        modal.classList.add('is-active');
-    };
-
-    // 주문 취소 기능
-    window.cancelOrder = (btn) => {
-        if (!confirm('이 주문을 취소하시겠습니까?')) return;
-        const cell = btn.closest('.order-status-cell') || btn.parentElement;
-        if (cell) {
-            cell.innerHTML = '<span style="font-weight:600; color:#ff4d4f;">취소완료</span>';
-            if (window.Utils?.showToast) window.Utils.showToast('주문이 정상적으로 취소되었습니다.', 'success');
-        }
-    };
-
-    // 모달 닫기 버튼 공통 처리 (Address Modal 포함)
+    // 모달 닫기 버튼 공통 처리 (Address Modal 및 기타 모든 varo-modal 대응)
     document.querySelectorAll('.varo-modal__close, .varo-modal__overlay').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.getElementById('addressModal')?.classList.remove('is-active');
+        btn.addEventListener('click', (e) => {
+            const modal = e.target.closest('.varo-modal');
+            if (modal) {
+                modal.classList.remove('is-active');
+            }
         });
     });
+
+    // 배송조회 모달 (deliveryTrackingModal) 오버레이 클릭 시 닫기
+    const deliveryModal = document.getElementById('deliveryTrackingModal');
+    if (deliveryModal) {
+        deliveryModal.addEventListener('click', (e) => {
+            if (e.target === deliveryModal) {
+                closeDeliveryModal();
+            }
+        });
+    }
 
     // 타 창 동기화를 위한 이벤트 리스너
     window.addEventListener('storage', (e) => {

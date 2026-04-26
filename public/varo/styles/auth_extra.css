@@ -343,3 +343,128 @@
 .u-mb-30 {
   margin-bottom: 30px !important;
 }
+
+/* ── 소셜 로그인 시뮬레이션 모달 ── */
+.social-modal-content {
+  max-width: 400px;
+  text-align: center;
+  padding: 40px 20px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.social-modal-logo {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.social-modal-text {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.social-spinner {
+  display: none;
+  margin: 0 auto 30px;
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #D96B3C;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+#socialLoginModal .social-modal-content {
+  animation: modalUp 0.3s ease-out;
+}
+
+@keyframes modalUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ── 소셜 로그인 안내 문구 스타일 ── */
+.social-notice {
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.social-notice__main {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1C1A16;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.social-notice__box {
+  background: #F9F9F9;
+  border: 1px solid #EAEAEA;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.social-notice__title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #888;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.social-notice__list {
+  font-size: 13.5px;
+  color: #333;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.social-notice__list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.social-notice__list li::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  background-color: currentColor;
+  border-radius: 50%;
+}
+
+.social-notice__sub {
+  font-size: 12px;
+  color: #AAA;
+  line-height: 1.5;
+  text-align: center;
+}

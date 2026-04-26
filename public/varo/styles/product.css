@@ -1136,3 +1136,49 @@
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
+
+/* ── 리뷰 작성 폼 ── */
+.review-write-form {
+  margin-bottom: 30px;
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.review-write-form h4 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.review-write-form .form-group {
+  margin-bottom: 15px;
+}
+
+.review-write-form label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.review-write-form select {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.review-write-form textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  resize: none;
+}
+
+.review-write-form .hint {
+  font-size: 11px;
+  color: #888;
+  margin-top: 8px;
+}
