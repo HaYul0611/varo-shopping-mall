@@ -4,7 +4,26 @@
 const API = (() => {
   const BASE = '/api';
   const TOKEN_KEY = 'varo_token';
-  const FORCE_MOCK = true; // 로컬 환경에서의 완벽한 동작을 위해 true로 강제 설정
+
+  // [ 동적 API 모드 설정 ]
+  // localStorage 'varo_api_mode' 값에 따라 실시간 전환
+  let FORCE_MOCK = localStorage.getItem('varo_api_mode') !== 'real';
+
+  // 시연용 모드 전환 전역 함수
+  window.toggleApiMode = () => {
+    const current = localStorage.getItem('varo_api_mode') === 'real' ? 'real' : 'mock';
+    const next = current === 'real' ? 'mock' : 'real';
+    localStorage.setItem('varo_api_mode', next);
+    FORCE_MOCK = (next === 'mock');
+
+    const modeText = next === 'real' ? '실제 API 연동 모드' : '시연용 Mock 데이터 모드';
+    if (window.Utils?.showToast) {
+      window.Utils.showToast(`[시스템] ${modeText}로 전환되었습니다.`, 'info');
+    } else {
+      alert(`[시스템] ${modeText}로 전환되었습니다.`);
+    }
+    return `현재 모드: ${modeText}`;
+  };
 
   const getToken = () => localStorage.getItem(TOKEN_KEY);
   const setToken = (t) => localStorage.setItem(TOKEN_KEY, t);
@@ -35,12 +54,15 @@ const API = (() => {
       const isJson = res.headers.get('content-type')?.includes('application/json');
       if (isJson) {
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+        if (!res.ok) return { success: false, ...data, status: res.status }; // [FIX] throw 대신 결과 반환
         return { success: true, ...data };
       }
-      return { success: res.ok };
+      return { success: res.ok, status: res.status };
     } catch (err) {
-      return handleMockRequest(method, path, body);
+      if (!FORCE_MOCK && err.name === 'TypeError') { // 네트워크 에러 등만 Mock 전환
+        return handleMockRequest(method, path, body);
+      }
+      return { success: false, message: err.message };
     }
   };
 
@@ -123,6 +145,20 @@ const API = (() => {
       return { success: true };
     }
 
+    if (method === 'PUT' && path.includes('/reorder')) {
+      const { orders } = body;
+      orders.forEach(o => {
+        const idx = items.findIndex(x => x.id == o.id);
+        if (idx > -1) {
+          items[idx].sort_order = o.sort_order;
+          items[idx].parent_id = o.parent_id;
+        }
+      });
+      localStorage.setItem(storageKey, JSON.stringify(items));
+      notifyChange(entity, { reordered: true });
+      return { success: true };
+    }
+
 
     return { success: false, error: 'Mock handler not found' };
   };
@@ -137,6 +173,7 @@ const API = (() => {
   });
 
   return {
+    req, // [ADD] 공통 요청 함수 노출
     auth: {
       login: async (email, password) => {
         const res = await req('POST', '/auth/login', { email, password });

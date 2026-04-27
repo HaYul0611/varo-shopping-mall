@@ -633,6 +633,17 @@
   margin-bottom: 28px;
 }
 
+/* 추가 라벨 스타일 */
+.label-point--indigo {
+  background: #6366f1;
+  color: #fff;
+}
+
+.label-point--red {
+  background: #ef4444;
+  color: #fff;
+}
+
 
 /* Ǫ��, ����� ���� �ּ�ȭ */
 .site-footer {

@@ -9,7 +9,8 @@ async function seed() {
   try {
     await db.initDB();
 
-    // 기존 데이터 제거
+    // 기존 데이터 제거 (시연용 데이터 보존을 위해 주석 처리)
+    /*
     console.log('[Seed] 기존 데이터 초기화 중...');
     await db.execute('DELETE FROM reviews');
     await db.execute('DELETE FROM wishlist');
@@ -17,6 +18,7 @@ async function seed() {
     await db.execute('DELETE FROM orders');
     await db.execute('DELETE FROM products');
     await db.execute('DELETE FROM users');
+    */
 
     /* ── 사용자 데이터 ── */
     const users = [
@@ -31,10 +33,29 @@ async function seed() {
     for (const u of users) {
       const hash = bcrypt.hashSync(u.password, 10);
       await db.execute(`
-        INSERT INTO users (name, email, password, phone, grade, points, total_spent, is_admin)
+        INSERT IGNORE INTO users (name, email, password, phone, grade, points, total_spent, is_admin)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `, [u.name, u.email, hash, u.phone, u.grade, u.points, u.spent, u.admin]);
     }
+    /* ── 카테고리 데이터 ── */
+    const categories = [
+      { name: '아우터', slug: 'outer', order: 1 },
+      { name: '셔츠', slug: 'shirt', order: 2 },
+      { name: '상의', slug: 'top', order: 3 },
+      { name: '니트', slug: 'knit', order: 4 },
+      { name: '하의', slug: 'bottom', order: 5 },
+      { name: '슈즈', slug: 'shoes', order: 6 },
+      { name: '악세서리', slug: 'acc', order: 7 },
+    ];
+
+    for (const c of categories) {
+      await db.execute(`
+        INSERT IGNORE INTO categories (name, slug, sort_order, is_active)
+        VALUES (?, ?, ?, 1)
+      `, [c.name, c.slug, c.order]);
+    }
+    console.log(`[Seed] 카테고리 ${categories.length}개 삽입 완료`);
+
     console.log(`[Seed] 사용자 ${users.length}명 삽입 완료`);
 
     /* ── 상품 데이터 ── */
@@ -103,7 +124,7 @@ async function seed() {
 
     for (const p of products) {
       await db.execute(`
-        INSERT INTO products (
+        INSERT IGNORE INTO products (
           product_code, category_id, brand, name, price, sale_price, badge,
           styles, main_img, sub_img, images, colors, sizes, sold_out_sizes,
           description, material, care, rating, review_count, is_event, stock

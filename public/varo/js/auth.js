@@ -300,6 +300,40 @@ const Auth = (() => {
     const segs = document.querySelectorAll('.pw-strength__seg');
     const label = document.getElementById('pwStrengthLabel');
 
+    // 각 필드 입력 시 해당 에러 메시지 실시간 제거
+    const inputsToWatch = [
+      { id: 'signupName', error: 'nameError' },
+      { id: 'signupEmail', error: 'signupEmailError' },
+      { id: 'signupPw', error: 'pwError' },
+      { id: 'signupPwConfirm', error: 'pwConfirmError' }
+    ];
+
+    inputsToWatch.forEach(entry => {
+      const el = document.getElementById(entry.id);
+      if (el) {
+        el.addEventListener('input', () => {
+          const errEl = document.getElementById(entry.error);
+          if (errEl) {
+            errEl.textContent = '';
+            errEl.classList.remove('is-visible');
+          }
+        });
+      }
+    });
+
+    // 약관 체크박스 조작 시 에러 제거
+    const termsCheckboxes = document.querySelectorAll('.terms-list input[type="checkbox"]');
+    termsCheckboxes.forEach(chk => {
+      chk.addEventListener('change', () => {
+        const termsError = document.getElementById('termsError');
+        if (termsError) {
+          termsError.textContent = '';
+          const termsWrap = document.getElementById('termsWrap');
+          if (termsWrap) termsWrap.style.outline = 'none';
+        }
+      });
+    });
+
     if (pwInput && segs.length) {
       const calcStrength = (pw) => {
         let score = 0;
@@ -333,6 +367,13 @@ const Auth = (() => {
     form?.addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      // 인라인 에러 초기화
+      document.querySelectorAll('.form-group .form-error').forEach(el => {
+        el.textContent = '';
+        el.classList.remove('is-visible');
+      });
+      document.getElementById('termsError').textContent = '';
+
       const email = document.getElementById('signupEmail').value.trim();
       const pw = document.getElementById('signupPw').value.trim();
       const pwConfirm = document.getElementById('signupPwConfirm').value.trim();
@@ -340,38 +381,79 @@ const Auth = (() => {
       const terms1 = document.getElementById('terms1').checked;
       const terms2 = document.getElementById('terms2').checked;
 
-      if (!name) return alert('이름을 입력해주세요.');
-      if (!REGEX.email.test(email)) return alert('올바른 이메일 형식을 입력해주세요.');
-      if (!REGEX.password.test(pw)) return alert('비밀번호는 영문, 숫자, 특수문자를 포함한 8자 이상이어야 합니다.');
-      if (pw !== pwConfirm) return alert('비밀번호가 일치하지 않습니다.');
-      if (!terms1 || !terms2) return alert('필수 약관에 동의해주세요.');
+      let hasError = false;
+      const setError = (id, msg) => {
+        const errEl = document.getElementById(id);
+        if (errEl) {
+          errEl.textContent = msg;
+          errEl.classList.add('is-visible');
+          hasError = true;
+        }
+      };
+
+      if (!name) setError('nameError', '이름을 입력해주세요.');
+      if (!REGEX.email.test(email)) setError('signupEmailError', '올바른 이메일 형식을 입력해주세요.');
+      if (!REGEX.password.test(pw)) setError('pwError', '비밀번호는 영문, 숫자, 특수문자를 포함한 8자 이상이어야 합니다.');
+      if (pw !== pwConfirm) setError('pwConfirmError', '비밀번호가 일치하지 않습니다.');
+      if (!terms1 || !terms2) {
+        const termsError = document.getElementById('termsError');
+        const termsWrap = document.getElementById('termsWrap');
+        if (termsError) {
+          termsError.textContent = '[필수] 모든 약관에 동의하셔야 서비스 이용이 가능합니다.';
+          termsError.style.color = '#e74c3c';
+        }
+        if (termsWrap) {
+          termsWrap.style.outline = '2px solid rgba(231, 76, 60, 0.3)';
+          termsWrap.style.borderRadius = '8px';
+          termsWrap.style.padding = '5px';
+        }
+        hasError = true;
+      }
+
+      if (hasError) {
+        const firstError = document.querySelector('.form-error.is-visible') || document.getElementById('termsError');
+        if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
 
       if (window.API?.users) {
-        // 기존 동일 이메일 있는지 체크
-        const usersRes = await window.API.users.getAll();
-        if (usersRes.success) {
-          const exists = usersRes.data.find(u => u.email === email);
-          if (exists) return alert('이미 가입된 이메일입니다.');
+        const submitBtn = document.getElementById('signupSubmit');
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = '처리 중...';
         }
 
-        const newUser = {
-          email,
-          password: pw,
-          name,
-          role: 'USER',
-          grade: 'BASIC',
-          is_admin: false
-        };
+        try {
+          // 성능 개선: 모든 유저를 가져오는 대신 가입 시도 후 서버 에러 처리로 위임하거나
+          // 실제 시연용으로는 바로 가입 시도
+          const newUser = {
+            email,
+            password: pw,
+            name,
+            role: 'USER',
+            grade: 'BASIC',
+            is_admin: false
+          };
 
-        const res = await window.API.users.create(newUser);
-        if (res.success) {
-          // 실시간 로그인 동기화
-          localStorage.setItem('varo_user', JSON.stringify(res.data));
-          window.dispatchEvent(new CustomEvent('varo:dataChange', { detail: { type: 'auth', data: res.data } }));
-          alert('가입이 완료되었습니다!');
-          location.replace('./index.html');
-        } else {
-          alert('회원가입 실패: ' + (res.error || '다시 시도해주세요.'));
+          const res = await window.API.users.create(newUser);
+          if (res.success) {
+            localStorage.setItem('varo_user', JSON.stringify(res.data));
+            window.dispatchEvent(new CustomEvent('varo:dataChange', { detail: { type: 'auth', data: res.data } }));
+            alert('가입이 완료되었습니다!');
+            location.replace('./index.html');
+          } else {
+            // 중복 이메일 등의 에러 메시지 처리
+            if (res.error?.includes('email')) {
+              setError('signupEmailError', '이미 가입된 이메일입니다.');
+            } else {
+              alert('회원가입 실패: ' + (res.error || '다시 시도해주세요.'));
+            }
+          }
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '가입하기';
+          }
         }
       }
     });

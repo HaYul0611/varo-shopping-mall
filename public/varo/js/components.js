@@ -36,9 +36,12 @@ const ComponentLoader = (() => {
       return path;
     };
 
-    if (headerP) await loadComponent('header-placeholder', getFinalUrl(getResourcePath(headerP.dataset.path || './includes/header.html')));
-    if (footerP) await loadComponent('footer-placeholder', getFinalUrl(getResourcePath(footerP.dataset.path || './includes/footer.html')));
-    if (overlayP) await loadComponent('overlay-placeholder', getFinalUrl(getResourcePath(overlayP.dataset.path || './includes/overlays.html')));
+    const tasks = [];
+    if (headerP) tasks.push(loadComponent('header-placeholder', getFinalUrl(getResourcePath(headerP.dataset.path || './includes/header.html'))));
+    if (footerP) tasks.push(loadComponent('footer-placeholder', getFinalUrl(getResourcePath(footerP.dataset.path || './includes/footer.html'))));
+    if (overlayP) tasks.push(loadComponent('overlay-placeholder', getFinalUrl(getResourcePath(overlayP.dataset.path || './includes/overlays.html'))));
+
+    await Promise.all(tasks);
 
     window.varoComponentsLoaded = true;
     document.dispatchEvent(new CustomEvent('varo:componentsLoaded'));

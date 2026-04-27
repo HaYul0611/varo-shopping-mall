@@ -12,7 +12,7 @@ const requireAuth = async (req, res, next) => {
   if (!token) return res.status(401).json({ success: false, message: '로그인이 필요한 서비스입니다.' });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'varo_secret_key_2024');
+    const decoded = jwt.verify(token, SECRET);
     const user = await db.execute('SELECT id, email, name, is_admin FROM users WHERE id = ?', [decoded.id]);
 
     if (!user || user.length === 0) {

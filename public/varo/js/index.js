@@ -208,20 +208,36 @@ const IndexPage = (() => {
     descEl.className = 'product-card__desc';
     descEl.textContent = product.description || 'VARO가 제안하는 이번 시즌 필수 아이템입니다.';
 
-    // 4. 포인트 라벨 (Badge 기반 색상 포인트)
+    // 4. 포인트 라벨 (Badge 기반 다중 라벨 렌더링)
     const labels = document.createElement('div');
     labels.className = 'product-card__labels';
-    if (product.badge === 'best') {
-      const l1 = document.createElement('span');
-      l1.className = 'label-point label-point--blue';
-      l1.textContent = 'MD추천/주문폭주';
-      labels.appendChild(l1);
+
+    if (product.badge) {
+      const badgeList = product.badge.split(',').filter(Boolean);
+
+      const badgeConfigs = {
+        'new': { text: 'NEW 5% 신상 추가 할인', cls: 'label-point--green' },
+        'md': { text: 'MD추천', cls: 'label-point--blue' },
+        'best': { text: '주문폭주', cls: 'label-point--indigo' },
+        'sale': { text: 'SALE', cls: 'label-point--red' }
+      };
+
+      badgeList.forEach(b => {
+        const config = badgeConfigs[b.trim()];
+        if (config) {
+          const l = document.createElement('span');
+          l.className = `label-point ${config.cls}`;
+          l.textContent = config.text;
+          labels.appendChild(l);
+        }
+      });
     }
-    if (product.isNew || product.badge === 'new') {
-      const l2 = document.createElement('span');
-      l2.className = 'label-point label-point--green';
-      l2.textContent = 'NEW 5% 신상 추가 할인';
-      labels.appendChild(l2);
+
+    if (product.isNew && !product.badge?.includes('new')) {
+      const l_new = document.createElement('span');
+      l_new.className = 'label-point label-point--green';
+      l_new.textContent = 'NEW 5% 신상 추가 할인';
+      labels.appendChild(l_new);
     }
 
     // 5. 리뷰 수

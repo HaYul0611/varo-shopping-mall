@@ -188,10 +188,24 @@ window.closeDeliveryModal = () => {
     }
 };
 
+window.closePointModal = () => {
+    const modal = document.getElementById('pointHistoryModal');
+    if (modal) modal.classList.remove('is-active');
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     // ════════════════════════════════════════════════════════
     // 순수 JS 이벤트 바인딩 (인라인 onclick 제거 대응)
     // ════════════════════════════════════════════════════════
+
+    // 0. 적립금 내역 보기
+    document.querySelectorAll('.btn-view-points').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const modal = document.getElementById('pointHistoryModal');
+            if (modal) modal.classList.add('is-active');
+        });
+    });
 
     // 1. 주문취소
     document.querySelectorAll('.btn-cancel-order').forEach(btn => {

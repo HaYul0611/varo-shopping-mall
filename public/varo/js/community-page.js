@@ -95,20 +95,34 @@ const CommunityPageV2 = (() => {
   };
 
   /* ── 리뷰 렌더 ────────────────────────────────────── */
-  const renderReviews = () => {
+  const renderReviews = (filter = 'all') => {
     const list = document.getElementById('communityReviewList');
     if (!list) return;
 
     const reviews = [
-      { user: '민준 *', rating: 5, product: '더블 브레스티드 코트', date: '2026.04.10', body: '카멜 색상 진짜 예쁩니다. 소재도 고급지고 핏이 너무 마음에 들어요. 주변에서 어디 샀냐고 많이 물어봐요!', sizeInfo: 'M 구매 / 평소 M 착용', img: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=60&h=80&fit=crop&q=80', hasPhoto: true },
-      { user: '도현 *', rating: 5, product: '와이드 카고 팬츠', date: '2026.04.08', body: '카키 색상 진짜 예뻐요. 와이드 핏이라 걸을때 편하고 카고 포켓도 실용적입니다. 재구매 의사 있어요.', sizeInfo: 'M 구매 / 평소 M 착용', img: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=60&h=80&fit=crop&q=80', hasPhoto: true },
-      { user: '해찬 *', rating: 4, product: '코튼 오버핏 헤비 티셔츠', date: '2026.04.07', body: '두꺼운 원단 퀄리티가 정말 좋네요. 색감도 사진과 똑같이 나왔습니다. 그레이도 사려고요.', sizeInfo: 'L 구매 / 평소 M 착용', img: null, hasPhoto: false },
-      { user: '지우 *', rating: 5, product: '스웨트 오버사이즈 후드', date: '2026.04.06', body: '두께감 진짜 좋아요! 320gsm이라 그런지 묵직하고 따뜻합니다. 아이보리 색상 너무 예뻐요.', sizeInfo: 'L 구매 / 평소 M 착용', img: 'https://images.unsplash.com/photo-1556821840-3a63f8550d64?w=60&h=80&fit=crop&q=80', hasPhoto: true },
-      { user: '박준 *', rating: 4, product: '슬림 테이퍼드 슬랙스', date: '2026.04.05', body: '핏이 정말 깔끔해요. 차콜 색상으로 샀는데 어디에나 잘 어울립니다.', sizeInfo: '32 구매 / 평소 32 착용', img: null, hasPhoto: false },
-      { user: '서준 *', rating: 5, product: '하프집업 니트 스웨터', date: '2026.04.04', body: '오트밀 색상 진짜 예쁘네요. 소재도 부드럽고 하프집업이라 스타일 연출이 다양해서 좋아요.', sizeInfo: 'M 구매 / 평소 M 착용', img: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=60&h=80&fit=crop&q=80', hasPhoto: true },
+      { user: '민준 *', rating: 5, product: '핸드메이드 캐시미어 롱 코트', date: '2026.04.10', body: '카멜 색상 진짜 예쁩니다. 소재도 고급지고 핏이 너무 마음에 들어요. 주변에서 어디 샀냐고 많이 물어봐요!', sizeInfo: 'M 구매 / 평소 M 착용', img: './assets/products/P001_main.png', hasPhoto: true },
+      { user: '도현 *', rating: 5, product: '와이드 카고 스트링 팬츠', date: '2026.04.08', body: '카키 색상 진짜 예뻐요. 와이드 핏이라 걸을때 편하고 카고 포켓도 실용적입니다. 재구매 의사 있어요.', sizeInfo: 'M 구매 / 평소 M 착용', img: './assets/products/P040_main.jpg', hasPhoto: true },
+      { user: '해찬 *', rating: 4, product: '헤비 웨이트 20수 티셔츠', date: '2026.04.07', body: '두꺼운 원단 퀄리티가 정말 좋네요. 색감도 사진과 똑같이 나왔습니다. 그레이도 사려고요.', sizeInfo: 'L 구매 / 평소 M 착용', img: null, hasPhoto: false },
+      { user: '지우 *', rating: 5, product: 'USA 코튼 세미오버 후드', date: '2026.04.06', body: '두께감 진짜 좋아요! USA 코튼이라 그런지 묵직하고 따뜻합니다. 아이보리 색상 너무 예뻐요.', sizeInfo: 'L 구매 / 평소 M 착용', img: './assets/products/P020_main.jpg', hasPhoto: true },
+      { user: '박준 *', rating: 4, product: '세미 와이드 핀턱 슬랙스', date: '2026.04.05', body: '핏이 정말 깔끔해요. 차콜 색상으로 샀는데 어디에나 잘 어울립니다.', sizeInfo: '32 구매 / 평소 32 착용', img: null, hasPhoto: false },
+      { user: '서준 *', rating: 5, product: '모크넥 하프 지업 맨투맨', date: '2026.04.04', body: '오트밀 색상 진짜 예쁘네요. 소재도 부드럽고 하프집업이라 스타일 연출이 다양해서 좋아요.', sizeInfo: 'M 구매 / 평소 M 착용', img: './assets/products/P026_main.jpg', hasPhoto: true },
     ];
 
-    list.innerHTML = reviews.map(r => `
+    const filteredReviews = reviews.filter(r => {
+      if (filter === 'all') return true;
+      if (filter === '5') return r.rating === 5;
+      if (filter === '4') return r.rating === 4;
+      if (filter === '3') return r.rating <= 3;
+      if (filter === 'photo') return r.hasPhoto === true;
+      return true;
+    });
+
+    if (filteredReviews.length === 0) {
+      list.innerHTML = `<li style="grid-column: 1 / -1; text-align: center; padding: 40px 0; color: #888; font-size: 14px;">조건에 맞는 리뷰가 없습니다.</li>`;
+      return;
+    }
+
+    list.innerHTML = filteredReviews.map(r => `
       <li class="review-card-comm">
         <div class="review-card-comm__header">
           <span class="review-card-comm__stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
@@ -123,6 +137,18 @@ const CommunityPageV2 = (() => {
         </div>
       </li>
     `).join('');
+  };
+
+  const initReviewFilters = () => {
+    const filters = document.querySelectorAll('.review-filter');
+    filters.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filters.forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        const rating = btn.dataset.rating;
+        renderReviews(rating);
+      });
+    });
   };
 
   /* ── Q&A (문의하기) 시스템 ──────────────────────────── */
@@ -495,6 +521,7 @@ const CommunityPageV2 = (() => {
     initNotice();
     initFAQ();
     renderReviews();
+    initReviewFilters();
     loadQNA();
     renderQNA();
     initQNAEvents();

@@ -5,18 +5,18 @@
 // ════════════════════════════════════════════════════════
 const DATA = {
   products: [
-    { id: 1, name: '오버핏 코튼 티셔츠', sku: 'VR-TOP-001', category: '상의', price: 29000, origPrice: 39000, stock: 145, sold: 892, status: '판매중', img: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop&q=85' },
-    { id: 2, name: '슬림 데님 팬츠', sku: 'VR-BOT-001', category: '하의', price: 59000, origPrice: 79000, stock: 67, sold: 534, status: '판매중', img: 'https://images.unsplash.com/photo-1603252109612-6d5fee16a54d?w=600&h=800&fit=crop&q=85' },
-    { id: 3, name: '크롭 후드 집업', sku: 'VR-OUT-001', category: '아우터', price: 89000, origPrice: 119000, stock: 32, sold: 421, status: '판매중', img: 'https://images.unsplash.com/photo-1556821840-03a63f8550d64?w=600&h=800&fit=crop&q=85' },
-    { id: 4, name: '캔버스 스니커즈', sku: 'VR-SHO-001', category: '신발', price: 69000, origPrice: 89000, stock: 0, sold: 312, status: '품절', img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=800&fit=crop&q=85' },
-    { id: 5, name: '버킷햇', sku: 'VR-ACC-001', category: '악세서리', price: 25000, origPrice: 32000, stock: 8, sold: 278, status: '판매중', img: 'https://images.unsplash.com/photo-1554062614-69755137dbad?w=600&h=800&fit=crop&q=85' },
-    { id: 6, name: '린넨 셔츠', sku: 'VR-TOP-002', category: '상의', price: 45000, origPrice: 59000, stock: 88, sold: 167, status: '판매중', img: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&h=800&fit=crop&q=85' },
-    { id: 7, name: '와이드 트라우저', sku: 'VR-BOT-002', category: '하의', price: 72000, origPrice: 89000, stock: 3, sold: 145, status: '판매중', img: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&h=800&fit=crop&q=85' },
-    { id: 8, name: '나일론 윈드브레이커', sku: 'VR-OUT-002', category: '아우터', price: 129000, origPrice: 159000, stock: 21, sold: 98, status: '판매중', img: 'https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=600&h=800&fit=crop&q=85' },
-    { id: 9, name: '슬링백 힐', sku: 'VR-SHO-002', category: '신발', price: 85000, origPrice: 105000, stock: 14, sold: 87, status: '판매중', img: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600&h=800&fit=crop&q=85' },
-    { id: 10, name: '미니 크로스백', sku: 'VR-ACC-002', category: '악세서리', price: 55000, origPrice: 72000, stock: 0, sold: 203, status: '숨김', img: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600&h=800&fit=crop&q=85' },
-    { id: 11, name: '스트라이프 니트', sku: 'VR-TOP-003', category: '상의', price: 65000, origPrice: 82000, stock: 56, sold: 134, status: '판매중', img: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=600&h=800&fit=crop&q=85' },
-    { id: 12, name: '조거 팬츠', sku: 'VR-BOT-003', category: '하의', price: 48000, origPrice: 62000, stock: 77, sold: 221, status: '판매중', img: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&h=800&fit=crop&q=85' },
+    { id: 1, name: '오버핏 코튼 티셔츠', sku: 'VR-TOP-001', category: '상의', price: 29000, origPrice: 39000, stock: 145, sold: 892, status: '판매중', img: './assets/products/P001_main.png' },
+    { id: 2, name: '슬림 데님 팬츠', sku: 'VR-BOT-001', category: '하의', price: 59000, origPrice: 79000, stock: 67, sold: 534, status: '판매중', img: './assets/products/P002_main.png' },
+    { id: 3, name: '크롭 후드 집업', sku: 'VR-OUT-001', category: '아우터', price: 89000, origPrice: 119000, stock: 32, sold: 421, status: '판매중', img: './assets/products/P003_main.jpg' },
+    { id: 4, name: '캔버스 스니커즈', sku: 'VR-SHO-001', category: '신발', price: 69000, origPrice: 89000, stock: 0, sold: 312, status: '품절', img: './assets/products/P004_main.png' },
+    { id: 5, name: '버킷햇', sku: 'VR-ACC-001', category: '악세서리', price: 25000, origPrice: 32000, stock: 8, sold: 278, status: '판매중', img: './assets/products/P005_main.jpg' },
+    { id: 6, name: '린넨 셔츠', sku: 'VR-TOP-002', category: '상의', price: 45000, origPrice: 59000, stock: 88, sold: 167, status: '판매중', img: './assets/products/P006_main.jpg' },
+    { id: 7, name: '와이드 트라우저', sku: 'VR-BOT-002', category: '하의', price: 72000, origPrice: 89000, stock: 3, sold: 145, status: '판매중', img: './assets/products/P007_main.jpg' },
+    { id: 8, name: '나일론 윈드브레이커', sku: 'VR-OUT-002', category: '아우터', price: 129000, origPrice: 159000, stock: 21, sold: 98, status: '판매중', img: './assets/products/P008_main.gif' },
+    { id: 9, name: '슬링백 힐', sku: 'VR-SHO-002', category: '신발', price: 85000, origPrice: 105000, stock: 14, sold: 87, status: '판매중', img: './assets/products/P009_main.png' },
+    { id: 10, name: '미니 크로스백', sku: 'VR-ACC-002', category: '악세서리', price: 55000, origPrice: 72000, stock: 0, sold: 203, status: '숨김', img: './assets/products/P010_main.jpg' },
+    { id: 11, name: '스트라이프 니트', sku: 'VR-TOP-003', category: '상의', price: 65000, origPrice: 82000, stock: 56, sold: 134, status: '판매중', img: './assets/products/P011_main.jpg' },
+    { id: 12, name: '조거 팬츠', sku: 'VR-BOT-003', category: '하의', price: 48000, origPrice: 62000, stock: 77, sold: 221, status: '판매중', img: './assets/products/P012_main.jpg' },
   ],
   orders: [
     { id: 'ORD-202504-0284', customer: '김민준', email: 'mj@email.com', phone: '010-1234-5678', product: '오버핏 코튼 티셔츠 외 2개', amount: 87000, payment: '카드', status: '결제완료', date: '2025-04-23 14:22' },
@@ -73,7 +73,7 @@ function avatarHTML(person) {
 
 function statusBadge(s) {
   const map = {
-    '판매중': 'badge-success', '품절': 'badge-danger', '숨김': 'badge-gray', '준비중': 'badge-warning',
+    '판매중': 'badge-success', '품절': 'badge-danger', '숨기기': 'badge-gray', '입고 예정': 'badge-warning',
     '결제완료': 'badge-info', '배송준비': 'badge-warning', '배송중': 'badge-info', '배송완료': 'badge-success', '취소/반품': 'badge-danger',
     '정상': 'badge-success', '정지': 'badge-danger',
     'BRONZE': 'badge-bronze', 'SILVER': 'badge-silver', 'GOLD': 'badge-gold', 'DIA': 'badge-dia', 'MANAGER': 'badge-manager',
@@ -106,7 +106,53 @@ function showPage(id, tabEl) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+  // 탭 자동 매칭 (tabEl이 없을 경우를 위해)
+  if (!tabEl) {
+    const tabs = document.querySelectorAll('.nav-tab');
+    const tabMap = { 'dashboard': 0, 'products': 1, 'orders': 2, 'members': 3, 'categories': 4, 'banners': 5, 'settings': 6, 'qna': 7 };
+    tabEl = tabs[tabMap[id]];
+  }
+
   if (tabEl) tabEl.classList.add('active');
+
+  // 페이지 상태 저장
+  localStorage.setItem('activeAdminPage', id);
+}
+
+// ════════════════════════════════════════════════════════
+// RICH TEXT EDITOR HELPERS
+// ════════════════════════════════════════════════════════
+function execEditorCommand(cmd, val = null) {
+  if (cmd === 'hiliteColor') {
+    // 형광펜 토글 로직: 선택 영역의 배경색을 확인하여 이미 배경색이 있으면 투명하게 처리
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+      const parent = selection.getRangeAt(0).commonAncestorContainer.parentElement;
+      const bg = window.getComputedStyle(parent).backgroundColor;
+      // 노란색(#ffff00 -> rgb(255, 255, 0)) 확인
+      if (bg === 'rgb(255, 255, 0)' || bg === 'yellow') {
+        document.execCommand('hiliteColor', false, 'transparent');
+      } else {
+        document.execCommand('hiliteColor', false, val);
+      }
+    }
+  } else if (cmd === 'removeFormat') {
+    document.execCommand('removeFormat', false, null);
+    document.execCommand('hiliteColor', false, 'transparent'); // 배경색도 명시적으로 제거
+  } else {
+    document.execCommand(cmd, false, val);
+  }
+  document.getElementById('pDescEditor').focus();
+}
+
+// 에디터 내용 -> 숨겨진 textarea 동기화
+function syncEditorToTextarea() {
+  const editor = document.getElementById('pDescEditor');
+  const textarea = document.getElementById('pDesc');
+  if (editor && textarea) {
+    textarea.value = editor.innerHTML;
+  }
 }
 
 function previewImage(input, previewId = 'pImgPreview') {
@@ -348,8 +394,11 @@ async function saveProduct() {
   const name = document.getElementById('pName').value;
   if (!name) { showToast('상품명을 입력하세요.', 'error'); return; }
   const price = document.getElementById('pPrice').value || 0;
+  const salePrice = document.getElementById('pSalePrice').value || null;
+  const badge = document.getElementById('pBadge').value || null;
   const stock = document.getElementById('pStock').value || 0;
   const categoryId = document.getElementById('pCategory').value;
+  syncEditorToTextarea();
   const description = document.getElementById('pDesc').value;
   const mainFile = document.getElementById('pMainImgFile').files[0];
   const subFiles = document.getElementById('pSubImgFiles').files;
@@ -357,6 +406,8 @@ async function saveProduct() {
   const formData = new FormData();
   formData.append('name', name);
   formData.append('price', price);
+  if (salePrice) formData.append('sale_price', salePrice);
+  if (badge) formData.append('badge', badge);
   formData.append('stock', stock);
   formData.append('category_id', categoryId);
   formData.append('description', description);
@@ -368,10 +419,15 @@ async function saveProduct() {
     }
   }
 
+  const token = localStorage.getItem('varo_token');
+  if (!token) {
+    showToast('권한이 없습니다. 다시 로그인해 주세요.', 'error');
+    return;
+  }
+
   showToast('저장 중...', 'info');
 
   try {
-    const token = localStorage.getItem('varo_token');
     const res = await fetch('/api/products', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` },
@@ -380,29 +436,72 @@ async function saveProduct() {
 
     const data = await res.json();
     if (res.ok) {
-      showToast(`"${name}" 상품이 등록되었습니다.`, 'success');
+      showToast(`"${name}" 상품이 처리되었습니다.`, 'success');
       closeModal('modal-add-product');
       syncAllData();
-      // 필드 초기화... (생략하거나 함수화 추천)
     } else {
-      throw new Error(data.error);
+      throw new Error(data.error || '권한이 없거나 서버 에러가 발생했습니다.');
     }
   } catch (err) {
     showToast('등록 실패: ' + err.message, 'error');
   }
 }
 
+function openAddProductModal() {
+  document.getElementById('productModalTitle').textContent = '새 상품 등록';
+  // 필드 초기화
+  document.getElementById('pName').value = '';
+  document.getElementById('pSku').value = '';
+  document.getElementById('pCategory').selectedIndex = 0;
+  document.getElementById('pPrice').value = '';
+  document.getElementById('pSalePrice').value = '';
+
+  // 배지 초기화
+  document.querySelectorAll('.badge-toggle').forEach(btn => btn.classList.remove('is-active'));
+  document.getElementById('pBadge').value = '';
+
+  document.getElementById('pStock').value = '';
+  document.getElementById('pStatus').selectedIndex = 0;
+  document.getElementById('pDescEditor').innerHTML = '';
+  document.getElementById('pMainImgFile').value = '';
+  document.getElementById('pSubImgFiles').value = '';
+
+  openModal('modal-add-product');
+}
+
+function toggleBadge(el) {
+  // 다중 선택 허용 (체크박스 스타일)
+  el.classList.toggle('is-active');
+
+  // 활성화된 값들을 모아서 input에 저장
+  const actives = Array.from(document.querySelectorAll('.badge-toggle.is-active'))
+    .map(btn => btn.dataset.value);
+  document.getElementById('pBadge').value = actives.join(',');
+}
+
 function editProduct(id) {
-  const p = DATA.products.find(x => x.id === id);
+  // API 데이터 또는 더미 데이터에서 검색
+  const p = API_PRODUCTS.find(x => x.id === id) || DATA.products.find(x => x.id === id);
   if (!p) return;
   document.getElementById('productModalTitle').textContent = '상품 수정';
-  document.getElementById('pName').value = p.name;
-  document.getElementById('pSku').value = p.sku;
-  document.getElementById('pCategory').value = p.category;
-  document.getElementById('pPrice').value = p.price;
-  document.getElementById('pOrigPrice').value = p.origPrice;
-  document.getElementById('pStock').value = p.stock;
-  document.getElementById('pStatus').value = p.status;
+  document.getElementById('pName').value = p.name || '';
+  document.getElementById('pSku').value = p.product_code || p.sku || '';
+  document.getElementById('pCategory').value = p.category_id || p.category || '';
+  document.getElementById('pPrice').value = p.price || 0;
+  document.getElementById('pSalePrice').value = p.sale_price || '';
+
+  // 배지 버튼 활성화 (다중)
+  const badgeStr = p.badge || '';
+  const badges = badgeStr.split(',').filter(Boolean);
+  document.getElementById('pBadge').value = badgeStr;
+  document.querySelectorAll('.badge-toggle').forEach(btn => {
+    if (badges.includes(btn.dataset.value)) btn.classList.add('is-active');
+    else btn.classList.remove('is-active');
+  });
+
+  document.getElementById('pStock').value = p.stock || 0;
+  document.getElementById('pStatus').value = p.isActive ? '판매중' : (p.status || '판매중');
+  document.getElementById('pDescEditor').innerHTML = p.description || '';
   openModal('modal-add-product');
 }
 
@@ -738,27 +837,139 @@ function saveReply() {
 // CATEGORIES [NEW]
 // ════════════════════════════════════════════════════════
 function renderCategories() {
-  const tbody = document.getElementById('categoryTable');
-  if (!tbody) return;
-  tbody.innerHTML = API_CATEGORIES.map(c => `
-    <tr>
-      <td style="font-family:'Inter'">${c.sort_order}</td>
-      <td style="font-weight:600">${c.name}</td>
-      <td style="font-family:'Inter';color:var(--gray-500)">${c.slug}</td>
-      <td>${statusBadge(c.is_active ? '정상' : '중지')}</td>
-      <td>
-        <div style="display:flex;gap:4px;">
-          <button class="btn btn-outline btn-sm" onclick="editCategory(${c.id})">수정</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.id})">삭제</button>
-        </div>
-      </td>
-    </tr>`).join('') || '<tr><td colspan="5" class="tbl-empty">등록된 카테고리가 없습니다.</td></tr>';
+  const container = document.getElementById('categoryContainer');
+  if (!container) return;
 
-  // 상품 등록 모달의 카테고리 셀렉트박스 동기화
+  const parents = API_CATEGORIES.filter(c => !c.parent_id).sort((a, b) => a.sort_order - b.sort_order);
+  const children = API_CATEGORIES.filter(c => c.parent_id).sort((a, b) => a.sort_order - b.sort_order);
+
+  // 모달 셀렉트박스 업데이트
+  const catParentSelect = document.getElementById('catParent');
+  if (catParentSelect) {
+    catParentSelect.innerHTML = '<option value="">없음 (최상위)</option>' +
+      parents.map(p => `<option value="${p.id}">${p.name || p.label}</option>`).join('');
+  }
+
   const pCatSelect = document.getElementById('pCategory');
   if (pCatSelect) {
-    pCatSelect.innerHTML = '<option value="">선택</option>' +
-      API_CATEGORIES.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    let options = '<option value="">선택</option>';
+    parents.forEach(p => {
+      options += `<option value="${p.id}" style="font-weight:700;">${p.name || p.label}</option>`;
+      children.filter(c => c.parent_id == p.id).forEach(c => {
+        options += `<option value="${c.id}">&nbsp;&nbsp;↳ ${c.name || c.label}</option>`;
+      });
+    });
+    pCatSelect.innerHTML = options;
+  }
+
+  // 아코디언 렌더링
+  container.innerHTML = parents.map(p => {
+    const parentChildren = children.filter(c => c.parent_id == p.id);
+    return `
+      <div class="category-item expanded" data-id="${p.id}">
+        <div class="category-parent" onclick="toggleAccordion(this)">
+          <div class="drag-handle parent-handle">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/>
+            </svg>
+          </div>
+          <span class="toggle-icon">
+             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </span>
+          <span class="name">${p.name || p.label} <small style="color:var(--gray-400); font-weight:400; margin-left:8px;">(${p.slug})</small></span>
+          <div class="category-actions" onclick="event.stopPropagation()">
+            <button class="add-sub-btn" onclick="addSubCategory(${p.id})">+ 서브 추가</button>
+            <button class="btn btn-outline btn-sm" style="margin-left:8px" onclick="editCategory(${p.id})">수정</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteCategory(${p.id})">삭제</button>
+          </div>
+        </div>
+        <div class="sub-category-list" data-parent-id="${p.id}">
+          ${parentChildren.map(c => `
+            <div class="sub-item" data-id="${c.id}">
+              <div class="drag-handle child-handle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/>
+                </svg>
+              </div>
+              <span class="name">${c.name || c.label} <small style="color:var(--gray-400); margin-left:6px;">(${c.slug})</small></span>
+              <div class="category-actions">
+                <button class="btn btn-outline btn-sm" onclick="editCategory(${c.id})">수정</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.id})">삭제</button>
+              </div>
+            </div>
+          `).join('') || '<div style="padding:15px 52px; font-size:12px; color:var(--gray-400);">서브 카테고리가 없습니다.</div>'}
+        </div>
+      </div>`;
+  }).join('') || '<div class="tbl-empty">등록된 카테고리가 없습니다.</div>';
+
+  initCategorySortable();
+}
+
+function toggleAccordion(el) {
+  el.parentElement.classList.toggle('expanded');
+}
+
+function addSubCategory(parentId) {
+  document.getElementById('categoryModalTitle').textContent = '서브 카테고리 추가';
+  document.getElementById('catName').value = '';
+  document.getElementById('catSlug').value = '';
+  document.getElementById('catOrder').value = '0';
+  document.getElementById('catParent').value = parentId;
+  delete document.getElementById('modal-add-category').dataset.editId;
+  openModal('modal-add-category');
+}
+
+function initCategorySortable() {
+  // 1. 상위 카테고리 재정렬
+  const container = document.getElementById('categoryContainer');
+  if (container && !container._sortable) {
+    container._sortable = Sortable.create(container, {
+      handle: '.parent-handle',
+      animation: 150,
+      onEnd: async function () {
+        const items = Array.from(container.querySelectorAll('.category-item'));
+        const orders = items.map((item, index) => ({
+          id: item.dataset.id,
+          sort_order: index + 1,
+          parent_id: null
+        }));
+        await saveReorder(orders);
+      }
+    });
+  }
+
+  // 2. 각 하위 카테고리 리스트 재정렬
+  document.querySelectorAll('.sub-category-list').forEach(list => {
+    if (list._sortable) return;
+    const parentId = list.dataset.parentId;
+    list._sortable = Sortable.create(list, {
+      handle: '.child-handle',
+      animation: 150,
+      onEnd: async function () {
+        const items = Array.from(list.querySelectorAll('.sub-item'));
+        const orders = items.map((item, index) => ({
+          id: item.dataset.id,
+          sort_order: index + 1,
+          parent_id: parentId
+        }));
+        await saveReorder(orders);
+      }
+    });
+  });
+}
+
+async function saveReorder(orders) {
+  showToast('순서를 저장 중...', 'info');
+  try {
+    const res = await API.req('PUT', '/categories/reorder', { orders }, true);
+    if (res.success) {
+      showToast('순서가 변경되었습니다.', 'success');
+      syncAllData(); // [ADD] 즉시 데이터 동기화 및 렌더링
+    } else {
+      showToast(res.message || '순서 저장 실패', 'error');
+    }
+  } catch (err) {
+    showToast('네트워크 오류', 'error');
   }
 }
 
@@ -766,21 +977,54 @@ async function saveCategory() {
   const name = document.getElementById('catName').value;
   const slug = document.getElementById('catSlug').value;
   const order = document.getElementById('catOrder').value || 0;
+  const parentId = document.getElementById('catParent').value;
 
   if (!name || !slug) { showToast('이름과 슬러그를 입력하세요.', 'error'); return; }
 
+  const payload = {
+    name,
+    slug,
+    sort_order: parseInt(order),
+    parent_id: parentId ? parseInt(parentId) : null,
+    is_active: 1
+  };
+
+  const editId = document.getElementById('modal-add-category').dataset.editId;
+
   try {
-    const res = await API.categories.create({ name, slug, sort_order: order });
+    let res;
+    if (editId) {
+      res = await API.categories.update(editId, payload);
+    } else {
+      res = await API.categories.create(payload);
+    }
+
     if (res.success) {
       showToast('카테고리가 저장되었습니다.', 'success');
       closeModal('modal-add-category');
+      delete document.getElementById('modal-add-category').dataset.editId;
       syncAllData();
     }
-  } catch (e) { showToast('오류: ' + e.message, 'error'); }
+  } catch (err) {
+    showToast('저장 실패: ' + err.message, 'error');
+  }
+}
+
+async function editCategory(id) {
+  const c = API_CATEGORIES.find(x => x.id == id);
+  if (!c) return;
+  document.getElementById('categoryModalTitle').textContent = '카테고리 수정';
+  document.getElementById('catName').value = c.name || c.label;
+  document.getElementById('catSlug').value = c.slug || c.id;
+  document.getElementById('catOrder').value = c.sort_order || 0;
+  document.getElementById('catParent').value = c.parent_id || '';
+  document.getElementById('modal-add-category').dataset.editId = id;
+  openModal('modal-add-category');
 }
 
 async function deleteCategory(id) {
-  if (!confirm('정말 삭제하시겠습니까? 관련 상품의 카테고리 정보가 초기화될 수 있습니다.')) return;
+  if (!confirm('정말 삭제하시겠습니까? 하위 카테고리도 함께 삭제될 수 있습니다.')) return;
+
   try {
     const res = await API.categories.delete(id);
     if (res.success) {
@@ -996,6 +1240,9 @@ function submitAdminReply(qId) {
 // INIT
 // ════════════════════════════════════════════════════════
 async function init() {
+  const savedPage = localStorage.getItem('activeAdminPage') || 'dashboard';
+  showPage(savedPage);
+
   renderSalesChart();
   renderCategoryStats();
   renderDashboardOrders();
@@ -1013,3 +1260,110 @@ async function init() {
 }
 
 init();
+
+/* ── 알림(Notifications) 시스템 ── */
+const DEFAULT_NOTIFICATIONS = [
+  { id: 1, title: '새로운 주문', desc: '주문번호 #20250423-001 건이 결제 완료되었습니다.', time: '5분 전', unread: true, category: 'order' },
+  { id: 2, title: '재고 부족 알림', desc: '[Handmade Coat] 상품의 재고가 3개 이하입니다.', time: '1시간 전', unread: true, category: 'stock' },
+  { id: 3, title: '신규 회원 가입', desc: '홍길동 님이 새로운 회원으로 가입하셨습니다.', time: '3시간 전', unread: false, category: 'user' }
+];
+
+let NOTIFICATIONS = JSON.parse(localStorage.getItem('varo_notifications')) || DEFAULT_NOTIFICATIONS;
+
+function saveNotifications() {
+  localStorage.setItem('varo_notifications', JSON.stringify(NOTIFICATIONS));
+}
+
+function toggleNotifications(e) {
+  if (e) e.stopPropagation();
+  const dropdown = document.getElementById('notifDropdown');
+  if (!dropdown) return;
+
+  const isShow = dropdown.classList.toggle('show');
+  if (isShow) {
+    renderNotifications();
+    // 바깥 클릭 시 닫기 (한 번만 등록)
+    window.addEventListener('click', closeNotifOnOutside, { once: true });
+  }
+}
+
+function closeNotifOnOutside(e) {
+  const dropdown = document.getElementById('notifDropdown');
+  const bell = document.querySelector('.nav-notif');
+  if (dropdown && !dropdown.contains(e.target) && !bell.contains(e.target)) {
+    dropdown.classList.remove('show');
+  } else if (dropdown && dropdown.classList.contains('show')) {
+    // 여전히 열려있으면 다시 등록 (한 번만 실행되므로)
+    window.addEventListener('click', closeNotifOnOutside, { once: true });
+  }
+}
+
+function renderNotifications() {
+  const list = document.getElementById('notifList');
+  const dot = document.getElementById('notifDot');
+  if (!list) return;
+
+  if (NOTIFICATIONS.length === 0) {
+    list.innerHTML = `<div style="padding:40px 20px; text-align:center; color:var(--gray-400); font-size:13px;">새로운 알림이 없습니다.</div>`;
+    if (dot) dot.style.display = 'none';
+    return;
+  }
+
+  const icons = {
+    order: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+    stock: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    user: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'
+  };
+
+  const bgColors = {
+    order: '#e1effe',
+    stock: '#fde8e8',
+    user: '#edf2f7'
+  };
+
+  const iconColors = {
+    order: '#1e429f',
+    stock: '#9b1c1c',
+    user: '#4a5568'
+  };
+
+  list.innerHTML = NOTIFICATIONS.map(n => `
+    <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="readNotification(${n.id}, event)">
+      <div class="notif-icon-circle" style="background:${bgColors[n.category] || '#eee'}; color:${iconColors[n.category] || '#666'}">
+        ${icons[n.category] || ''}
+      </div>
+      <div class="notif-content">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-desc">${n.desc}</div>
+        <div class="notif-time">${n.time}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // 점 표시 여부 (안읽은 알림이 있으면 표시)
+  if (dot) {
+    dot.style.display = NOTIFICATIONS.some(n => n.unread) ? 'block' : 'none';
+  }
+}
+
+function readNotification(id, e) {
+  if (e) e.stopPropagation();
+  const index = NOTIFICATIONS.findIndex(n => n.id === id);
+  if (index !== -1) {
+    NOTIFICATIONS[index].unread = false;
+    saveNotifications();
+    renderNotifications();
+  }
+}
+
+function readAllNotifications(e) {
+  if (e) e.stopPropagation();
+  NOTIFICATIONS.forEach(n => n.unread = false);
+  saveNotifications();
+  renderNotifications();
+}
+
+// 초기 로딩 시 호출 (점 표시를 위해)
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(renderNotifications, 1000); // 데이터 로드 후 여유있게 실행
+});
