@@ -31,14 +31,14 @@ const DATA = {
     { id: 'ORD-202504-0275', customer: '오민서', email: 'ms@email.com', phone: '010-0123-4567', product: '조거 팬츠 외 2개', amount: 96000, payment: '네이버페이', status: '배송완료', date: '2025-04-19 14:00' },
   ],
   members: [
-    { id: 1, name: '김민준', email: 'mj@email.com', phone: '010-1234-5678', role: 'GOLD', purchase: 487000, joinDate: '2024-01-15', lastLogin: '2025-04-23', status: '정상' },
-    { id: 2, name: '이서연', email: 'sy@email.com', phone: '010-2345-6789', role: 'GOLD', purchase: 312000, joinDate: '2024-02-20', lastLogin: '2025-04-22', status: '정상' },
-    { id: 3, name: '박지훈', email: 'jh@email.com', phone: '010-3456-7890', role: 'SILVER', purchase: 178000, joinDate: '2024-03-05', lastLogin: '2025-04-21', status: '정상' },
-    { id: 4, name: '최수아', email: 'sa@email.com', phone: '010-4567-8901', role: 'BRONZE', purchase: 95000, joinDate: '2024-04-12', lastLogin: '2025-04-20', status: '정상' },
-    { id: 5, name: '정태양', email: 'ty@email.com', phone: '010-5678-9012', role: 'BRONZE', purchase: 44000, joinDate: '2024-05-01', lastLogin: '2025-04-18', status: '정상' },
-    { id: 6, name: '강하늘', email: 'hn@email.com', phone: '010-6789-0123', role: 'BRONZE', purchase: 69000, joinDate: '2024-06-14', lastLogin: '2025-04-15', status: '정지' },
-    { id: 7, name: '윤도현', email: 'dh@email.com', phone: '010-7890-1234', role: 'DIA', purchase: 1524000, joinDate: '2023-11-10', lastLogin: '2025-04-23', status: '정상' },
-    { id: 8, name: '임채린', email: 'cr@email.com', phone: '010-8901-2345', role: 'SILVER', purchase: 120000, joinDate: '2025-01-08', lastLogin: '2025-04-22', status: '정상' },
+    { id: 1, name: '김민준', email: 'mj@email.com', phone: '010-1234-5678', role: 'GOLD', purchase: 487000, point: 12450, joinDate: '2024-01-15', lastLogin: '2025-04-23', status: '정상' },
+    { id: 2, name: '이서연', email: 'sy@email.com', phone: '010-2345-6789', role: 'GOLD', purchase: 312000, point: 8900, joinDate: '2024-02-20', lastLogin: '2025-04-22', status: '정상' },
+    { id: 3, name: '박지훈', email: 'jh@email.com', phone: '010-3456-7890', role: 'SILVER', purchase: 178000, point: 4500, joinDate: '2024-03-05', lastLogin: '2025-04-21', status: '정상' },
+    { id: 4, name: '최수아', email: 'sa@email.com', phone: '010-4567-8901', role: 'BRONZE', purchase: 95000, point: 2100, joinDate: '2024-04-12', lastLogin: '2025-04-20', status: '정상' },
+    { id: 5, name: '정태양', email: 'ty@email.com', phone: '010-5678-9012', role: 'BRONZE', purchase: 44000, point: 1200, joinDate: '2024-05-01', lastLogin: '2025-04-18', status: '정상' },
+    { id: 6, name: '강하늘', email: 'hn@email.com', phone: '010-6789-0123', role: 'BRONZE', purchase: 69000, point: 3400, joinDate: '2024-06-14', lastLogin: '2025-04-15', status: '정지' },
+    { id: 7, name: '윤도현', email: 'dh@email.com', phone: '010-7890-1234', role: 'DIA', purchase: 1524000, point: 45800, joinDate: '2023-11-10', lastLogin: '2025-04-23', status: '정상' },
+    { id: 8, name: '임채린', email: 'cr@email.com', phone: '010-8901-2345', role: 'SILVER', purchase: 120000, point: 5600, joinDate: '2025-01-08', lastLogin: '2025-04-22', status: '정상' },
   ],
   coupons: [
     { id: 1, name: '신규가입 웰컴 쿠폰', type: '정액', discount: 3000, minOrder: 30000, target: '신규 회원', expiry: '2025-06-30', used: 342, total: 1200, status: '진행중' },
@@ -53,6 +53,11 @@ const DATA = {
     { id: 3, product: '크롭 후드 집업', customer: '박지훈', rating: 3, content: '색상이 사진이랑 조금 다른 것 같아요.', date: '2025-04-20', replied: false },
     { id: 4, product: '버킷햇', customer: '최수아', rating: 5, content: '가성비 최고! 친구한테도 추천했어요.', date: '2025-04-19', replied: true, reply: '추천해 주셔서 정말 감사합니다!' },
     { id: 5, product: '린넨 셔츠', customer: '정태양', rating: 2, content: '배송이 너무 늦었어요. 품질은 괜찮네요.', date: '2025-04-18', replied: false },
+  ],
+  banners: [
+    { id: 101, title: '2026 S/S 시즌 컬렉션', img_url: './assets/lookbook/lookbook_1.png', link_url: '/shop?cat=new', sort_order: 1, is_active: true },
+    { id: 102, title: '신규 회원 웰컴 쿠폰', img_url: './assets/lookbook/lookbook_2.png', link_url: '/event/welcome', sort_order: 2, is_active: true },
+    { id: 103, title: '리미티드 에디션 발매', img_url: './assets/lookbook/lookbook_3.png', link_url: '/product/P001', sort_order: 3, is_active: false }
   ]
 };
 
@@ -110,14 +115,462 @@ function showPage(id, tabEl) {
   // 탭 자동 매칭 (tabEl이 없을 경우를 위해)
   if (!tabEl) {
     const tabs = document.querySelectorAll('.nav-tab');
-    const tabMap = { 'dashboard': 0, 'products': 1, 'orders': 2, 'members': 3, 'categories': 4, 'banners': 5, 'settings': 6, 'qna': 7 };
+    const tabMap = {
+      'dashboard': 0,
+      'banners': 1,
+      'products': 2,
+      'orders': 3,
+      'members': 4,
+      'coupons': 5,
+      'community': 6,
+      'analytics': 7,
+      'settings': 8
+    };
     tabEl = tabs[tabMap[id]];
   }
 
   if (tabEl) tabEl.classList.add('active');
 
+  // 페이지별 초기화
+  if (id === 'community') showCommunityTab('notice');
+  if (id === 'banners') {
+    const activeTab = document.querySelector('#page-banners .inner-tab.active');
+    const subType = (activeTab && activeTab.textContent.includes('카테고리')) ? 'category' : 'banner';
+    showBannerTab(subType);
+  }
+  if (id === 'coupons') showCouponTab('진행중');
+  if (id === 'settings') renderFullNotifications();
+
   // 페이지 상태 저장
   localStorage.setItem('activeAdminPage', id);
+}
+
+// 서브 탭 제어 (쿠폰)
+function showCouponTab(type, el) {
+  if (el) {
+    el.parentElement.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+  renderCoupons(type);
+}
+
+function renderCoupons(type) {
+  const grid = document.getElementById('couponGrid');
+  if (!grid) return;
+
+  let list = DATA.coupons || [];
+  if (type === '진행중') list = list.filter(c => c.status === '진행중');
+  else if (type === '만료') list = list.filter(c => c.status === '만료');
+  // '발급'은 전체 또는 별도 발급 내역 테이블로 표시 가능 (여기서는 전체로 예시)
+
+  if (type === '발급') {
+    // 발급 내역 테이블 형태
+    grid.style.display = 'block';
+    grid.innerHTML = `
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>회원명</th>
+                <th>쿠폰명</th>
+                <th>할인율/금액</th>
+                <th>발급일시</th>
+                <th>사용여부</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>김민준</td>
+                <td>신규가입 웰컴 쿠폰</td>
+                <td>3,000원</td>
+                <td>2025-04-23 14:22</td>
+                <td><span class="badge badge-success">사용완료</span></td>
+              </tr>
+              <tr>
+                <td>이서연</td>
+                <td>봄맞이 SALE 10%</td>
+                <td>10%</td>
+                <td>2025-04-23 13:10</td>
+                <td><span class="badge badge-warning">미사용</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  } else {
+    grid.style.display = 'grid';
+    grid.innerHTML = list.map(c => `
+      <div class="card coupon-card" style="border-left: 4px solid var(--primary-color);">
+        <div class="card-body" style="padding: 20px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+            <span class="badge ${c.type === '정액' ? 'badge-info' : 'badge-warning'}">${c.type}</span>
+            ${statusBadge(c.status)}
+          </div>
+          <div style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">${c.name}</div>
+          <div style="font-size: 24px; font-weight: 800; color: var(--primary-color); margin-bottom: 12px;">
+            ${c.type === '정액' ? fmtW(c.discount) : c.discount + '%'} 할인
+          </div>
+          <div style="font-size: 12px; color: var(--gray-400); margin-bottom: 4px;">최소 주문: ${fmtW(c.minOrder || 0)}</div>
+          <div style="font-size: 12px; color: var(--gray-400); margin-bottom: 15px;">만료일: ${c.expiry}</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size: 13px; border-top: 1px dashed var(--gray-200); padding-top: 12px;">
+            <span>사용: <b>${c.used}</b> / ${c.total}</span>
+            <button class="btn btn-outline btn-sm" onclick="showToast('쿠폰 정보 수정')">수정</button>
+          </div>
+        </div>
+      </div>
+    `).join('') || '<div class="tbl-empty">쿠폰이 없습니다.</div>';
+  }
+}
+
+// 서브 탭 제어 (커뮤니티)
+function showCommunityTab(type, el) {
+  if (el) {
+    el.parentElement.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+  const content = document.getElementById('community-content');
+  if (type === 'review') {
+    content.innerHTML = `<div class="card"><div class="card-body" id="reviewList"></div></div>`;
+    renderReviews();
+  } else if (type === 'qna') {
+    content.innerHTML = `<div class="card"><div class="card-body" id="adminQnaList"></div></div>`;
+    renderAdminQNA ? renderAdminQNA() : (content.innerHTML = '<div class="p-4 text-center">Q&A 로딩 중...</div>');
+  } else if (type === 'notice') {
+    content.innerHTML = `<div class="card"><div class="card-body" id="adminNoticeList"></div></div>`;
+    renderAdminNotice();
+  } else if (type === 'faq') {
+    content.innerHTML = `<div class="card"><div class="card-body" id="adminFaqList"></div></div>`;
+    renderAdminFAQ();
+  }
+}
+
+function renderAdminNotice() {
+  const container = document.getElementById('adminNoticeList');
+  if (!container) return;
+
+  const list = JSON.parse(localStorage.getItem('varo_notices')) || [
+    { id: 1, title: '2026년 봄맞이 정기 세일 안내', date: '2026-03-15', views: 124, important: true },
+    { id: 2, title: '시스템 점검 안내 (4/28 02:00 ~ 04:00)', date: '2026-04-25', views: 89, important: true },
+    { id: 3, title: '신규 회원 웰컴 혜택 개편', date: '2026-04-01', views: 210, important: false }
+  ];
+
+  if (!localStorage.getItem('varo_notices')) {
+    localStorage.setItem('varo_notices', JSON.stringify(list));
+  }
+
+  container.innerHTML = `
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>번호</th>
+            <th>제목</th>
+            <th>작성일</th>
+            <th>조회수</th>
+            <th>관리</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.map(n => `
+            <tr>
+              <td>${n.important ? '<span class="badge badge-danger">공지</span>' : n.id}</td>
+              <td style="font-weight:${n.important ? '700' : '400'}">${n.title}</td>
+              <td>${n.date}</td>
+              <td>${n.views}</td>
+              <td>
+                <button class="btn btn-outline btn-sm" onclick="openNoticeModal(${n.id})">수정</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top: 15px; text-align: right;">
+      <button class="btn btn-primary" onclick="openNoticeModal()">공지 등록</button>
+    </div>
+  `;
+}
+
+function openNoticeModal(id = null) {
+  const notices = JSON.parse(localStorage.getItem('varo_notices')) || [];
+  const notice = id ? notices.find(n => n.id === id) : { title: '', content: '', important: false };
+  const isEdit = !!id;
+
+  let modal = document.getElementById('modal-add-notice');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-add-notice';
+    modal.className = 'modal-overlay';
+    document.body.appendChild(modal);
+  }
+
+  modal.innerHTML = `
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">${isEdit ? '공지사항 수정' : '공지사항 등록'}</span>
+        <button class="modal-close" onclick="closeModal('modal-add-notice')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label class="form-label" style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" id="noticeImportant"${notice.important ? ' checked' : ''} style="width:16px; height:16px;">
+            중요 공지 (상단 노출)
+          </label>
+        </div>
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label class="form-label">제목</label>
+          <input type="text" id="noticeTitle" class="form-control" value="${notice.title}" placeholder="공지 제목을 입력하세요.">
+        </div>
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label class="form-label">내용</label>
+          <textarea id="noticeContent" class="form-control" style="height: 150px; resize: none;" placeholder="공지 내용을 입력하세요.">${notice.content || ''}</textarea>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between;">
+        <div>
+          ${isEdit ? `<button class="btn btn-danger" onclick="deleteNotice('${id}')">삭제</button>` : ''}
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-outline" onclick="closeModal('modal-add-notice')">취소</button>
+          <button class="btn btn-primary" onclick="saveNotice(${id})">${isEdit ? '수정' : '등록'}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  modal.classList.add('open');
+}
+
+function saveNotice(id = null) {
+  const title = document.getElementById('noticeTitle').value.trim();
+  const content = document.getElementById('noticeContent').value.trim();
+  const important = document.getElementById('noticeImportant').checked;
+
+  if (!title) {
+    showToast('제목을 입력해주세요.', 'error');
+    return;
+  }
+
+  const notices = JSON.parse(localStorage.getItem('varo_notices')) || [];
+
+  if (id) {
+    const idx = notices.findIndex(n => n.id === id);
+    if (idx !== -1) {
+      notices[idx] = { ...notices[idx], title, content, important };
+    }
+  } else {
+    const newId = notices.length > 0 ? Math.max(...notices.map(n => n.id)) + 1 : 1;
+    notices.unshift({ id: newId, title, content, important, date: new Date().toISOString().split('T')[0], views: 0 });
+  }
+
+  localStorage.setItem('varo_notices', JSON.stringify(notices));
+  closeModal('modal-add-notice');
+  showToast(id ? '공지사항이 수정되었습니다.' : '공지사항이 등록되었습니다.', 'success');
+  renderAdminNotice();
+}
+
+function showCustomConfirm(message, onConfirm) {
+  let modal = document.getElementById('modal-custom-confirm');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-custom-confirm';
+    modal.className = 'modal-overlay';
+    document.body.appendChild(modal);
+  }
+
+  modal.innerHTML = `
+    <div class="modal" style="width: 400px; max-width: 90vw;">
+      <div class="modal-header">
+        <span class="modal-title">삭제 확인</span>
+        <button class="modal-close" onclick="document.getElementById('modal-custom-confirm').classList.remove('open')">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 30px 20px; text-align: center; font-size: 15px; font-weight: 500;">
+        ${message}
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: center; gap: 12px;">
+        <button class="btn btn-outline" onclick="document.getElementById('modal-custom-confirm').classList.remove('open')">취소</button>
+        <button class="btn btn-danger" id="customConfirmBtn">삭제</button>
+      </div>
+    </div>
+  `;
+
+  modal.querySelector('#customConfirmBtn').onclick = () => {
+    modal.classList.remove('open');
+    if (onConfirm) onConfirm();
+  };
+
+  modal.classList.add('open');
+}
+
+function deleteNotice(id) {
+  showCustomConfirm('정말 삭제하시겠습니까?<br><span style="color:var(--danger); font-size:12px; font-weight:400;">* 삭제 시 전체 데이터에 즉시 반영됩니다.</span>', () => {
+    const notices = JSON.parse(localStorage.getItem('varo_notices')) || [];
+    const filtered = notices.filter(n => String(n.id) !== String(id));
+
+    localStorage.setItem('varo_notices', JSON.stringify(filtered));
+    closeModal('modal-add-notice');
+    showToast('공지사항이 삭제되었습니다.', 'success');
+    renderAdminNotice();
+  });
+}
+
+function renderAdminFAQ() {
+  const container = document.getElementById('adminFaqList');
+  if (!container) return;
+
+  const list = JSON.parse(localStorage.getItem('varo_faqs')) || [
+    { id: 1, category: '주문/결제', question: '주문 취소는 어떻게 하나요?', answer: '배송 준비 중 상태 이전에는 마이페이지에서 즉시 취소가 가능합니다.' },
+    { id: 2, category: '배송', question: '무료 배송 기준이 어떻게 되나요?', answer: '5만원 이상 구매 시 무료 배송입니다.' },
+    { id: 3, category: '교환/반품', question: '단순 변심 반품 시 배송비는 얼마인가요?', answer: '왕복 배송비 6,000원이 청구됩니다.' }
+  ];
+
+  if (!localStorage.getItem('varo_faqs')) {
+    localStorage.setItem('varo_faqs', JSON.stringify(list));
+  }
+
+  container.innerHTML = `
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>분류</th>
+            <th>질문</th>
+            <th>답변</th>
+            <th>관리</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.map(f => `
+            <tr>
+              <td><span class="badge badge-gray">${f.category}</span></td>
+              <td style="font-weight:600">${f.question}</td>
+              <td style="font-size:12px; color:var(--gray-500);">${f.answer}</td>
+              <td>
+                <button class="btn btn-outline btn-sm" onclick="openFaqModal(${f.id})">수정</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top: 15px; text-align: right;">
+      <button class="btn btn-primary" onclick="openFaqModal()">FAQ 등록</button>
+    </div>
+  `;
+}
+
+function openFaqModal(id = null) {
+  const faqs = JSON.parse(localStorage.getItem('varo_faqs')) || [];
+  const faq = id ? faqs.find(f => f.id === id) : { category: '주문/결제', question: '', answer: '' };
+  const isEdit = !!id;
+
+  let modal = document.getElementById('modal-add-faq');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-add-faq';
+    modal.className = 'modal-overlay';
+    document.body.appendChild(modal);
+  }
+
+  modal.innerHTML = `
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">${isEdit ? 'FAQ 수정' : 'FAQ 등록'}</span>
+        <button class="modal-close" onclick="closeModal('modal-add-faq')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label class="form-label">분류</label>
+          <select id="faqCategory" class="form-control">
+            <option value="주문/결제"${faq.category === '주문/결제' ? ' selected' : ''}>주문/결제</option>
+            <option value="배송"${faq.category === '배송' ? ' selected' : ''}>배송</option>
+            <option value="교환/반품"${faq.category === '교환/반품' ? ' selected' : ''}>교환/반품</option>
+            <option value="회원/정보"${faq.category === '회원/정보' ? ' selected' : ''}>회원/정보</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label class="form-label">질문</label>
+          <input type="text" id="faqQuestion" class="form-control" value="${faq.question}" placeholder="질문을 입력하세요.">
+        </div>
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label class="form-label">답변</label>
+          <textarea id="faqAnswer" class="form-control" style="height: 120px; resize: none;" placeholder="답변을 입력하세요.">${faq.answer}</textarea>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between;">
+        <div>
+          ${isEdit ? `<button class="btn btn-danger" onclick="deleteFAQ('${id}')">삭제</button>` : ''}
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-outline" onclick="closeModal('modal-add-faq')">취소</button>
+          <button class="btn btn-primary" onclick="saveFAQ(${id})">${isEdit ? '수정' : '등록'}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  modal.classList.add('open');
+}
+
+function saveFAQ(id = null) {
+  const category = document.getElementById('faqCategory').value;
+  const question = document.getElementById('faqQuestion').value.trim();
+  const answer = document.getElementById('faqAnswer').value.trim();
+
+  if (!question || !answer) {
+    showToast('질문과 답변을 모두 입력해주세요.', 'error');
+    return;
+  }
+
+  const faqs = JSON.parse(localStorage.getItem('varo_faqs')) || [];
+
+  if (id) {
+    const idx = faqs.findIndex(f => f.id === id);
+    if (idx !== -1) {
+      faqs[idx] = { id, category, question, answer };
+    }
+  } else {
+    const newId = faqs.length > 0 ? Math.max(...faqs.map(f => f.id)) + 1 : 1;
+    faqs.push({ id: newId, category, question, answer });
+  }
+
+  localStorage.setItem('varo_faqs', JSON.stringify(faqs));
+  closeModal('modal-add-faq');
+  showToast(id ? 'FAQ가 수정되었습니다.' : 'FAQ가 등록되었습니다.', 'success');
+  renderAdminFAQ();
+}
+
+function deleteFAQ(id) {
+  showCustomConfirm('정말 삭제하시겠습니까?<br><span style="color:var(--danger); font-size:12px; font-weight:400;">* 삭제 시 전체 데이터에 즉시 반영됩니다.</span>', () => {
+    const faqs = JSON.parse(localStorage.getItem('varo_faqs')) || [];
+    const filtered = faqs.filter(f => String(f.id) !== String(id));
+
+    localStorage.setItem('varo_faqs', JSON.stringify(filtered));
+    closeModal('modal-add-faq');
+    showToast('FAQ가 삭제되었습니다.', 'success');
+    renderAdminFAQ();
+  });
+}
+
+function showBannerTab(type, el) {
+  if (el) {
+    el.parentElement.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  const bannerEl = document.getElementById('sub-page-banner');
+  const sectionEl = document.getElementById('sub-page-section');
+  const categoryEl = document.getElementById('sub-page-category');
+
+  if (bannerEl) bannerEl.style.display = type === 'banner' ? 'block' : 'none';
+  if (sectionEl) sectionEl.style.display = type === 'section' ? 'block' : 'none';
+  if (categoryEl) categoryEl.style.display = type === 'category' ? 'block' : 'none';
+
+  if (type === 'banner') renderBanners();
+  else if (type === 'section' && typeof renderHomeSections === 'function') renderHomeSections();
+  else if (type === 'category' && typeof renderCategories === 'function') renderCategories();
 }
 
 // ════════════════════════════════════════════════════════
@@ -220,11 +673,37 @@ async function syncAllData() {
   }
 }
 
-// 실시간 동기화 리스너
-window.addEventListener('varo:dataChange', (e) => {
-  console.log('Real-time Data Change Detected:', e.detail);
+// 실시간 동기화 브로드캐스트 채널
+const adminSyncChannel = new BroadcastChannel('varo_admin_sync');
+
+// 실시간 동기화 리스너 고도화
+function handleSync(data) {
+  console.log('Real-time Data Change Detected:', data);
+  const { type, action } = data || {};
+
+  // 전체 동기화 실행 (API 호출 등)
   syncAllData();
+
+  // 특정 페이지 실시간 즉시 반영 (깜빡임 없이)
+  const activePage = localStorage.getItem('activeAdminPage');
+  if (type === 'order' && activePage === 'orders') renderOrders();
+  if (type === 'notification') {
+    renderNotifications();
+    if (activePage === 'settings') renderFullNotifications();
+  }
+}
+
+// 로컬 이벤트 리스너
+window.addEventListener('varo:dataChange', (e) => {
+  handleSync(e.detail);
+  // 다른 탭으로 전파
+  adminSyncChannel.postMessage(e.detail);
 });
+
+// 다른 탭으로부터의 메시지 수신
+adminSyncChannel.onmessage = (e) => {
+  handleSync(e.data);
+};
 
 // ════════════════════════════════════════════════════════
 // DASHBOARD RENDER
@@ -331,21 +810,46 @@ function renderActivity() {
 // ════════════════════════════════════════════════════════
 let productFilter = '';
 function renderProducts(list) {
-  // 하이브리드 병합: 더미 데이터 + API 데이터
-  const allList = [...(API_PRODUCTS.map(p => ({
-    id: p.id,
-    name: p.name,
-    sku: p.product_code || 'API-PROD',
-    category: p.categoryId || '기타',
-    price: p.price,
-    origPrice: p.price, // API에는 정가가 따로 없을 수 있음
-    stock: p.stock || 0,
-    sold: p.rating || 0, // rating을 시연용 sold로 활용
-    status: p.isActive ? '판매중' : '숨김',
-    img: p.mainImg || './assets/products/default.jpg'
-  }))), ...DATA.products];
+  const filterCat = document.getElementById('pFilterCategory')?.value || '';
+  const filterStatus = document.getElementById('pFilterStatus')?.value || '';
+  const filterSort = document.getElementById('pSort')?.value || '최신순';
 
-  const targetList = list || allList;
+  // 하이브리드 병합: 더미 데이터 + API 데이터
+  const allList = [...(API_PRODUCTS.map(p => {
+    const catObj = API_CATEGORIES.find(c => c.id == p.categoryId || c.id === p.category_id);
+    return {
+      id: p.id,
+      name: p.name,
+      sku: p.product_code || 'API-PROD',
+      category: catObj ? (catObj.name || catObj.label) : (p.categoryId || '기타'),
+      price: p.price,
+      origPrice: p.price,
+      stock: p.stock || 0,
+      sold: p.rating || 0,
+      status: p.isActive ? '판매중' : '숨김',
+      img: p.mainImg || './assets/products/default.jpg'
+    };
+  })), ...DATA.products];
+
+  let targetList = list || allList;
+
+  if (filterCat) {
+    targetList = targetList.filter(p => p.category === filterCat);
+  }
+  if (filterStatus) {
+    targetList = targetList.filter(p => p.status === filterStatus);
+  }
+
+  if (filterSort === '최신순') {
+    targetList.sort((a, b) => b.id - a.id);
+  } else if (filterSort === '판매량순') {
+    targetList.sort((a, b) => b.sold - a.sold);
+  } else if (filterSort === '가격높은순') {
+    targetList.sort((a, b) => b.price - a.price);
+  } else if (filterSort === '가격낮은순') {
+    targetList.sort((a, b) => a.price - b.price);
+  }
+
   document.getElementById('productCount').textContent = fmt(targetList.length);
   const tbody = document.getElementById('productTable');
   tbody.innerHTML = targetList.map(p => `
@@ -389,6 +893,13 @@ function filterByCategory(cat) {
   const filtered = cat ? DATA.products.filter(p => p.category === cat) : DATA.products;
   renderProducts(filtered);
 }
+function filterByStatus(status) {
+  renderProducts();
+}
+
+function sortBy(sortType) {
+  renderProducts();
+}
 
 async function saveProduct() {
   const name = document.getElementById('pName').value;
@@ -403,14 +914,25 @@ async function saveProduct() {
   const mainFile = document.getElementById('pMainImgFile').files[0];
   const subFiles = document.getElementById('pSubImgFiles').files;
 
+  const tags = document.getElementById('pTags').value;
+  const colors = document.getElementById('pColors').value;
+  const sizes = document.getElementById('pSizes').value;
+  const material = document.getElementById('pMaterial').value;
+  const sku = document.getElementById('pSku').value;
+
   const formData = new FormData();
   formData.append('name', name);
+  formData.append('product_code', sku);
   formData.append('price', price);
   if (salePrice) formData.append('sale_price', salePrice);
   if (badge) formData.append('badge', badge);
   formData.append('stock', stock);
   formData.append('category_id', categoryId);
   formData.append('description', description);
+  formData.append('tags', tags);
+  formData.append('colors', colors);
+  formData.append('sizes', sizes);
+  formData.append('material', material);
 
   if (mainFile) formData.append('main_img', mainFile);
   if (subFiles.length > 0) {
@@ -502,7 +1024,169 @@ function editProduct(id) {
   document.getElementById('pStock').value = p.stock || 0;
   document.getElementById('pStatus').value = p.isActive ? '판매중' : (p.status || '판매중');
   document.getElementById('pDescEditor').innerHTML = p.description || '';
+
+  // 신규 필드 (adminadd 연동)
+  document.getElementById('pMaterial').value = p.material || '';
+
+  // 상세 옵션 초기화
+  productTags = p.tags ? p.tags.split(',').filter(Boolean) : [];
+  selectedColors = p.colors ? p.colors.split(',').filter(Boolean) : [];
+  selectedSizes = p.sizes ? p.sizes.split(',').filter(Boolean) : [];
+
+  renderTags();
+  renderStockTable();
+
+  // 색상 칩 상태 반영
+  document.querySelectorAll('.color-swatch-item').forEach(el => {
+    const c = el.dataset.color;
+    if (selectedColors.includes(c)) el.classList.add('selected');
+    else el.classList.remove('selected');
+  });
+
+  // 사이즈 칩 상태 반영
+  document.querySelectorAll('.size-chip').forEach(el => {
+    const s = el.innerText.trim();
+    if (selectedSizes.includes(s)) el.classList.add('selected');
+    else el.classList.remove('selected');
+  });
+
   openModal('modal-add-product');
+}
+
+// ════════════════════════════════════════════════════════
+// PRODUCT OPTIONS HELPERS (GLOBAL)
+// ════════════════════════════════════════════════════════
+let selectedSizes = [];
+let selectedColors = [];
+let productTags = [];
+
+function toggleSize(el, size) {
+  el.classList.toggle('selected');
+  if (el.classList.contains('selected')) {
+    if (!selectedSizes.includes(size)) selectedSizes.push(size);
+  } else {
+    selectedSizes = selectedSizes.filter(s => s !== size);
+  }
+  renderStockTable();
+  document.getElementById('pSizes').value = selectedSizes.join(',');
+}
+
+function renderStockTable() {
+  const wrap = document.getElementById('pStockTableWrap');
+  const tbody = document.getElementById('pStockTableBody');
+  if (!wrap || !tbody) return;
+  if (selectedSizes.length === 0) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  tbody.innerHTML = selectedSizes.map(s => `
+    <tr>
+      <td><span class="tag-chip">${s}</span></td>
+      <td><input type="number" class="form-control" data-size="${s}" value="0" style="width:80px;"></td>
+    </tr>`).join('');
+}
+
+function toggleColor(el, color) {
+  el.classList.toggle('selected');
+  if (el.classList.contains('selected')) {
+    if (!selectedColors.includes(color)) selectedColors.push(color);
+  } else {
+    selectedColors = selectedColors.filter(c => c !== color);
+  }
+  document.getElementById('pColors').value = selectedColors.join(',');
+}
+
+function removeTag(i) {
+  productTags.splice(i, 1);
+  renderTags();
+}
+
+function renderTags() {
+  const wrap = document.getElementById('pTagWrap');
+  const input = document.getElementById('pTagInput');
+  if (!wrap || !input) return;
+  const chips = productTags.map((t, i) => `<span class="tag-chip">${t} <i onclick="removeTag(${i})" style="cursor:pointer;margin-left:4px;">&times;</i></span>`).join('');
+  wrap.innerHTML = chips;
+  wrap.appendChild(input);
+  document.getElementById('pTags').value = productTags.join(',');
+}
+
+// Tag Input Event (전역 등록을 위해 init 또는 DOMContentLoaded로 이동 권장하나 일단 여기 배치)
+document.addEventListener('keydown', (e) => {
+  if (e.target.id === 'pTagInput' && e.key === 'Enter') {
+    e.preventDefault();
+    const val = e.target.value.trim();
+    if (val && !productTags.includes(val)) {
+      productTags.push(val);
+      renderTags();
+      e.target.value = '';
+    }
+  }
+});
+
+// Banner & Section Renders
+function renderBanners() {
+  const list = document.getElementById('bannerSortableList');
+  if (!list) return;
+  list.innerHTML = [1, 2, 3].map(i => `
+  <div class="notif-item" style="background:#fff;border-radius:8px;margin-bottom:8px;border:1px solid var(--gray-100)">
+    <div style="width:40px;height:40px;background:var(--surface);border-radius:4px;display:flex;align-items:center;justify-content:center;">${i}</div>
+    <div style="flex:1">
+      <div style="font-weight:600">메인 배너 0${i}</div>
+      <div style="font-size:12px;color:var(--gray-400)">배너 이미지 및 링크 설정</div>
+    </div>
+    <div style="color:var(--gray-300)">⠿</div>
+  </div>`).join('');
+
+  if (window.Sortable) {
+    new Sortable(list, { animation: 150 });
+  }
+}
+
+function renderHomeSections() {
+  const list = document.getElementById('homeSectionList');
+  if (!list) return;
+
+  // 기본 섹션 + 카테고리별 상품 섹션 결합
+  const baseSections = [
+    { title: 'NEW IN', desc: '최신 상품 목록 섹션', active: true },
+    { title: 'BEST SELLERS', desc: '주간 베스트 상품 섹션', active: true },
+    { title: 'COMMUNITY', desc: '고객 리뷰 및 Q&A 섹션', active: true },
+    { title: 'BRAND STORY', desc: '브랜드 가치 및 소개 섹션', active: false }
+  ];
+
+  const catSections = API_CATEGORIES.filter(c => !c.parent_id).map(c => ({
+    title: (c.name || c.label).toUpperCase(),
+    desc: `${c.name || c.label} 카테고리 홈 노출 섹션`,
+    active: c.is_home || false
+  }));
+
+  const sections = [...baseSections, ...catSections];
+
+  list.innerHTML = sections.map(s => `
+  <div class="section-card">
+    <div class="section-card-header">
+      <div style="font-weight:700">${s.title}</div>
+      <div class="form-switch"><input type="checkbox" ${s.active ? 'checked' : ''}></div>
+    </div>
+    <div class="section-card-body">
+      <p style="font-size:13px;color:var(--gray-400)">${s.desc}</p>
+    </div>
+  </div>`).join('');
+}
+
+
+
+function renderFullNotifications() {
+  const list = document.getElementById('notif-full-list');
+  if (!list) return;
+  list.innerHTML = [1, 2, 3, 4, 5].map(i => `
+  <div class="notif-item unread">
+    <div class="avatar" style="background:var(--accent);color:#fff;">N</div>
+    <div style="flex:1">
+      <div style="font-weight:600">새로운 주문이 발생했습니다. (ORD-2025-00${i})</div>
+      <div style="font-size:12px;color:var(--gray-400)">방금 전 · 시스템 자동 알림</div>
+    </div>
+    <div class="badge badge-info">NEW</div>
+  </div>`).join('');
 }
 
 function deleteProduct(id) {
@@ -621,17 +1305,20 @@ async function updateOrderStatus(id, newStatus) {
       if (o) o.status = newStatus;
       renderOrders();
       showToast(`주문 상태가 "${newStatus}"로 변경되었습니다.`, 'success');
+      window.dispatchEvent(new CustomEvent('varo:dataChange', { detail: { type: 'order', id, action: 'updateStatus' } }));
     } else {
       const o = DATA.orders.find(x => x.id === id);
       if (o) o.status = newStatus;
       renderOrders();
       showToast(`주문 상태가 "${newStatus}"로 변경되었습니다.`, 'success');
+      window.dispatchEvent(new CustomEvent('varo:dataChange', { detail: { type: 'order', id, action: 'updateStatus' } }));
     }
   } catch (e) {
     const o = DATA.orders.find(x => x.id === id);
     if (o) o.status = newStatus;
     renderOrders();
     showToast(`주문 상태가 "${newStatus}"로 변경되었습니다.`, 'success');
+    window.dispatchEvent(new CustomEvent('varo:dataChange', { detail: { type: 'order', id, action: 'updateStatus' } }));
   }
 }
 
@@ -648,6 +1335,7 @@ function renderMembers() {
       <td style="font-size:13px;color:var(--gray-500)">${m.phone}</td>
       <td>${statusBadge(m.role)}</td>
       <td style="font-weight:600;font-family:'Inter'">${fmtW(m.purchase)}</td>
+      <td style="font-weight:600;font-family:'Inter';color:var(--accent)">${fmt(m.point)} P</td>
       <td style="font-size:12px;color:var(--gray-400)">${m.joinDate}</td>
       <td style="font-size:12px;color:var(--gray-400)">${m.lastLogin}</td>
       <td>${m.status === '정지' ? statusBadge('정지') : statusBadge('정상')}</td>
@@ -840,33 +1528,83 @@ function renderCategories() {
   const container = document.getElementById('categoryContainer');
   if (!container) return;
 
-  const parents = API_CATEGORIES.filter(c => !c.parent_id).sort((a, b) => a.sort_order - b.sort_order);
-  const children = API_CATEGORIES.filter(c => c.parent_id).sort((a, b) => a.sort_order - b.sort_order);
+  const categoryData = [
+    { id: 1, parent_id: null, name: 'BEST', slug: 'best', sort_order: 1 },
+    { id: 2, parent_id: null, name: 'NEW 5%', slug: 'new', sort_order: 2 },
+    { id: 3, parent_id: null, name: 'COLLECTION', slug: 'collection', sort_order: 3 },
+    { id: 4, parent_id: null, name: 'OUTER', slug: 'outer', sort_order: 4 },
+    { id: 5, parent_id: 4, name: '자켓', slug: 'jacket', sort_order: 1 },
+    { id: 6, parent_id: 4, name: '코트', slug: 'coat', sort_order: 2 },
+    { id: 7, parent_id: 4, name: '패딩', slug: 'padding', sort_order: 3 },
+    { id: 8, parent_id: 4, name: '점퍼', slug: 'jumper', sort_order: 4 },
+    { id: 9, parent_id: 4, name: '레더/무스탕', slug: 'leather', sort_order: 5 },
+    { id: 10, parent_id: null, name: 'SHIRT', slug: 'shirt', sort_order: 5 },
+    { id: 17, parent_id: 10, name: '반팔셔츠', slug: 'shortshirt', sort_order: 1 },
+    { id: 18, parent_id: 10, name: '긴팔셔츠', slug: 'longshirt', sort_order: 2 },
+    { id: 19, parent_id: 10, name: '오버셔츠', slug: 'overshirt', sort_order: 3 },
+    { id: 20, parent_id: 10, name: '데님셔츠', slug: 'denimshirt', sort_order: 4 },
+    { id: 11, parent_id: null, name: 'TOP', slug: 'top', sort_order: 6 },
+    { id: 21, parent_id: 11, name: '반팔티', slug: 'shorttee', sort_order: 1 },
+    { id: 22, parent_id: 11, name: '긴팔티', slug: 'longtee', sort_order: 2 },
+    { id: 23, parent_id: 11, name: '맨투맨', slug: 'sweatshirt', sort_order: 3 },
+    { id: 24, parent_id: 11, name: '후드티', slug: 'hoodie', sort_order: 4 },
+    { id: 25, parent_id: 11, name: '민소매', slug: 'sleeveless', sort_order: 5 },
+    { id: 12, parent_id: null, name: 'BOTTOM', slug: 'bottom', sort_order: 7 },
+    { id: 26, parent_id: 12, name: '데님팬츠', slug: 'denim', sort_order: 1 },
+    { id: 27, parent_id: 12, name: '슬랙스', slug: 'slacks', sort_order: 2 },
+    { id: 28, parent_id: 12, name: '카고팬츠', slug: 'cargo', sort_order: 3 },
+    { id: 29, parent_id: 12, name: '조거팬츠', slug: 'jogger', sort_order: 4 },
+    { id: 30, parent_id: 12, name: '반바지', slug: 'shorts', sort_order: 5 },
+    { id: 13, parent_id: null, name: 'KNIT', slug: 'knit', sort_order: 8 },
+    { id: 31, parent_id: 13, name: '풀오버', slug: 'pullover', sort_order: 1 },
+    { id: 32, parent_id: 13, name: '집업니트', slug: 'zipup', sort_order: 2 },
+    { id: 33, parent_id: 13, name: '가디건', slug: 'cardigan', sort_order: 3 },
+    { id: 34, parent_id: 13, name: '니트베스트', slug: 'vest', sort_order: 4 },
+    { id: 14, parent_id: null, name: 'SHOES', slug: 'shoes', sort_order: 9 },
+    { id: 35, parent_id: 14, name: '스니커즈', slug: 'sneakers', sort_order: 1 },
+    { id: 36, parent_id: 14, name: '로퍼', slug: 'loafer', sort_order: 2 },
+    { id: 37, parent_id: 14, name: '샌들', slug: 'sandal', sort_order: 3 },
+    { id: 38, parent_id: 14, name: '부츠', slug: 'boots', sort_order: 4 },
+    { id: 15, parent_id: null, name: '1+1 EVENT', slug: 'event', sort_order: 10 },
+    { id: 16, parent_id: null, name: 'COMMUNITY', slug: 'community', sort_order: 11 }
+  ];
+
+  const parents = categoryData.filter(c => !c.parent_id).sort((a, b) => a.sort_order - b.sort_order);
+  const children = categoryData.filter(c => c.parent_id).sort((a, b) => a.sort_order - b.sort_order);
 
   // 모달 셀렉트박스 업데이트
   const catParentSelect = document.getElementById('catParent');
   if (catParentSelect) {
     catParentSelect.innerHTML = '<option value="">없음 (최상위)</option>' +
-      parents.map(p => `<option value="${p.id}">${p.name || p.label}</option>`).join('');
+      parents.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
   }
 
   const pCatSelect = document.getElementById('pCategory');
-  if (pCatSelect) {
-    let options = '<option value="">선택</option>';
+  const pFilterSelect = document.getElementById('pFilterCategory');
+
+  if (pCatSelect || pFilterSelect) {
+    let modalOptions = '<option value="">선택</option>';
+    let filterOptions = '<option value="">전체 카테고리</option>';
+
     parents.forEach(p => {
-      options += `<option value="${p.id}" style="font-weight:700;">${p.name || p.label}</option>`;
+      modalOptions += `<option value="${p.id}" style="font-weight:700;">${p.name}</option>`;
+      filterOptions += `<option value="${p.name}" style="font-weight:700;">${p.name}</option>`;
+
       children.filter(c => c.parent_id == p.id).forEach(c => {
-        options += `<option value="${c.id}">&nbsp;&nbsp;↳ ${c.name || c.label}</option>`;
+        modalOptions += `<option value="${c.id}">&nbsp;&nbsp;↳ ${c.name}</option>`;
+        filterOptions += `<option value="${c.name}">&nbsp;&nbsp;↳ ${c.name}</option>`;
       });
     });
-    pCatSelect.innerHTML = options;
+
+    if (pCatSelect) pCatSelect.innerHTML = modalOptions;
+    if (pFilterSelect) pFilterSelect.innerHTML = filterOptions;
   }
 
   // 아코디언 렌더링
   container.innerHTML = parents.map(p => {
     const parentChildren = children.filter(c => c.parent_id == p.id);
     return `
-      <div class="category-item expanded" data-id="${p.id}">
+      <div class="category-item" data-id="${p.id}">
         <div class="category-parent" onclick="toggleAccordion(this)">
           <div class="drag-handle parent-handle">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -876,7 +1614,7 @@ function renderCategories() {
           <span class="toggle-icon">
              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
           </span>
-          <span class="name">${p.name || p.label} <small style="color:var(--gray-400); font-weight:400; margin-left:8px;">(${p.slug})</small></span>
+          <span class="name">${p.name} <small style="color:var(--gray-400); font-weight:400; margin-left:8px;">(${p.slug})</small></span>
           <div class="category-actions" onclick="event.stopPropagation()">
             <button class="add-sub-btn" onclick="addSubCategory(${p.id})">+ 서브 추가</button>
             <button class="btn btn-outline btn-sm" style="margin-left:8px" onclick="editCategory(${p.id})">수정</button>
@@ -891,7 +1629,7 @@ function renderCategories() {
                   <line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/>
                 </svg>
               </div>
-              <span class="name">${c.name || c.label} <small style="color:var(--gray-400); margin-left:6px;">(${c.slug})</small></span>
+              <span class="name">${c.name} <small style="color:var(--gray-400); margin-left:6px;">(${c.slug})</small></span>
               <div class="category-actions">
                 <button class="btn btn-outline btn-sm" onclick="editCategory(${c.id})">수정</button>
                 <button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.id})">삭제</button>
@@ -1038,25 +1776,85 @@ async function deleteCategory(id) {
 // BANNERS [NEW]
 // ════════════════════════════════════════════════════════
 function renderBanners() {
-  const grid = document.getElementById('bannerGrid');
-  if (!grid) return;
-  grid.innerHTML = API_BANNERS.map(b => `
-    <div class="card">
-      <div class="card-body">
-        <div style="height:120px;background:var(--gray-100);border-radius:6px;overflow:hidden;margin-bottom:12px;">
-          <img src="${b.img_url}" style="width:100%;height:100%;object-fit:cover;">
-        </div>
-        <div style="font-weight:600;margin-bottom:4px;">${b.title || '제목 없음'}</div>
-        <div style="font-size:12px;color:var(--gray-400);margin-bottom:8px;">URL: ${b.link_url || '-'}</div>
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:12px;color:var(--gray-500)">순서: ${b.sort_order}</span>
-          <div style="display:flex;gap:4px;">
-            <button class="btn btn-outline btn-sm" onclick="editBanner(${b.id})">수정</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteBanner(${b.id})">삭제</button>
-          </div>
-        </div>
+  console.log('Rendering Banners...', { API_BANNERS, DATA_BANNERS: DATA.banners });
+  const container = document.getElementById('bannerSortableList');
+  if (!container) {
+    console.warn('bannerSortableList container not found');
+    return;
+  }
+
+  // Ensure visibility
+  container.style.minHeight = '200px';
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+
+  // Merge API data with local default data
+  const apiItems = Array.isArray(API_BANNERS) ? API_BANNERS : [];
+  const defaultItems = Array.isArray(DATA.banners) ? DATA.banners : [];
+  const allBanners = [...apiItems, ...defaultItems.filter(db => !apiItems.some(ab => ab.id === db.id))];
+
+  console.log('Merged Banners:', allBanners);
+
+  if (allBanners.length === 0) {
+    container.innerHTML = '<div class="tbl-empty">등록된 배너가 없습니다.</div>';
+    return;
+  }
+
+  container.innerHTML = allBanners.map(b => `
+    <div class="banner-item-card" onclick="selectBannerForPreview(${b.id})" style="display:flex !important; visibility:visible !important; opacity:1 !important;">
+      <div class="drag-handle" style="padding-right:10px; cursor:grab;">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/>
+          <circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/>
+        </svg>
       </div>
-    </div>`).join('') || '<div class="tbl-empty">등록된 배너가 없습니다.</div>';
+      <div class="banner-thumb" style="width:80px; height:50px; background:#eee; border-radius:4px; overflow:hidden;">
+        <img src="${b.img_url}" alt="banner" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="banner-info" style="flex:1; padding-left:10px;">
+        <div class="title" style="font-weight:600; font-size:14px;">${b.title || '제목 없음'}</div>
+        <div class="desc" style="font-size:12px; color:#999;">${b.link_url || '링크 없음'}</div>
+      </div>
+      <div class="banner-actions" onclick="event.stopPropagation()" style="display:flex; align-items:center; gap:10px;">
+        <label class="ios-switch">
+          <input type="checkbox" ${b.is_active !== false ? 'checked' : ''} onchange="toggleBannerStatus(${b.id}, this.checked)">
+          <span class="ios-slider"></span>
+        </label>
+        <button class="btn btn-outline btn-sm" onclick="editBanner(${b.id})">수정</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteBanner(${b.id})">삭제</button>
+      </div>
+    </div>`).join('');
+
+  // Auto-select first banner if none selected
+  if (allBanners.length > 0) {
+    setTimeout(() => selectBannerForPreview(allBanners[0].id), 100);
+  }
+}
+
+function selectBannerForPreview(id) {
+  const banner = API_BANNERS.find(b => b.id === id) || DATA.banners.find(b => b.id === id);
+  if (!banner) return;
+
+  const content = document.getElementById('bannerPreviewContent');
+  if (content) {
+    content.classList.remove('preview-placeholder');
+    content.innerHTML = `<img src="${banner.img_url}" style="width:100%; height:100%; object-fit:cover;">`;
+  }
+
+  // Highlight active card
+  document.querySelectorAll('.banner-item-card').forEach(el => el.style.border = '1px solid var(--gray-100)');
+  const selectedCard = [...document.querySelectorAll('.banner-item-card')].find(el => el.getAttribute('onclick')?.includes(id));
+  if (selectedCard) selectedCard.style.border = '2px solid #b59670';
+}
+
+async function toggleBannerStatus(id, isActive) {
+  try {
+    const res = await API.banners.update(id, { is_active: isActive });
+    if (res.success) {
+      showToast(`배너가 ${isActive ? '활성화' : '비활성'} 되었습니다.`, 'success');
+      syncAllData();
+    }
+  } catch (e) { showToast('오류: ' + e.message, 'error'); }
 }
 
 async function saveBanner() {
@@ -1132,23 +1930,79 @@ function renderAnalytics() {
 // SETTINGS TOGGLES
 // ════════════════════════════════════════════════════════
 function renderSettings() {
+  const settings = JSON.parse(localStorage.getItem('varo_settings')) || {
+    noti_order: true,
+    noti_stock: true,
+    noti_user: true,
+    noti_qna: true,
+    pay_card: true,
+    pay_kakao: true,
+    pay_naver: true,
+    pay_bank: true
+  };
+
   const notiItems = [
-    ['신규 주문 알림', 'noti1', true], ['재고 부족 알림 (10개 미만)', 'noti2', true],
-    ['회원 가입 알림', 'noti3', false], ['리뷰 등록 알림', 'noti4', true],
-    ['주문 취소/반품 알림', 'noti5', true],
+    ['신규 주문 알림', 'noti_order', settings.noti_order],
+    ['재고 부족 알림', 'noti_stock', settings.noti_stock],
+    ['회원 가입 알림', 'noti_user', settings.noti_user],
+    ['1:1 문의 알림', 'noti_qna', settings.noti_qna],
   ];
-  document.getElementById('notiSettings').innerHTML = notiItems.map(([label, id, checked]) => `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gray-100);">
-      <span style="font-size:13.5px;">${label}</span>
-      <label class="toggle"><input type="checkbox"${checked ? ' checked' : ''}><span class="toggle-slider"></span></label>
+
+  const notiHtml = notiItems.map(([label, key, checked]) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--gray-100);">
+      <div>
+        <div style="font-weight:600; font-size:14px;">${label}</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox"${checked ? ' checked' : ''} onchange="updateSetting('${key}', this.checked)">
+        <span class="slider"></span>
+      </label>
     </div>`).join('');
 
-  const payItems = [['신용카드', 'pay1', true], ['카카오페이', 'pay2', true], ['네이버페이', 'pay3', true], ['계좌이체', 'pay4', true], ['무통장입금', 'pay5', false]];
-  document.getElementById('paymentSettings').innerHTML = payItems.map(([label, id, checked]) => `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gray-100);">
-      <span style="font-size:13.5px;">${label}</span>
-      <label class="toggle"><input type="checkbox"${checked ? ' checked' : ''}><span class="toggle-slider"></span></label>
+  const notiContainer = document.getElementById('notiSettings');
+  if (notiContainer) notiContainer.innerHTML = notiHtml;
+
+  const payItems = [
+    ['신용카드 결제', 'pay_card', settings.pay_card],
+    ['카카오페이', 'pay_kakao', settings.pay_kakao],
+    ['네이버페이', 'pay_naver', settings.pay_naver],
+    ['무통장 입금', 'pay_bank', settings.pay_bank],
+  ];
+
+  const payHtml = payItems.map(([label, key, checked]) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--gray-100);">
+      <div>
+        <div style="font-weight:600; font-size:14px;">${label}</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox"${checked ? ' checked' : ''} onchange="updateSetting('${key}', this.checked)">
+        <span class="slider"></span>
+      </label>
     </div>`).join('');
+
+  const payContainer = document.getElementById('paymentSettings');
+  if (payContainer) payContainer.innerHTML = payHtml;
+}
+
+function updateSetting(key, value) {
+  const settings = JSON.parse(localStorage.getItem('varo_settings')) || {
+    noti_order: true,
+    noti_stock: true,
+    noti_user: true,
+    noti_qna: true,
+    pay_card: true,
+    pay_kakao: true,
+    pay_naver: true,
+    pay_bank: true
+  };
+  settings[key] = value;
+  localStorage.setItem('varo_settings', JSON.stringify(settings));
+  showToast('설정이 변경되었습니다.', 'success');
+
+  if (key.startsWith('noti_')) {
+    renderNotifications();
+    if (typeof renderFullNotifications === 'function') renderFullNotifications();
+  }
 }
 
 // ════════════════════════════════════════════════════════
@@ -1303,7 +2157,23 @@ function renderNotifications() {
   const dot = document.getElementById('notifDot');
   if (!list) return;
 
-  if (NOTIFICATIONS.length === 0) {
+  const settings = JSON.parse(localStorage.getItem('varo_settings')) || {
+    noti_order: true,
+    noti_stock: true,
+    noti_user: true,
+    noti_qna: true
+  };
+
+  // 설정에 따라 알림 필터링
+  const filteredNotifs = NOTIFICATIONS.filter(n => {
+    if (n.category === 'order' && !settings.noti_order) return false;
+    if (n.category === 'stock' && !settings.noti_stock) return false;
+    if (n.category === 'user' && !settings.noti_user) return false;
+    if (n.category === 'qna' && !settings.noti_qna) return false;
+    return true;
+  });
+
+  if (filteredNotifs.length === 0) {
     list.innerHTML = `<div style="padding:40px 20px; text-align:center; color:var(--gray-400); font-size:13px;">새로운 알림이 없습니다.</div>`;
     if (dot) dot.style.display = 'none';
     return;
@@ -1327,7 +2197,7 @@ function renderNotifications() {
     user: '#4a5568'
   };
 
-  list.innerHTML = NOTIFICATIONS.map(n => `
+  list.innerHTML = filteredNotifs.map(n => `
     <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="readNotification(${n.id}, event)">
       <div class="notif-icon-circle" style="background:${bgColors[n.category] || '#eee'}; color:${iconColors[n.category] || '#666'}">
         ${icons[n.category] || ''}
@@ -1342,7 +2212,7 @@ function renderNotifications() {
 
   // 점 표시 여부 (안읽은 알림이 있으면 표시)
   if (dot) {
-    dot.style.display = NOTIFICATIONS.some(n => n.unread) ? 'block' : 'none';
+    dot.style.display = filteredNotifs.some(n => n.unread) ? 'block' : 'none';
   }
 }
 
@@ -1365,5 +2235,66 @@ function readAllNotifications(e) {
 
 // 초기 로딩 시 호출 (점 표시를 위해)
 document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(renderNotifications, 1000); // 데이터 로드 후 여유있게 실행
+  setTimeout(() => {
+    renderNotifications();
+    renderFullNotifications();
+  }, 1000); // 데이터 로드 후 여유있게 실행
 });
+
+function renderFullNotifications() {
+  const container = document.getElementById('notif-full-list');
+  if (!container) return;
+
+  const settings = JSON.parse(localStorage.getItem('varo_settings')) || {
+    noti_order: true,
+    noti_stock: true,
+    noti_user: true,
+    noti_qna: true
+  };
+
+  const filteredNotifs = NOTIFICATIONS.filter(n => {
+    if (n.category === 'order' && !settings.noti_order) return false;
+    if (n.category === 'stock' && !settings.noti_stock) return false;
+    if (n.category === 'user' && !settings.noti_user) return false;
+    if (n.category === 'qna' && !settings.noti_qna) return false;
+    return true;
+  });
+
+  if (filteredNotifs.length === 0) {
+    container.innerHTML = `<div style="text-align:center; padding:40px; color:#888;">새로운 알림이 없습니다.</div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>구분</th>
+            <th>제목</th>
+            <th>내용</th>
+            <th>시간</th>
+            <th>상태</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filteredNotifs.map(n => `
+            <tr style="${n.unread ? 'font-weight:600; background:var(--gray-50);' : ''}">
+              <td>
+                <span class="badge badge-${n.category === 'order' ? 'success' : n.category === 'stock' ? 'danger' : 'warning'}">
+                  ${n.category === 'order' ? '주문' : n.category === 'stock' ? '재고' : '회원'}
+                </span>
+              </td>
+              <td>${n.title}</td>
+              <td style="font-size:13px; color:var(--gray-600);">${n.desc}</td>
+              <td style="font-size:12px; color:var(--gray-400);">${n.time}</td>
+              <td>
+                ${n.unread ? `<button class="btn btn-outline btn-sm" onclick="readNotification(${n.id}); renderFullNotifications();">읽음</button>` : '<span style="color:var(--gray-300); font-size:12px;">읽음</span>'}
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}

@@ -70,14 +70,16 @@ const purgeExpiredGuestData = async () => {
 
 /* ── 서버 시작 (DB 초기화 후 리스닝) ───────────────────────────── */
 const startServer = async () => {
+  console.log('[Server] MySQL 초기화 중...');
   try {
-    console.log('[Server] MySQL 초기화 중...');
     await db.initDB();
-
-    // 서버 시작 시 1회 + 24시간마다 실행
     await purgeExpiredGuestData();
     setInterval(purgeExpiredGuestData, 24 * 60 * 60 * 1000);
+  } catch (err) {
+    console.error('[Server] DB 초기화 실패 (데이터 연동이 제한될 수 있습니다):', err.message);
+  }
 
+  try {
     app.listen(PORT, () => {
       console.log('');
       console.log('  ██╗   ██╗ █████╗ ██████╗  ██████╗');

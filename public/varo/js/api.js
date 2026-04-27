@@ -76,7 +76,16 @@ const API = (() => {
     let items = JSON.parse(localStorage.getItem(storageKey) || 'null');
     if (items === null) {
       if (entity === 'categories' && typeof VARO_DATA !== 'undefined') items = VARO_DATA.CATEGORIES;
-      else if (entity === 'banners' && typeof VARO_DATA !== 'undefined') items = VARO_DATA.HERO_SLIDES;
+      else if (entity === 'banners' && typeof VARO_DATA !== 'undefined') {
+        items = VARO_DATA.HERO_SLIDES.map(s => ({
+          id: s.id,
+          title: `메인 배너 - ${s.id}`,
+          img_url: s.panels && s.panels.length > 0 ? s.panels[0] : '',
+          link_url: '/varo/shop.html',
+          sort_order: 0,
+          is_active: true
+        }));
+      }
       else items = [];
       localStorage.setItem(storageKey, JSON.stringify(items));
     }
