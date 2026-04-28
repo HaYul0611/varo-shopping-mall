@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const { v4: uuidv4 } = require('uuid');
 const db = require('../db/database');
 
 const SECRET = process.env.JWT_SECRET || 'varo2026_secret';

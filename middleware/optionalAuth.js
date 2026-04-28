@@ -1,7 +1,7 @@
 // middleware/optionalAuth.js
 'use strict';
 const jwt = require('jsonwebtoken');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 const db = require('../db/database');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'varo-secret-2026';
@@ -14,7 +14,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'varo-secret-2026';
 module.exports = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
-  req.guestId = req.headers['x-guest-id'] || `guest_${uuidv4().replace(/-/g, '').slice(0, 12)}`;
+  req.guestId = req.headers['x-guest-id'] || `guest_${randomUUID().replace(/-/g, '').slice(0, 12)}`;
 
   if (!token) {
     return next();
