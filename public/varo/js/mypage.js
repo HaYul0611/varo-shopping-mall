@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const applyAdminLayout = () => {
         const user = JSON.parse(localStorage.getItem('varo_user') || '{}');
-        const isAdmin = user.role === 'ADMIN' || user.grade === 'ADMIN';
+        const isAdmin = user.role === 'ADMIN' || user.grade === 'ADMIN' || user.email === 'admin@varo.com';
         if (!isAdmin) return;
 
         // 사이드바 메뉴 변경
@@ -339,13 +339,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 'BASIC': 'BRONZE', 'BRONZE': 'BRONZE',
                 'SILVER': 'SILVER', 'GOLD': 'GOLD',
                 'DIA': 'DIA',
-                'MANAGER': 'MANAGER', 'ADMIN': 'ADMIN'
+                'MANAGER': 'MANAGER', 'ADMIN': '관리자설정'
             };
-            const displayGrade = gradeMap[user.grade] || user.grade || 'BRONZE';
+            const isAdmin = user.role === 'ADMIN' || user.grade === 'ADMIN' || user.email === 'admin@varo.com';
+            let displayGrade = gradeMap[user.grade] || user.grade || 'BRONZE';
+            if (isAdmin) displayGrade = '관리자설정';
+
             userGradeLabel.textContent = displayGrade;
 
             // 등급별 색상 클래스 추가 (매핑된 displayGrade 기준)
-            userGradeLabel.className = `user-grade is-${displayGrade.toLowerCase()}`;
+            const gradeClass = isAdmin ? 'is-admin' : `is-${displayGrade.toLowerCase()}`;
+            userGradeLabel.className = `user-grade ${gradeClass}`;
         }
 
         if (avatarImg && avatarDefault) {
@@ -509,18 +513,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!badge || !desc || !amountEl) return;
 
         const grade = (user.grade || 'BRONZE').toUpperCase();
-        badge.textContent = grade;
+        const displayGrade = grade === 'ADMIN' ? '관리자설정' : grade;
+        badge.textContent = displayGrade;
 
         // 색상 동기화
         const colors = {
             'BRONZE': '#A87C6C', 'SILVER': '#A0A0A0', 'GOLD': '#D4AF37',
-            'DIA': '#00D1FF', 'MANAGER': '#D1D1FF', 'ADMIN': '#1B2B4B'
+            'DIA': '#00D1FF', 'MANAGER': '#D1D1FF', 'ADMIN': '#1B2B4B', '관리자설정': '#1B2B4B'
         };
-        badge.style.background = colors[grade] || '#1c1a16';
+        badge.style.background = colors[displayGrade] || colors[grade] || '#1c1a16';
         if (grade === 'DIA' || grade === 'MANAGER') badge.style.color = '#111';
         else badge.style.color = '#fff';
 
-        desc.innerHTML = `회원님은 현재 <strong>${grade}</strong> 등급입니다.`;
+        desc.innerHTML = `회원님은 현재 <strong>${displayGrade}</strong> 권한으로 로그인 중입니다.`;
 
         const totalAmount = parseInt(localStorage.getItem('varo_total_order_amount') || '0');
         amountEl.textContent = `${totalAmount.toLocaleString()}원`;
@@ -563,6 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
+            if (link.classList.contains('mypage-nav__link--logout')) return;
             e.preventDefault();
             const user = localStorage.getItem('varo_user');
             const targetId = link.getAttribute('data-target');
@@ -726,6 +732,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const cW = cRect.width;
                     const cH = cRect.height;
 
+
+
                     // 원형 오버레이: 컨테이너 중앙, 반지름 = min(w,h) * 0.42
                     const overlayR = Math.min(cW, cH) * 0.42;
 
@@ -779,23 +787,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 로그아웃 처리
-    const btnLogout = document.getElementById('btnLogout');
-    if (btnLogout) {
-        btnLogout.addEventListener('click', (e) => {
-            const user = localStorage.getItem('varo_user');
-            if (!user) {
-                location.href = './login.html';
-                return;
-            }
-
+    const btnLogoutSidebar = document.getElementById('btnLogout');
+    if (btnLogoutSidebar) {
+        btnLogoutSidebar.addEventListener('click', (e) => {
             e.preventDefault();
             if (confirm('로그아웃 하시겠습니까?')) {
                 localStorage.removeItem('varo_user');
                 localStorage.removeItem('varo_token');
+                // 실시간 헤더 및 타 탭 동기화를 위한 이벤트 발생
+                window.dispatchEvent(new CustomEvent('varo:dataChange', { detail: { type: 'auth', data: null } }));
                 location.replace('./index.html');
             }
         });
-    }    /* ── 위시리스트 & 문의내역 렌더링 ──────────────────── */
+    }
+    /* ── 위시리스트 & 문의내역 렌더링 ──────────────────── */
     function renderWishlist() {
         window.renderWishlist = renderWishlist;
         const grid = document.querySelector('.wishlist-grid');

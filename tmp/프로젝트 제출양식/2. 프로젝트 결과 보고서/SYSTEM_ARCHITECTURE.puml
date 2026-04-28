@@ -1,0 +1,53 @@
+@startuml
+title VARO Shopping Mall - System Architecture
+
+' 스타일 설정
+skinparam componentStyle rectangle
+skinparam packageStyle frame
+skinparam backgroundColor white
+
+actor "User" as user
+
+node "Client / Web Browser" as browser {
+    component "Frontend App\n(HTML/CSS/JS)" as frontend
+    component "SPA Router" as spa_router
+}
+
+package "Node.js Application Server (Express)" as server {
+    package "Presentation & Routing Layer" as pres {
+        component "Static Middleware" as static
+        component "API Gateways\n(Auth, Products, etc.)" as api_gate
+    }
+    
+    package "Business Logic Layer" as logic {
+        component "Express Routers" as routers
+        component "Middleware Chain\n(CORS, JSON Parser)" as middleware
+        component "Utility Functions" as utils
+    }
+    
+    package "Data Access Layer" as dal {
+        component "MySQL Connection Pool\n(database.js)" as db_manager
+        component "SQL Query Executor" as sql_exec
+    }
+}
+
+database "MySQL Database" as mysql {
+    [Products Table]
+    [Users Table]
+    [Orders Table]
+}
+
+folder "Local File System" as fs {
+    [Product Images]
+    [Banner Assets]
+}
+
+' 관계 정의
+user --> browser : Interacts with
+browser --> pres : HTTP/HTTPS (Port 3000)
+pres --> logic : Route Requests
+logic --> dal : Execute Operations
+dal --> mysql : SQL Queries
+dal --> fs : File I/O (multer)
+
+@enduml

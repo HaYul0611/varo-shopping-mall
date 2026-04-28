@@ -56,7 +56,8 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
   enableKeepAlive: true,
-  keepAliveInitialDelay: 0
+  keepAliveInitialDelay: 0,
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
 });
 
 /**
@@ -69,6 +70,7 @@ const initDB = async () => {
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     port: process.env.DB_PORT || 3306,
+    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
   });
 
   try {

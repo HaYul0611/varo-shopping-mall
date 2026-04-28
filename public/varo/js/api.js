@@ -100,8 +100,8 @@ const API = (() => {
       const user = users.find(u => u.email === body.email && u.password === body.password);
       if (user) return { success: true, user, token: 'mock-token' };
       // Default Admin
-      if (body?.email === 'admin@varo.com' && body?.password === 'varo2026admin') {
-        return { success: true, user: { name: '관리자', email: 'admin@varo.com', role: 'ADMIN', grade: 'ADMIN', is_admin: true }, token: 'mock-token' };
+      if (body?.email === 'admin@varo.com' && body?.password === '1234') {
+        return { success: true, user: { name: '관리자님', email: 'admin@varo.com', role: 'ADMIN', grade: 'ADMIN', is_admin: true }, token: 'mock-token' };
       }
       return { success: false, error: '인증 실패' };
     }

@@ -1918,6 +1918,11 @@ input[type=checkbox] {
     border-color: #ef4444 !important;
 }
 
+.badge-toggle.is-active[data-value="md"] {
+    background: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+}
+
 /* Switch Toggle */
 .switch {
     position: relative;

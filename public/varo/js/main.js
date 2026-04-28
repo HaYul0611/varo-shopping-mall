@@ -115,37 +115,38 @@ const App = (() => {
           'BASIC': 'BRONZE', 'BRONZE': 'BRONZE',
           'SILVER': 'SILVER', 'GOLD': 'GOLD',
           'DIA': 'DIA',
-          'MANAGER': 'MANAGER', 'ADMIN': 'ADMIN'
+          'MANAGER': 'MANAGER', 'ADMIN': '관리자설정'
         };
-        let displayGrade = gradeMap[user.grade] || user.grade || 'BRONZE';
-
-        const gradeClass = `is-${displayGrade.toLowerCase()}`;
-
         // 아바타가 없을 경우 기본 아이콘 표시 (마이페이지와 동일하게 처리)
         const avatarHtml = user.avatar
           ? `<div class="user-avatar-mini"><img src="${user.avatar}" alt="${user.name}"></div>`
-          : `<div class="user-avatar-mini"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>`;
+          : `<div class="user-avatar-mini" style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; background: #f0f0f0; border-radius: 50%;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>`;
 
-        const isAdmin = user.role === 'ADMIN' || user.grade === 'ADMIN';
+        const isAdmin = user.role === 'ADMIN' || user.grade === 'ADMIN' || user.email === 'admin@varo.com';
         const adminBtnHtml = isAdmin
-          ? `<a href="./admin.html" class="header-admin-btn">관리자 모드</a><span class="header-top__sep"></span>`
+          ? `<a href="./admin.html" class="header-admin-btn" style="color: #D96B3C; font-weight: 700; font-size: 11px;">관리자 모드</a><span class="header-top__sep"></span>`
           : '';
         const orderInquiryHtml = isAdmin
           ? ''
           : `<a href="./cart.html">주문조회</a><span class="header-top__sep"></span>`;
 
+        let displayGrade = gradeMap[user.grade] || user.grade || 'BRONZE';
+        if (isAdmin) displayGrade = '관리자설정';
+
+        const gradeClass = isAdmin ? 'is-admin' : `is-${displayGrade.toLowerCase()}`;
+
         utilNav.innerHTML = `
-          <div class="user-info-group">
+          <div class="user-info-group" style="display: flex; align-items: center; gap: 8px;">
             ${avatarHtml}
-            <span class="user-greeting">안녕하세요, <strong>${user.name}</strong>님</span>
-            <span class="header-top__badge ${gradeClass}">${displayGrade}</span>
+            <span class="user-greeting" style="font-size: 11px; color: #666;">안녕하세요, <strong>${user.name || '회원'}</strong>님</span>
+            <span class="header-top__badge ${gradeClass}" style="padding: 2px 6px; font-size: 9px;">${displayGrade}</span>
           </div>
           <span class="header-top__sep"></span>
           ${adminBtnHtml}
           ${orderInquiryHtml}
-          <a href="./mypage.html">마이페이지</a>
+          <a href="./mypage.html" style="font-size: 11px;">마이페이지</a>
           <span class="header-top__sep"></span>
-          <a href="#" id="logoutBtn">로그아웃</a>
+          <a href="#" id="logoutBtn" style="font-size: 11px;">로그아웃</a>
         `;
         document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
           e.preventDefault();
@@ -231,7 +232,11 @@ const App = (() => {
     });
 
     window.addEventListener('storage', (e) => {
-      if (e.key === 'varo_last_sync_time') location.reload();
+      if (e.key === 'varo_last_sync_time' || e.key === 'varo_user') {
+        syncAuthState();
+        // 필요 시 페이지 리로드 (데이터 정합성 보장)
+        if (e.key === 'varo_last_sync_time') location.reload();
+      }
     });
   };
 
