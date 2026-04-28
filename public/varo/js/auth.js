@@ -92,10 +92,26 @@ const Auth = (() => {
 
   const initLogin = () => {
     const form = document.getElementById('loginForm');
+    const generalError = document.getElementById('loginGeneralError');
+
     form?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = document.getElementById('loginEmail').value.trim();
-      const pw = document.getElementById('loginPassword').value.trim();
+      const emailInput = document.getElementById('loginEmail');
+      const pwInput = document.getElementById('loginPassword');
+      const email = emailInput.value.trim();
+      const pw = pwInput.value.trim();
+
+      // 에러 메시지 초기화
+      if (generalError) {
+        generalError.textContent = '';
+        generalError.classList.remove('is-visible');
+      }
+
+      const submitBtn = document.getElementById('loginSubmit');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '로그인 중...';
+      }
 
       if (window.API?.auth) {
         const res = await window.API.auth.login(email, pw);
@@ -108,7 +124,6 @@ const Auth = (() => {
             localStorage.removeItem('varo_remembered_email');
           }
 
-          // [비회원 데이터 병합 이식]
           if (window.GuestManager) {
             try {
               await window.GuestManager.mergeAfterLogin(res.token);
@@ -119,7 +134,16 @@ const Auth = (() => {
 
           location.href = './index.html';
         } else {
-          alert('로그인 실패: ' + (res.error || '정보를 확인하세요.'));
+          if (generalError) {
+            generalError.textContent = res.error || '이메일 또는 비밀번호가 올바르지 않습니다.';
+            generalError.classList.add('is-visible');
+          } else {
+            alert('로그인 실패: ' + (res.error || '정보를 확인하세요.'));
+          }
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '로그인';
+          }
         }
       }
     });
@@ -127,6 +151,7 @@ const Auth = (() => {
 
   const initSignup = () => {
     const form = document.getElementById('signupForm');
+    const generalError = document.getElementById('signupGeneralError');
     const termsAll = document.getElementById('termsAll');
     const termChecks = document.querySelectorAll('.terms-list input[type="checkbox"]');
 
@@ -399,13 +424,13 @@ const Auth = (() => {
         const termsError = document.getElementById('termsError');
         const termsWrap = document.getElementById('termsWrap');
         if (termsError) {
-          termsError.textContent = '[필수] 모든 약관에 동의하셔야 서비스 이용이 가능합니다.';
-          termsError.style.color = '#e74c3c';
+          termsError.textContent = '[필수] 약관에 동의하셔야 회원가입이 가능합니다.';
+          termsError.classList.add('is-visible');
         }
         if (termsWrap) {
-          termsWrap.style.outline = '2px solid rgba(231, 76, 60, 0.3)';
+          termsWrap.style.outline = '2px solid rgba(231, 76, 60, 0.4)';
           termsWrap.style.borderRadius = '8px';
-          termsWrap.style.padding = '5px';
+          termsWrap.style.padding = '8px';
         }
         hasError = true;
       }
@@ -416,38 +441,38 @@ const Auth = (() => {
         return;
       }
 
-      if (window.API?.users) {
-        const submitBtn = document.getElementById('signupSubmit');
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          submitBtn.textContent = '처리 중...';
-        }
+      const submitBtn = document.getElementById('signupSubmit');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '처리 중...'; }
 
+      if (window.API?.auth) {
         try {
-          // 성능 개선: 모든 유저를 가져오는 대신 가입 시도 후 서버 에러 처리로 위임하거나
-          // 실제 시연용으로는 바로 가입 시도
-          const newUser = {
-            email,
-            password: pw,
-            name,
-            role: 'USER',
-            grade: 'BASIC',
-            is_admin: false
-          };
-
-          const res = await window.API.users.create(newUser);
+          const res = await window.API.auth.register({ name, email, password: pw });
           if (res.success) {
-            localStorage.setItem('varo_user', JSON.stringify(res.data));
-            window.dispatchEvent(new CustomEvent('varo:dataChange', { detail: { type: 'auth', data: res.data } }));
-            alert('가입이 완료되었습니다!');
-            location.replace('./index.html');
+            alert('VARO 회원가입을 진심으로 환영합니다!');
+            location.replace('./login.html');
           } else {
-            // 중복 이메일 등의 에러 메시지 처리
-            if (res.error?.includes('email')) {
-              setError('signupEmailError', '이미 가입된 이메일입니다.');
+            // [사용자 요청] 중복 이메일 발생 시 팝업(alert)으로 즉시 알림
+            if (res.error?.includes('이메일') || res.error?.includes('email') || res.status === 409) {
+              alert('이미 가입된 이메일 주소입니다. 다른 이메일을 사용하시거나 로그인을 해주세요.');
+              const emailInput = document.getElementById('signupEmail');
+              emailInput?.focus();
+            } else if (generalError) {
+              // 시스템 에러 메시지 한국어 매핑
+              let errorMsg = res.error || '회원가입 처리 중 오류가 발생했습니다.';
+              if (errorMsg.includes('Unknown column') || errorMsg.includes('field list')) {
+                errorMsg = '시스템 설정 중 일시적인 오류가 발생했습니다. 잠시 후 다시 가입해 주세요.';
+              }
+              generalError.textContent = errorMsg;
+              generalError.classList.add('is-visible');
             } else {
-              alert('회원가입 실패: ' + (res.error || '다시 시도해주세요.'));
+              alert('회원가입 실패: ' + (res.error || '입력 정보를 다시 확인해 주세요.'));
             }
+          }
+        } catch (err) {
+          console.error('[Signup] Error:', err);
+          if (generalError) {
+            generalError.textContent = '서버와의 통신이 원활하지 않습니다.';
+            generalError.classList.add('is-visible');
           }
         } finally {
           if (submitBtn) {

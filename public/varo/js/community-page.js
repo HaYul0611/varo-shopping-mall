@@ -28,7 +28,74 @@ const CommunityPageV2 = (() => {
     history.replaceState(null, '', url);
   };
 
-  /* ── 공지사항 아코디언 ─────────────────────────────── */
+  /* ── 공지사항 렌더링 및 페이지네이션 ───────────────── */
+  const NOTICE_PER_PAGE = 5;
+  let currentNoticePage = 1;
+
+  const renderNotices = (page = 1) => {
+    let list = JSON.parse(localStorage.getItem('varo_notices')) || [
+      { id: 1, title: '[필독] 2026 SS 시즌 런칭 안내 및 신규 카테고리 오픈', date: '2026-04-15', views: 124, important: true, content: '안녕하세요, VARO입니다.<br><br>2026년 봄/여름(SS) 시즌을 맞이하여 감각적이고 트렌디한 신규 아이템들이 대거 업데이트되었습니다.<br>아울러 새로운 라이프스타일 카테고리가 추가 오픈되었으니 많은 관심 부탁드립니다.<br><br>항상 VARO를 이용해 주셔서 감사합니다.' },
+      { id: 2, title: '개인정보처리방침 개정 안내 (2026년 4월 시행)', date: '2026-04-10', views: 89, important: true, content: '안녕하세요, VARO입니다.<br><br>고객님의 소중한 개인정보를 보다 안전하게 보호하고자 개인정보처리방침이 일부 개정될 예정입니다.<br><br>[개정 사항]<br>- 수집하는 개인정보 항목 및 이용 목적의 구체화<br>- 개인정보 파기 절차 및 방법 개선<br><br>시행일자: 2026년 4월 25일<br><br>감사합니다.' },
+      { id: 3, title: '1+1 이벤트 상의 전품목 4/19~4/25 진행', date: '2026-04-19', views: 210, important: false, content: 'VARO의 특별한 1+1 혜택!<br><br>봄 시즌 필수 아이템인 상의 전 품목을 대상으로 1+1 이벤트를 진행합니다.<br>한정 수량으로 조기 소진될 수 있으니 서두르세요.<br><br>기간: 2026. 04. 19 ~ 2026. 04. 25' },
+      { id: 4, title: '황금연휴 기간 배송 일정 안내 (4/29~5/5)', date: '2026-04-18', views: 156, important: false, content: '황금연휴 기간 배송 및 고객센터 휴무 안내입니다.<br><br>- 배송 마감: 4월 28일(화) 오후 2시 결제 완료 건까지 당일 발송<br>- 휴무 기간: 4월 29일 ~ 5월 5일<br>- 배송 재개: 5월 6일(수)부터 순차 발송<br><br>연휴 기간 동안 주문량이 많아 배송이 평소보다 2~3일 지연될 수 있는 점 양해 부탁드립니다.' },
+      { id: 5, title: '앱 업데이트 및 서버 점검 완료 안내', date: '2026-04-12', views: 342, important: false, content: '보다 안정적인 서비스 제공을 위한 시스템 정기 점검이 완료되었습니다.<br><br>현재 모든 결제 및 장바구니 기능이 정상 작동 중입니다.<br>이용에 불편을 드려 죄송합니다.' },
+      { id: 6, title: 'VARO 멤버십 등급 전환 기준 변경 안내', date: '2026-04-08', views: 275, important: false, content: '멤버십 등급 산정 기준이 개편되었습니다.<br><br>[변경 후 등급]<br>- 브론즈, 실버, 골드, DIA<br><br>자세한 등급별 혜택은 멤버십 안내 탭에서 확인하실 수 있습니다.' },
+      { id: 7, title: '교환/반품 정책 변경 안내 (7일 → 14일 확대)', date: '2026-04-01', views: 198, important: false, content: '고객 만족을 위해 교환/반품 신청 가능 기간을 기존 상품 수령 후 7일에서 **14일**로 대폭 확대합니다.<br><br>더욱 여유롭고 안전한 쇼핑을 즐기세요.' }
+    ];
+
+    if (!localStorage.getItem('varo_notices')) {
+      localStorage.setItem('varo_notices', JSON.stringify(list));
+    }
+    const container = document.getElementById('noticeList');
+    const pagination = document.querySelector('#panel-notice .board-pagination');
+    if (!container) return;
+
+    currentNoticePage = page;
+    const start = (page - 1) * NOTICE_PER_PAGE;
+    const end = start + NOTICE_PER_PAGE;
+    const pagedList = list.slice(start, end);
+
+    if (list.length === 0) {
+      container.innerHTML = '<li class="notice-item" style="text-align:center; padding:40px 0; color:#888;">등록된 공지사항이 없습니다.</li>';
+      if (pagination) pagination.style.display = 'none';
+      return;
+    }
+
+    container.innerHTML = pagedList.map(n => `
+      <li class="notice-item ${n.important ? 'notice-item--pinned' : ''}" data-id="${n.id}">
+        <div class="notice-header">
+          <span class="notice-badge ${n.important ? 'notice-badge--pin' : ''}">${n.important ? '공지' : '안내'}</span>
+          <span class="notice-title">${Utils.escapeHTML(n.title)}</span>
+          <span class="notice-date">${n.date.replace(/-/g, '.')}</span>
+        </div>
+        <div class="notice-content" style="display:none;">
+          <p>${n.content || '내용이 없습니다.'}</p>
+        </div>
+      </li>
+    `).join('');
+
+    // 페이지네이션 렌더링
+    if (pagination) {
+      pagination.style.display = 'flex';
+      const totalPages = Math.ceil(list.length / NOTICE_PER_PAGE);
+      if (totalPages <= 1) {
+        pagination.innerHTML = '';
+        return;
+      }
+      let html = `<button class="board-page-btn board-page-btn--nav" ${page === 1 ? 'disabled' : ''} onclick="CommunityPageV2.renderNotices(${page - 1})">‹</button>`;
+      for (let i = 1; i <= totalPages; i++) {
+        html += `<button class="board-page-btn ${i === page ? 'is-active' : ''}" onclick="CommunityPageV2.renderNotices(${i})">${i}</button>`;
+      }
+      html += `<button class="board-page-btn board-page-btn--nav" ${page === totalPages ? 'disabled' : ''} onclick="CommunityPageV2.renderNotices(${page + 1})">›</button>`;
+      pagination.innerHTML = html;
+    }
+
+    // 페이지 상단으로 스크롤 (목록 갱신 시)
+    if (page !== 1) {
+      document.querySelector('.comm-body').scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const initNotice = () => {
     const noticeList = document.getElementById('noticeList');
     if (!noticeList) return;
@@ -38,14 +105,12 @@ const CommunityPageV2 = (() => {
       const item = header ? header.closest('.notice-item') : e.target.closest('.notice-item');
       if (!item) return;
 
-      // 링크(a) 클릭 시 기본 동작(페이지 상단 점프) 방지
       if (e.target.tagName === 'A' || e.target.closest('a')) {
         e.preventDefault();
       }
 
       const isOpen = item.classList.contains('is-open');
 
-      // 다른 공지사항 모두 닫기 (선택 사항, 여기서는 토글 방식으로 유지)
       noticeList.querySelectorAll('.notice-item.is-open').forEach(i => {
         if (i !== item) {
           i.classList.remove('is-open');
@@ -66,7 +131,25 @@ const CommunityPageV2 = (() => {
     });
   };
 
-  /* ── FAQ 아코디언 ─────────────────────────────────── */
+  /* ── FAQ 렌더링 및 아코디언 ────────────────────────── */
+  const renderFAQs = () => {
+    const list = JSON.parse(localStorage.getItem('varo_faqs')) || [];
+    const container = document.getElementById('faqList');
+    if (!container) return;
+
+    if (list.length === 0) {
+      container.innerHTML = '<li style="text-align:center; padding:40px 0; color:#888;">등록된 FAQ가 없습니다.</li>';
+      return;
+    }
+
+    container.innerHTML = list.map(f => `
+      <li class="faq-item" data-faq="${f.category === '주문/결제' ? 'order' : f.category === '배송' ? 'delivery' : f.category === '교환/반품' ? 'return' : f.category === '회원/정보' ? 'member' : 'product'}">
+        <button class="faq-q">${Utils.escapeHTML(f.question)}<span class="faq-arrow">+</span></button>
+        <div class="faq-a">${f.answer}</div>
+      </li>
+    `).join('');
+  };
+
   const initFAQ = () => {
     const faqList = document.getElementById('faqList');
     if (!faqList) return;
@@ -94,21 +177,30 @@ const CommunityPageV2 = (() => {
     });
   };
 
-  /* ── 리뷰 렌더 ────────────────────────────────────── */
-  const renderReviews = (filter = 'all') => {
-    const list = document.getElementById('communityReviewList');
-    if (!list) return;
+  /* ── 리뷰 렌더링 및 페이지네이션 ───────────────────── */
+  const REVIEW_PER_PAGE = 6;
+  let currentReviewPage = 1;
 
-    const reviews = [
-      { user: '민준 *', rating: 5, product: '핸드메이드 캐시미어 롱 코트', date: '2026.04.10', body: '카멜 색상 진짜 예쁩니다. 소재도 고급지고 핏이 너무 마음에 들어요. 주변에서 어디 샀냐고 많이 물어봐요!', sizeInfo: 'M 구매 / 평소 M 착용', img: './assets/products/P001_main.png', hasPhoto: true },
-      { user: '도현 *', rating: 5, product: '와이드 카고 스트링 팬츠', date: '2026.04.08', body: '카키 색상 진짜 예뻐요. 와이드 핏이라 걸을때 편하고 카고 포켓도 실용적입니다. 재구매 의사 있어요.', sizeInfo: 'M 구매 / 평소 M 착용', img: './assets/products/P040_main.jpg', hasPhoto: true },
-      { user: '해찬 *', rating: 4, product: '헤비 웨이트 20수 티셔츠', date: '2026.04.07', body: '두꺼운 원단 퀄리티가 정말 좋네요. 색감도 사진과 똑같이 나왔습니다. 그레이도 사려고요.', sizeInfo: 'L 구매 / 평소 M 착용', img: null, hasPhoto: false },
-      { user: '지우 *', rating: 5, product: 'USA 코튼 세미오버 후드', date: '2026.04.06', body: '두께감 진짜 좋아요! USA 코튼이라 그런지 묵직하고 따뜻합니다. 아이보리 색상 너무 예뻐요.', sizeInfo: 'L 구매 / 평소 M 착용', img: './assets/products/P020_main.jpg', hasPhoto: true },
-      { user: '박준 *', rating: 4, product: '세미 와이드 핀턱 슬랙스', date: '2026.04.05', body: '핏이 정말 깔끔해요. 차콜 색상으로 샀는데 어디에나 잘 어울립니다.', sizeInfo: '32 구매 / 평소 32 착용', img: null, hasPhoto: false },
-      { user: '서준 *', rating: 5, product: '모크넥 하프 지업 맨투맨', date: '2026.04.04', body: '오트밀 색상 진짜 예쁘네요. 소재도 부드럽고 하프집업이라 스타일 연출이 다양해서 좋아요.', sizeInfo: 'M 구매 / 평소 M 착용', img: './assets/products/P026_main.jpg', hasPhoto: true },
+  const renderReviews = (page = 1, filter = 'all') => {
+    const listContainer = document.getElementById('communityReviewList');
+    const pagination = document.getElementById('reviewPagination');
+    if (!listContainer) return;
+
+    let allReviews = JSON.parse(localStorage.getItem('varo_reviews')) || [
+      { id: 1, product: '핸드메이드 캐시미어 롱 코트', customer: '김민준', rating: 5, content: '카멜 색상 진짜 예쁩니다. 소재도 고급지고 핏이 너무 마음에 들어요. 주변에서 어디 샀냐고 많이 물어봐요!', date: '2026-04-10', hasPhoto: true, img: './assets/products/P001_main.png', sizeInfo: 'M 구매 / 평소 M 착용' },
+      { id: 2, product: '와이드 카고 스트링 팬츠', customer: '도현', rating: 5, content: '카키 색상 진짜 예뻐요. 와이드 핏이라 걸을때 편하고 카고 포켓도 실용적입니다.', date: '2026-04-08', hasPhoto: true, img: './assets/products/P040_main.jpg', sizeInfo: 'M 구매 / 평소 M 착용' },
+      { id: 3, product: '헤비 웨이트 20수 티셔츠', customer: '해찬', rating: 4, content: '두꺼운 원단 퀄리티가 정말 좋네요. 색감도 사진과 똑같이 나왔습니다.', date: '2026-04-07', hasPhoto: false, sizeInfo: 'L 구매 / 평소 M 착용' },
+      { id: 101, product: 'USA 코튼 세미오버 후드', customer: '지우', rating: 5, content: '두께감 진짜 좋아요! USA 코튼이라 그런지 묵직하고 따뜻합니다.', date: '2026-04-06', hasPhoto: true, img: './assets/products/P020_main.jpg', sizeInfo: 'L 구매 / 평소 M 착용' },
+      { id: 102, product: '세미 와이드 핀턱 슬랙스', customer: '박준', rating: 4, content: '핏이 정말 깔끔해요. 차콜 색상으로 샀는데 어디에나 잘 어울립니다.', date: '2026-04-05', hasPhoto: false, sizeInfo: '32 구매 / 평소 32 착용' },
+      { id: 103, product: '모크넥 하프 지업 맨투맨', customer: '서준', rating: 5, content: '오트밀 색상 진짜 예쁘네요. 소재도 부드럽고 하프집업이라 스타일 연출이 다양해서 좋아요.', date: '2026-04-04', hasPhoto: true, img: './assets/products/P026_main.jpg', sizeInfo: 'M 구매 / 평소 M 착용' },
+      { id: 104, product: '린넨 셔츠', customer: '정태양', rating: 2, content: '배송이 너무 늦었어요. 품질은 괜찮네요.', date: '2026-04-18', hasPhoto: false, sizeInfo: 'XL 구매 / 평소 L 착용' }
     ];
 
-    const filteredReviews = reviews.filter(r => {
+    if (!localStorage.getItem('varo_reviews')) {
+      localStorage.setItem('varo_reviews', JSON.stringify(allReviews));
+    }
+
+    const filteredReviews = allReviews.filter(r => {
       if (filter === 'all') return true;
       if (filter === '5') return r.rating === 5;
       if (filter === '4') return r.rating === 4;
@@ -118,25 +210,42 @@ const CommunityPageV2 = (() => {
     });
 
     if (filteredReviews.length === 0) {
-      list.innerHTML = `<li style="grid-column: 1 / -1; text-align: center; padding: 40px 0; color: #888; font-size: 14px;">조건에 맞는 리뷰가 없습니다.</li>`;
+      listContainer.innerHTML = `<li style="grid-column: 1 / -1; text-align: center; padding: 40px 0; color: #888; font-size: 14px;">조건에 맞는 리뷰가 없습니다.</li>`;
+      if (pagination) pagination.innerHTML = '';
       return;
     }
 
-    list.innerHTML = filteredReviews.map(r => `
+    currentReviewPage = page;
+    const start = (page - 1) * REVIEW_PER_PAGE;
+    const end = start + REVIEW_PER_PAGE;
+    const pagedList = filteredReviews.slice(start, end);
+
+    listContainer.innerHTML = pagedList.map(r => `
       <li class="review-card-comm">
         <div class="review-card-comm__header">
           <span class="review-card-comm__stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
-          <span class="review-card-comm__user">${Utils.escapeHTML(r.user)}</span>
-          <span class="review-card-comm__date">${r.date}</span>
+          <span class="review-card-comm__user">${Utils.escapeHTML(r.customer)}</span>
+          <span class="review-card-comm__date">${r.date.replace(/-/g, '.')}</span>
         </div>
         <p class="review-card-comm__product">${Utils.escapeHTML(r.product)}</p>
-        <p class="review-card-comm__body">${Utils.escapeHTML(r.body)}</p>
+        <p class="review-card-comm__body">${Utils.escapeHTML(r.content)}</p>
         <div style="display:flex;gap:10px;align-items:center;">
-          ${r.img ? `<div class="review-card-comm__img"><img src="${r.img}" alt="리뷰 이미지" loading="lazy"></div>` : ''}
-          <span style="font-size:11px;color:#AAA">${Utils.escapeHTML(r.sizeInfo)}</span>
+          ${r.img ? `<div class="review-card-comm__img"><img src="${r.img.startsWith('.') ? r.img : (r.img.startsWith('http') ? r.img : './assets' + r.img)}" alt="리뷰 이미지" loading="lazy"></div>` : ''}
+          <span style="font-size:11px;color:#AAA">${r.sizeInfo || ''}</span>
         </div>
       </li>
     `).join('');
+
+    // 페이지네이션 렌더링
+    if (pagination) {
+      const totalPages = Math.ceil(filteredReviews.length / REVIEW_PER_PAGE);
+      let html = `<button class="board-page-btn board-page-btn--nav" ${page === 1 ? 'disabled' : ''} onclick="CommunityPageV2.renderReviews(${page - 1}, '${filter}')">‹</button>`;
+      for (let i = 1; i <= totalPages; i++) {
+        html += `<button class="board-page-btn ${i === page ? 'is-active' : ''}" onclick="CommunityPageV2.renderReviews(${i}, '${filter}')">${i}</button>`;
+      }
+      html += `<button class="board-page-btn board-page-btn--nav" ${page === totalPages ? 'disabled' : ''} onclick="CommunityPageV2.renderReviews(${page + 1}, '${filter}')">›</button>`;
+      pagination.innerHTML = html;
+    }
   };
 
   const initReviewFilters = () => {
@@ -519,17 +628,27 @@ const CommunityPageV2 = (() => {
     });
 
     initNotice();
+    renderNotices();
     initFAQ();
+    renderFAQs();
     renderReviews();
     initReviewFilters();
     loadQNA();
     renderQNA();
     initQNAEvents();
     initAdminMode();
-    updateMembershipCTA(); // CTA 버튼 상태 업데이트
+    updateMembershipCTA();
+
+    // 실시간 동기화 리스너 추가
+    window.addEventListener('varo:dataChange', (e) => {
+      const type = e.detail.type;
+      if (type === 'notice') renderNotices(currentNoticePage);
+      if (type === 'faq') renderFAQs();
+      if (type === 'reviews') renderReviews(currentReviewPage, document.querySelector('.review-filter.is-active').dataset.rating);
+    });
   };
 
-  return { init, handleReplySubmit, startEditReply, cancelEditReply, saveEditedReply, deleteReply, handleSecretClick };
+  return { init, handleReplySubmit, startEditReply, cancelEditReply, saveEditedReply, deleteReply, handleSecretClick, renderNotices, renderReviews };
 })();
 
 document.addEventListener('DOMContentLoaded', CommunityPageV2.init);

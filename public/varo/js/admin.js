@@ -235,7 +235,29 @@ function showCommunityTab(type, el) {
     content.innerHTML = `<div class="card"><div class="card-body" id="reviewList"></div></div>`;
     renderReviews();
   } else if (type === 'qna') {
-    content.innerHTML = `<div class="card"><div class="card-body" id="adminQnaList"></div></div>`;
+    content.innerHTML = `
+      <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
+        <div class="stat-card">
+          <div class="stat-label">전체 문의</div>
+          <div class="stat-value" id="adminQnaTotalCount">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">답변 대기</div>
+          <div class="stat-value" style="color:var(--warning)" id="adminQnaPendingCount">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">답변 완료</div>
+          <div class="stat-value" style="color:var(--success)" id="adminQnaDoneCount">0</div>
+        </div>
+      </div>
+      <div class="filter-bar" style="margin-bottom: 20px;">
+        <select id="adminQnaFilter" class="form-control" style="width: 150px;" onchange="renderAdminQNA()">
+          <option value="all">전체 문의</option>
+          <option value="pending">답변 대기</option>
+          <option value="done">답변 완료</option>
+        </select>
+      </div>
+      <div class="card"><div class="card-body" id="adminQnaList"></div></div>`;
     renderAdminQNA ? renderAdminQNA() : (content.innerHTML = '<div class="p-4 text-center">Q&A 로딩 중...</div>');
   } else if (type === 'notice') {
     content.innerHTML = `<div class="card"><div class="card-body" id="adminNoticeList"></div></div>`;
@@ -251,9 +273,13 @@ function renderAdminNotice() {
   if (!container) return;
 
   const list = JSON.parse(localStorage.getItem('varo_notices')) || [
-    { id: 1, title: '2026년 봄맞이 정기 세일 안내', date: '2026-03-15', views: 124, important: true },
-    { id: 2, title: '시스템 점검 안내 (4/28 02:00 ~ 04:00)', date: '2026-04-25', views: 89, important: true },
-    { id: 3, title: '신규 회원 웰컴 혜택 개편', date: '2026-04-01', views: 210, important: false }
+    { id: 1, title: '[필독] 2026 SS 시즌 런칭 안내 및 신규 카테고리 오픈', date: '2026-04-15', views: 124, important: true, content: '안녕하세요, VARO입니다.<br><br>2026년 봄/여름(SS) 시즌을 맞이하여 감각적이고 트렌디한 신규 아이템들이 대거 업데이트되었습니다.<br>아울러 새로운 라이프스타일 카테고리가 추가 오픈되었으니 많은 관심 부탁드립니다.<br><br>항상 VARO를 이용해 주셔서 감사합니다.' },
+    { id: 2, title: '개인정보처리방침 개정 안내 (2026년 4월 시행)', date: '2026-04-10', views: 89, important: true, content: '안녕하세요, VARO입니다.<br><br>고객님의 소중한 개인정보를 보다 안전하게 보호하고자 개인정보처리방침이 일부 개정될 예정입니다.<br><br>[개정 사항]<br>- 수집하는 개인정보 항목 및 이용 목적의 구체화<br>- 개인정보 파기 절차 및 방법 개선<br><br>시행일자: 2026년 4월 25일<br><br>감사합니다.' },
+    { id: 3, title: '1+1 이벤트 상의 전품목 4/19~4/25 진행', date: '2026-04-19', views: 210, important: false, content: 'VARO의 특별한 1+1 혜택!<br><br>봄 시즌 필수 아이템인 상의 전 품목을 대상으로 1+1 이벤트를 진행합니다.<br>한정 수량으로 조기 소진될 수 있으니 서두르세요.<br><br>기간: 2026. 04. 19 ~ 2026. 04. 25' },
+    { id: 4, title: '황금연휴 기간 배송 일정 안내 (4/29~5/5)', date: '2026-04-18', views: 156, important: false, content: '황금연휴 기간 배송 및 고객센터 휴무 안내입니다.<br><br>- 배송 마감: 4월 28일(화) 오후 2시 결제 완료 건까지 당일 발송<br>- 휴무 기간: 4월 29일 ~ 5월 5일<br>- 배송 재개: 5월 6일(수)부터 순차 발송<br><br>연휴 기간 동안 주문량이 많아 배송이 평소보다 2~3일 지연될 수 있는 점 양해 부탁드립니다.' },
+    { id: 5, title: '앱 업데이트 및 서버 점검 완료 안내', date: '2026-04-12', views: 342, important: false, content: '보다 안정적인 서비스 제공을 위한 시스템 정기 점검이 완료되었습니다.<br><br>현재 모든 결제 및 장바구니 기능이 정상 작동 중입니다.<br>이용에 불편을 드려 죄송합니다.' },
+    { id: 6, title: 'VARO 멤버십 등급 전환 기준 변경 안내', date: '2026-04-08', views: 275, important: false, content: '멤버십 등급 산정 기준이 개편되었습니다.<br><br>[변경 후 등급]<br>- 브론즈, 실버, 골드, DIA<br><br>자세한 등급별 혜택은 멤버십 안내 탭에서 확인하실 수 있습니다.' },
+    { id: 7, title: '교환/반품 정책 변경 안내 (7일 → 14일 확대)', date: '2026-04-01', views: 198, important: false, content: '고객 만족을 위해 교환/반품 신청 가능 기간을 기존 상품 수령 후 7일에서 **14일**로 대폭 확대합니다.<br><br>더욱 여유롭고 안전한 쇼핑을 즐기세요.' }
   ];
 
   if (!localStorage.getItem('varo_notices')) {
@@ -421,9 +447,13 @@ function renderAdminFAQ() {
   if (!container) return;
 
   const list = JSON.parse(localStorage.getItem('varo_faqs')) || [
-    { id: 1, category: '주문/결제', question: '주문 취소는 어떻게 하나요?', answer: '배송 준비 중 상태 이전에는 마이페이지에서 즉시 취소가 가능합니다.' },
-    { id: 2, category: '배송', question: '무료 배송 기준이 어떻게 되나요?', answer: '5만원 이상 구매 시 무료 배송입니다.' },
-    { id: 3, category: '교환/반품', question: '단순 변심 반품 시 배송비는 얼마인가요?', answer: '왕복 배송비 6,000원이 청구됩니다.' }
+    { id: 1, category: '주문/결제', question: '주문 후 취소는 언제까지 가능한가요?', answer: '결제 완료 후 <strong>당일 자정</strong> 이전까지 마이페이지 > 주문내역에서 직접 취소 가능합니다. 이후에는 고객센터로 문의 부탁드립니다.' },
+    { id: 2, category: '배송', question: '배송기간이 얼마나 걸리나요?', answer: '결제 완료 후 <strong>1~3 영업일</strong> 이내 발송되며, 당일발송 상품은 오후 2시 이전 결제 시 당일 출고됩니다.' },
+    { id: 3, category: '교환/반품', question: '교환/반품 신청 방법을 알고 싶어요.', answer: '수령 후 <strong>14일 이내</strong> 마이페이지 > 주문내역 > 교환/반품 신청으로 진행하시거나, 고객센터 채팅으로 문의해 주세요. 상품 불량/오배송의 경우 전액 VARO 부담입니다.' },
+    { id: 4, category: '회원/정보', question: '멤버십 등급은 어떻게 올라가나요?', answer: '누적 구매금액 기준으로 자동 승급됩니다.<br>BRONZE(0원~) → SILVER(10만원~) → GOLD(30만원~) → DIA (100만원~)<br>등급별 할인혜택과 포인트 적립률이 달라집니다.' },
+    { id: 5, category: '상품', question: '사이즈가 맞지 않으면 교환할 수 있나요?', answer: '네, 단순 변심 사이즈 교환은 <strong>수령 후 14일 이내</strong> 가능합니다. 단, 왕복 배송비는 고객 부담입니다. 상품 태그가 제거되었거나 착용/세탁한 경우는 교환이 불가합니다.' },
+    { id: 6, category: '주문/결제', question: '무통장 입금 기한은 얼마인가요?', answer: '주문 완료 후 <strong>24시간 이내</strong> 입금 확인이 되어야 합니다. 기한 내 미입금 시 자동 주문 취소됩니다.' },
+    { id: 7, category: '배송', question: '무료배송 기준이 있나요?', answer: '<strong>5만원 이상</strong> 구매 시 무료배송입니다. VARO GOLD 이상 등급은 금액 무관 무료배송 혜택이 적용됩니다.' }
   ];
 
   if (!localStorage.getItem('varo_faqs')) {
@@ -1474,7 +1504,22 @@ function saveCoupon() {
 // REVIEWS
 // ════════════════════════════════════════════════════════
 function renderReviews() {
-  document.getElementById('reviewList').innerHTML = DATA.reviews.map(r => `
+  const container = document.getElementById('reviewList');
+  if (!container) return;
+
+  const list = JSON.parse(localStorage.getItem('varo_reviews')) || [
+    { id: 1, product: '오버핏 코튼 티셔츠', customer: '김민준', rating: 5, content: '사이즈도 딱 맞고 소재가 너무 좋아요! 재구매 의사 있습니다.', date: '2026-04-22', replied: true, reply: '소중한 리뷰 감사드립니다 😊', hasPhoto: true, img: './assets/products/P001_main.png' },
+    { id: 2, product: '슬림 데님 팬츠', customer: '이서연', rating: 4, content: '핏이 예쁜데 허리가 조금 작아요. 한 사이즈 업 추천합니다.', date: '2026-04-21', replied: false, hasPhoto: false },
+    { id: 3, product: '크롭 후드 집업', customer: '박지훈', rating: 3, content: '색상이 사진이랑 조금 다른 것 같아요.', date: '2026-04-20', replied: false, hasPhoto: false },
+    { id: 4, product: '버킷햇', customer: '최수아', rating: 5, content: '가성비 최고! 친구한테도 추천했어요.', date: '2026-04-19', replied: true, reply: '추천해 주셔서 정말 감사합니다!', hasPhoto: false },
+    { id: 5, product: '린넨 셔츠', customer: '정태양', rating: 2, content: '배송이 너무 늦었어요. 품질은 괜찮네요.', date: '2026-04-18', replied: false, hasPhoto: false }
+  ];
+
+  if (!localStorage.getItem('varo_reviews')) {
+    localStorage.setItem('varo_reviews', JSON.stringify(list));
+  }
+
+  container.innerHTML = list.map(r => `
     <div class="review-row">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
         <div style="display:flex;align-items:center;gap:10px;min-width:0;">
@@ -2009,7 +2054,16 @@ function updateSetting(key, value) {
 // Q&A 관리 (커뮤니티 varo_qna 연동)
 // ════════════════════════════════════════════════════════
 function getQnaData() {
-  return JSON.parse(localStorage.getItem('varo_qna') || '[]');
+  const data = JSON.parse(localStorage.getItem('varo_qna') || '[]');
+  if (data.length === 0 && !localStorage.getItem('varo_qna')) {
+    const defaultQna = [
+      { id: 1001, subject: '배송지 변경 가능한가요?', content: '방금 주문했는데 배송지를 변경하고 싶습니다. 가능한가요?', author: '김철수', date: '2026-04-28', status: 'pending', isSecret: false, replies: [] },
+      { id: 1002, subject: '재입고 일정 문의', content: '품절된 캔버스 스니커즈 재입고 언제 되나요?', author: '이영희', date: '2026-04-27', status: 'done', isSecret: true, replies: [{ author: 'VARO (관리자)', content: '안녕하세요 고객님, 해당 상품은 5월 초 재입고 예정입니다.', date: '2026-04-27', isAdmin: true }] }
+    ];
+    localStorage.setItem('varo_qna', JSON.stringify(defaultQna));
+    return defaultQna;
+  }
+  return data;
 }
 
 function renderAdminQNA() {

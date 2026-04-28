@@ -54,9 +54,13 @@ const API = (() => {
       const isJson = res.headers.get('content-type')?.includes('application/json');
       if (isJson) {
         const data = await res.json();
-        if (!res.ok) return { success: false, ...data, status: res.status }; // [FIX] throw 대신 결과 반환
+        if (!res.ok) {
+          console.warn(`[API] Request Failed (${res.status}):`, path, data);
+          return { success: false, ...data, status: res.status };
+        }
         return { success: true, ...data };
       }
+      if (!res.ok) console.warn(`[API] Non-JSON Error (${res.status}):`, path);
       return { success: res.ok, status: res.status };
     } catch (err) {
       if (!FORCE_MOCK && err.name === 'TypeError') { // 네트워크 에러 등만 Mock 전환
@@ -186,6 +190,14 @@ const API = (() => {
     auth: {
       login: async (email, password) => {
         const res = await req('POST', '/auth/login', { email, password });
+        if (res.success) {
+          setToken(res.token);
+          localStorage.setItem('varo_user', JSON.stringify(res.user));
+        }
+        return res;
+      },
+      register: async (data) => {
+        const res = await req('POST', '/auth/register', data);
         if (res.success) {
           setToken(res.token);
           localStorage.setItem('varo_user', JSON.stringify(res.user));
