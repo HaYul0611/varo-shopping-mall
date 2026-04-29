@@ -151,6 +151,8 @@ const App = (() => {
         document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
           e.preventDefault();
           localStorage.removeItem('varo_user');
+          localStorage.removeItem('varo_cart');
+          localStorage.removeItem('varo_wishlist');
           location.replace('./index.html');
         });
       }
@@ -316,6 +318,15 @@ const startApp = () => {
               <li><a href="./shop.html?category=shoes&sub=loafer">로퍼</a></li>
               <li><a href="./shop.html?category=shoes&sub=sandal">샌들</a></li>
               <li><a href="./shop.html?category=shoes&sub=boots">부츠</a></li>
+            </ul>
+          </li>
+          <li class="category-nav__item has-sub">
+            <a href="./shop.html?category=acc" style="font-size: 12px !important; font-weight: 500 !important; color: #333 !important;">ACC</a>
+            <ul class="sub-menu">
+              <li><a href="./shop.html?category=acc&sub=bag">가방</a></li>
+              <li><a href="./shop.html?category=acc&sub=hat">모자</a></li>
+              <li><a href="./shop.html?category=acc&sub=jewelry">주얼리</a></li>
+              <li><a href="./shop.html?category=acc&sub=etc">잡화</a></li>
             </ul>
           </li>
           <li class="category-nav__item"><a href="./event.html" style="font-size: 13px !important; font-weight: 700 !important; color: #D96B3C !important;">1+1 EVENT</a></li>

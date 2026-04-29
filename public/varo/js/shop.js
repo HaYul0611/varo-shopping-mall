@@ -131,7 +131,8 @@
           'shorttee': '반팔티', 'longtee': '긴팔티', 'sweatshirt': '맨투맨', 'hoodie': '후드', 'sleeveless': '민소매',
           'denim': '데님', 'slacks': '슬랙스', 'cargo': '카고', 'jogger': '조거', 'shorts': '반바지',
           'pullover': '풀오버', 'zipup': '집업', 'cardigan': '가디건', 'vest': '베스트',
-          'sneakers': '스니커즈', 'loafer': '로퍼', 'sandal': '샌들', 'boots': '부츠'
+          'sneakers': '스니커즈', 'loafer': '로퍼', 'sandal': '샌들', 'boots': '부츠',
+          'bag': '백', 'hat': '모자', 'jewelry': '팔찌', 'etc': '머플러'
         };
         const korSub = subMap[sub] || sub;
 

@@ -10,6 +10,7 @@
     href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="./styles/admin.css">
+  <script src="./js/admin-auth.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
@@ -532,7 +533,7 @@
           <div>
             <div class="section-title">쿠폰 / 이벤트</div>
           </div>
-          <button class="btn btn-primary" onclick="openModal('modal-add-coupon')">
+          <button class="btn btn-primary" onclick="openCouponModal()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />

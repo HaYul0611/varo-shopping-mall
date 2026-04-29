@@ -158,13 +158,17 @@ function renderCoupons(type) {
   const grid = document.getElementById('couponGrid');
   if (!grid) return;
 
-  let list = DATA.coupons || [];
+  // localStorage 연동
+  let list = JSON.parse(localStorage.getItem('varo_coupons'));
+  if (!list) {
+    list = DATA.coupons || [];
+    localStorage.setItem('varo_coupons', JSON.stringify(list));
+  }
+
   if (type === '진행중') list = list.filter(c => c.status === '진행중');
   else if (type === '만료') list = list.filter(c => c.status === '만료');
-  // '발급'은 전체 또는 별도 발급 내역 테이블로 표시 가능 (여기서는 전체로 예시)
 
   if (type === '발급') {
-    // 발급 내역 테이블 형태
     grid.style.display = 'block';
     grid.innerHTML = `
       <div class="card">
@@ -202,26 +206,145 @@ function renderCoupons(type) {
   } else {
     grid.style.display = 'grid';
     grid.innerHTML = list.map(c => `
-      <div class="card coupon-card" style="border-left: 4px solid var(--primary-color);">
-        <div class="card-body" style="padding: 20px;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
-            <span class="badge ${c.type === '정액' ? 'badge-info' : 'badge-warning'}">${c.type}</span>
-            ${statusBadge(c.status)}
+      <div class="card">
+        <div class="card-body">
+          <div class="coupon-card" style="margin-bottom:12px;">
+            <div>
+              <div class="coupon-discount">${c.type === '정액' || c.type === '정액 할인' ? fmtW(c.discount) : c.discount + '%'} <span style="font-size:16px;font-weight:500">할인</span></div>
+              <div class="coupon-name">${c.name}</div>
+              <div class="coupon-cond">최소 ${fmtW(c.minOrder)} 이상 · ${c.target || '전체 회원'}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:11px;color:var(--gray-400);">만료일</div>
+              <div style="font-size:13px;font-weight:600;">${c.expiry}</div>
+            </div>
           </div>
-          <div style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">${c.name}</div>
-          <div style="font-size: 24px; font-weight: 800; color: var(--primary-color); margin-bottom: 12px;">
-            ${c.type === '정액' ? fmtW(c.discount) : c.discount + '%'} 할인
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-400);margin-bottom:8px;">
+            <span>사용: <b style="color:var(--black)">${fmt(c.used || 0)}</b></span>
+            <span>발급: <b>${fmt(c.total || 1000)}</b></span>
+            <span>사용률: <b>${Math.round((c.used || 0) / (c.total || 1000) * 100)}%</b></span>
           </div>
-          <div style="font-size: 12px; color: var(--gray-400); margin-bottom: 4px;">최소 주문: ${fmtW(c.minOrder || 0)}</div>
-          <div style="font-size: 12px; color: var(--gray-400); margin-bottom: 15px;">만료일: ${c.expiry}</div>
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size: 13px; border-top: 1px dashed var(--gray-200); padding-top: 12px;">
-            <span>사용: <b>${c.used}</b> / ${c.total}</span>
-            <button class="btn btn-outline btn-sm" onclick="showToast('쿠폰 정보 수정')">수정</button>
+          <div class="progress"><div class="progress-bar" style="width:${Math.round((c.used || 0) / (c.total || 1000) * 100)}%"></div></div>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button class="btn btn-outline btn-sm" style="flex:1" onclick="openCouponModal(${c.id})">수정</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteCoupon(${c.id})" style="background-color:var(--danger); color:#fff;">삭제</button>
           </div>
         </div>
-      </div>
-    `).join('') || '<div class="tbl-empty">쿠폰이 없습니다.</div>';
+      </div>`).join('') || '<div class="tbl-empty">쿠폰이 없습니다.</div>';
   }
+}
+
+// 쿠폰 수정용 모달 열기
+let currentEditingCouponId = null;
+
+function openCouponModal(id = null) {
+  currentEditingCouponId = id;
+  const modal = document.getElementById('modal-add-coupon');
+  const title = document.getElementById('couponModalTitle') || modal.querySelector('.modal-title');
+
+  const nameInput = document.getElementById('cName');
+  const typeSelect = document.getElementById('cType');
+  const discountInput = document.getElementById('cDiscount');
+  const minOrderInput = document.getElementById('cMinOrder');
+  const expiryInput = document.getElementById('cExpiry');
+  const targetSelect = document.getElementById('cTarget');
+  const submitBtn = modal.querySelector('.modal-footer .btn-primary');
+
+  if (id) {
+    title.textContent = '쿠폰 수정';
+    submitBtn.textContent = '수정하기';
+
+    const coupons = JSON.parse(localStorage.getItem('varo_coupons')) || [];
+    const c = coupons.find(item => String(item.id) === String(id));
+
+    if (c) {
+      nameInput.value = c.name;
+      typeSelect.value = c.type.includes('정액') ? '정액 할인' : '정률 할인';
+      discountInput.value = c.discount;
+      minOrderInput.value = c.minOrder;
+      expiryInput.value = c.expiry;
+      if (targetSelect) targetSelect.value = c.target || '전체 회원';
+    }
+  } else {
+    title.textContent = '쿠폰 생성';
+    submitBtn.textContent = '생성';
+
+    nameInput.value = '';
+    typeSelect.value = '정액 할인';
+    discountInput.value = '';
+    minOrderInput.value = '';
+    expiryInput.value = '';
+    if (targetSelect) targetSelect.value = '전체 회원';
+  }
+
+  modal.classList.add('open');
+}
+
+// 쿠폰 저장 (생성/수정)
+function saveCoupon() {
+  const name = document.getElementById('cName').value.trim();
+  const type = document.getElementById('cType').value;
+  const discount = document.getElementById('cDiscount').value.trim();
+  const minOrder = document.getElementById('cMinOrder').value.trim();
+  const expiry = document.getElementById('cExpiry').value;
+  const targetSelect = document.getElementById('cTarget');
+  const target = targetSelect ? targetSelect.value : '전체 회원';
+
+  if (!name || !discount || !expiry) {
+    showToast('필수 항목(*)을 모두 입력해주세요.', 'error');
+    return;
+  }
+
+  const coupons = JSON.parse(localStorage.getItem('varo_coupons')) || [];
+
+  if (currentEditingCouponId) {
+    // 수정
+    const idx = coupons.findIndex(c => String(c.id) === String(currentEditingCouponId));
+    if (idx !== -1) {
+      coupons[idx] = {
+        ...coupons[idx],
+        name,
+        type: type.includes('정액') ? '정액' : '정률',
+        discount: Number(discount),
+        minOrder: Number(minOrder) || 0,
+        expiry,
+        target
+      };
+      showToast('쿠폰이 수정되었습니다.', 'success');
+    }
+  } else {
+    // 생성
+    const newId = coupons.length > 0 ? Math.max(...coupons.map(c => c.id)) + 1 : 1;
+    coupons.unshift({
+      id: newId,
+      name,
+      type: type.includes('정액') ? '정액' : '정률',
+      discount: Number(discount),
+      minOrder: Number(minOrder) || 0,
+      expiry,
+      target,
+      used: 0,
+      total: 1000,
+      status: '진행중'
+    });
+    showToast('쿠폰이 생성되었습니다.', 'success');
+  }
+
+  localStorage.setItem('varo_coupons', JSON.stringify(coupons));
+  closeModal('modal-add-coupon');
+  renderCoupons('진행중');
+}
+
+// 쿠폰 삭제
+function deleteCoupon(id) {
+  showCustomConfirm('정말 이 쿠폰을 삭제하시겠습니까?', () => {
+    const coupons = JSON.parse(localStorage.getItem('varo_coupons')) || [];
+    const filtered = coupons.filter(c => String(c.id) !== String(id));
+
+    localStorage.setItem('varo_coupons', JSON.stringify(filtered));
+    showToast('쿠폰이 삭제되었습니다.', 'success');
+    renderCoupons('진행중');
+  });
 }
 
 // 서브 탭 제어 (커뮤니티)
@@ -1452,53 +1575,6 @@ function updateMemberRole(id, newRole) {
   if (m) { m.role = newRole; renderMembers(); showToast(`${m.name}님 등급이 ${newRole}로 변경되었습니다.`, 'success'); }
 }
 
-// ════════════════════════════════════════════════════════
-// COUPONS
-// ════════════════════════════════════════════════════════
-function renderCoupons() {
-  document.getElementById('couponGrid').innerHTML = DATA.coupons.map(c => `
-    <div class="card">
-      <div class="card-body">
-        <div class="coupon-card" style="margin-bottom:12px;">
-          <div>
-            <div class="coupon-discount">${c.type === '정액' ? fmtW(c.discount) : c.discount + '%'} <span style="font-size:16px;font-weight:500">할인</span></div>
-            <div class="coupon-name">${c.name}</div>
-            <div class="coupon-cond">최소 ${fmtW(c.minOrder)} 이상 · ${c.target}</div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-size:11px;color:var(--gray-400);">만료일</div>
-            <div style="font-size:13px;font-weight:600;">${c.expiry}</div>
-          </div>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-400);margin-bottom:8px;">
-          <span>사용: <b style="color:var(--black)">${fmt(c.used)}</b></span>
-          <span>발급: <b>${fmt(c.total)}</b></span>
-          <span>사용률: <b>${Math.round(c.used / c.total * 100)}%</b></span>
-        </div>
-        <div class="progress"><div class="progress-bar" style="width:${Math.round(c.used / c.total * 100)}%"></div></div>
-        <div style="display:flex;gap:8px;margin-top:12px;">
-          <button class="btn btn-outline btn-sm" style="flex:1" onclick="showToast('쿠폰 수정')">수정</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteCoupon(${c.id})">삭제</button>
-        </div>
-      </div>
-    </div>`).join('');
-}
-
-function deleteCoupon(id) {
-  const idx = DATA.coupons.findIndex(x => x.id === id);
-  if (idx > -1) { DATA.coupons.splice(idx, 1); renderCoupons(); showToast('쿠폰이 삭제되었습니다.'); }
-}
-
-function saveCoupon() {
-  const name = document.getElementById('cName').value;
-  if (!name) { showToast('쿠폰명을 입력하세요.', 'error'); return; }
-  const discount = parseInt(document.getElementById('cDiscount').value) || 0;
-  const type = document.getElementById('cType').value === '정액 할인' ? '정액' : '정률';
-  DATA.coupons.unshift({ id: Date.now(), name, type, discount, minOrder: parseInt(document.getElementById('cMinOrder').value) || 0, target: document.getElementById('cTarget').value, expiry: document.getElementById('cExpiry').value || '2025-12-31', used: 0, total: 9999, status: '진행중' });
-  renderCoupons();
-  closeModal('modal-add-coupon');
-  showToast(`"${name}" 쿠폰이 생성되었습니다.`, 'success');
-}
 
 // ════════════════════════════════════════════════════════
 // REVIEWS
@@ -2148,23 +2224,24 @@ function submitAdminReply(qId) {
 // INIT
 // ════════════════════════════════════════════════════════
 async function init() {
-  const savedPage = localStorage.getItem('activeAdminPage') || 'dashboard';
-  showPage(savedPage);
+  await syncAllData(); // 초기 데이터 동기화
 
   renderSalesChart();
   renderCategoryStats();
   renderDashboardOrders();
   renderActivity();
-  await syncAllData(); // 초기 데이터 동기화
   renderOrders();
   renderMembers();
-  renderCoupons();
+  renderCoupons('진행중');
   renderReviews();
   renderAnalytics();
   renderCategories();
   renderBanners();
   renderSettings();
   renderAdminQNA();
+
+  const savedPage = localStorage.getItem('activeAdminPage') || 'dashboard';
+  showPage(savedPage);
 }
 
 init();
