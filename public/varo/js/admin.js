@@ -226,8 +226,8 @@ function renderCoupons(type) {
           </div>
           <div class="progress"><div class="progress-bar" style="width:${Math.round((c.used || 0) / (c.total || 1000) * 100)}%"></div></div>
           <div style="display:flex;gap:8px;margin-top:12px;">
-            <button class="btn btn-outline btn-sm" style="flex:1" onclick="openCouponModal(${c.id})">수정</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteCoupon(${c.id})" style="background-color:var(--danger); color:#fff;">삭제</button>
+            <button class="btn btn-outline btn-sm" onclick="openCouponModal(${c.id})">수정</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteCoupon(${c.id})">삭제</button>
           </div>
         </div>
       </div>`).join('') || '<div class="tbl-empty">쿠폰이 없습니다.</div>';
