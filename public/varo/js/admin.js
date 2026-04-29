@@ -247,6 +247,7 @@ function openCouponModal(id = null) {
   const discountInput = document.getElementById('cDiscount');
   const minOrderInput = document.getElementById('cMinOrder');
   const expiryInput = document.getElementById('cExpiry');
+  const totalInput = document.getElementById('cTotal');
   const targetSelect = document.getElementById('cTarget');
   const submitBtn = modal.querySelector('.modal-footer .btn-primary');
 
@@ -263,6 +264,7 @@ function openCouponModal(id = null) {
       discountInput.value = c.discount;
       minOrderInput.value = c.minOrder;
       expiryInput.value = c.expiry;
+      if (totalInput) totalInput.value = c.total || 1000;
       if (targetSelect) targetSelect.value = c.target || '전체 회원';
     }
   } else {
@@ -274,6 +276,7 @@ function openCouponModal(id = null) {
     discountInput.value = '';
     minOrderInput.value = '';
     expiryInput.value = '';
+    if (totalInput) totalInput.value = '1000';
     if (targetSelect) targetSelect.value = '전체 회원';
   }
 
@@ -287,10 +290,11 @@ function saveCoupon() {
   const discount = document.getElementById('cDiscount').value.trim();
   const minOrder = document.getElementById('cMinOrder').value.trim();
   const expiry = document.getElementById('cExpiry').value;
+  const total = document.getElementById('cTotal') ? document.getElementById('cTotal').value.trim() : '1000';
   const targetSelect = document.getElementById('cTarget');
   const target = targetSelect ? targetSelect.value : '전체 회원';
 
-  if (!name || !discount || !expiry) {
+  if (!name || !discount || !expiry || !total) {
     showToast('필수 항목(*)을 모두 입력해주세요.', 'error');
     return;
   }
@@ -308,6 +312,7 @@ function saveCoupon() {
         discount: Number(discount),
         minOrder: Number(minOrder) || 0,
         expiry,
+        total: Number(total),
         target
       };
       showToast('쿠폰이 수정되었습니다.', 'success');
@@ -324,7 +329,7 @@ function saveCoupon() {
       expiry,
       target,
       used: 0,
-      total: 1000,
+      total: Number(total),
       status: '진행중'
     });
     showToast('쿠폰이 생성되었습니다.', 'success');

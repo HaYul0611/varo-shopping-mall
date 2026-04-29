@@ -1093,15 +1093,20 @@
           <div class="form-group"><label class="form-label">만료일</label><input class="form-control" id="cExpiry"
               type="date"></div>
         </div>
-        <div class="form-group"><label class="form-label">발급 대상</label><select class="form-control" id="cTarget">
-            <option>전체 회원</option>
-            <option>DIA 회원</option>
-            <option>GOLD 회원</option>
-            <option>SILVER 회원</option>
-            <option>BRONZE 회원</option>
-            <option>신규 회원</option>
-            <option>선택 회원</option>
-          </select></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">발급 수량 *</label><input class="form-control" id="cTotal"
+              type="number" placeholder="1000"></div>
+          <div class="form-group"><label class="form-label">발급 대상</label><select class="form-control" id="cTarget">
+              <option>전체 회원</option>
+              <option>DIA 회원</option>
+              <option>GOLD 회원</option>
+              <option>SILVER 회원</option>
+              <option>BRONZE 회원</option>
+              <option>신규 회원</option>
+              <option>리뷰 작성자</option>
+              <option>선택 회원</option>
+            </select></div>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeModal('modal-add-coupon')">취소</button>
