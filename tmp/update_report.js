@@ -27,14 +27,15 @@ async function run() {
 
   // 11행(사용기술 및 개발환경) 수정
   const originalTech = worksheet.getCell('C11').value || '';
-  const newTech = String(originalTech) + '\n- 형상관리 및 배포 : Git, GitHub (main 브랜치 기반 실시간 배포 반영)';
+  const newTech = String(originalTech).replace(/\n- 형상관리 및 배포 : Git, GitHub \(main 브랜치 기반 실시간 배포 반영\)/g, '') 
+    + '\n- 클라우드 DB : TiDB Cloud (MySQL 호환 분산 DB)\n- 서버 호스팅/배포 : Render\n- 형상관리 : Git, GitHub';
   
   worksheet.getCell('C11').value = newTech;
   worksheet.getCell('D11').value = newTech;
   worksheet.getCell('E11').value = newTech;
   
   await workbook.xlsx.writeFile(filePath);
-  console.log('Successfully updated Personal Project Report (Features & Tech).');
+  console.log('Successfully updated Personal Project Report (Real Tech Stack).');
 }
 
 run().catch(console.error);
