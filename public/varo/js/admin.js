@@ -248,6 +248,7 @@ function openCouponModal(id = null) {
   const minOrderInput = document.getElementById('cMinOrder');
   const expiryInput = document.getElementById('cExpiry');
   const totalInput = document.getElementById('cTotal');
+  const codeInput = document.getElementById('cCode');
   const targetSelect = document.getElementById('cTarget');
   const submitBtn = modal.querySelector('.modal-footer .btn-primary');
 
@@ -265,6 +266,7 @@ function openCouponModal(id = null) {
       minOrderInput.value = c.minOrder;
       expiryInput.value = c.expiry;
       if (totalInput) totalInput.value = c.total || 1000;
+      if (codeInput) codeInput.value = c.code || '';
       if (targetSelect) targetSelect.value = c.target || '전체 회원';
     }
   } else {
@@ -277,6 +279,7 @@ function openCouponModal(id = null) {
     minOrderInput.value = '';
     expiryInput.value = '';
     if (totalInput) totalInput.value = '1000';
+    if (codeInput) codeInput.value = '';
     if (targetSelect) targetSelect.value = '전체 회원';
   }
 
@@ -291,6 +294,7 @@ function saveCoupon() {
   const minOrder = document.getElementById('cMinOrder').value.trim();
   const expiry = document.getElementById('cExpiry').value;
   const total = document.getElementById('cTotal') ? document.getElementById('cTotal').value.trim() : '1000';
+  const code = document.getElementById('cCode') ? document.getElementById('cCode').value.trim() : '';
   const targetSelect = document.getElementById('cTarget');
   const target = targetSelect ? targetSelect.value : '전체 회원';
 
@@ -308,6 +312,7 @@ function saveCoupon() {
       coupons[idx] = {
         ...coupons[idx],
         name,
+        code,
         type: type.includes('정액') ? '정액' : '정률',
         discount: Number(discount),
         minOrder: Number(minOrder) || 0,
@@ -323,6 +328,7 @@ function saveCoupon() {
     coupons.unshift({
       id: newId,
       name,
+      code,
       type: type.includes('정액') ? '정액' : '정률',
       discount: Number(discount),
       minOrder: Number(minOrder) || 0,
@@ -877,13 +883,30 @@ function renderSalesChart() {
     window.mySalesChart.destroy();
   }
 
+  // 실제 주문 데이터 반영 (더미 + 실제)
+  const realSales = [...salesData];
+  if (DATA && DATA.orders) {
+    DATA.orders.forEach(o => {
+      if (o.status !== '취소/반품' && o.date) {
+        const monthStr = o.date.split('-')[1];
+        const monthIdx = parseInt(monthStr) - 1;
+        if (monthIdx >= 0 && monthIdx < 12) {
+          realSales[monthIdx] += (o.amount || 0) / 1000000;
+        }
+      }
+    });
+  }
+
+  // 소수점 1자리 반올림
+  const finalSales = realSales.map(v => Math.round(v * 10) / 10);
+
   window.mySalesChart = new Chart(ctx, {
     type: 'line',
     data: {
       labels: months,
       datasets: [{
         label: '월별 매출 (₩M)',
-        data: salesData,
+        data: finalSales,
         borderColor: '#D96B3C',
         backgroundColor: 'rgba(217, 107, 60, 0.1)',
         borderWidth: 2,
@@ -1484,6 +1507,17 @@ async function updateOrderStatus(id, newStatus) {
 // MEMBERS
 // ════════════════════════════════════════════════════════
 function renderMembers() {
+  // 자동 등급 갱신 로직 추가
+  if (DATA && DATA.members) {
+    DATA.members.forEach(m => {
+      const p = m.purchase || 0;
+      if (p >= 1000000) m.role = 'DIA';
+      else if (p >= 500000) m.role = 'GOLD';
+      else if (p >= 200000) m.role = 'SILVER';
+      else m.role = 'BRONZE';
+    });
+  }
+
   document.getElementById('memberCount').textContent = fmt(DATA.members.length);
   document.getElementById('memberTable').innerHTML = DATA.members.map(m => `
     <tr>
