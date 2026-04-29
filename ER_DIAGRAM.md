@@ -1,4 +1,5 @@
 # VARO Shopping Mall - Entity Relationship Diagram
+> 버전: v1.0.0
 
 ```mermaid
 erDiagram

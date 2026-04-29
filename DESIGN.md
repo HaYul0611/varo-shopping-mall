@@ -1,5 +1,5 @@
 # VARO — 프로젝트 통합 명세서 (Project Specification)  
-> 버전: v1.3.0 | 작성일: 2026-04-28 | 상태: Stable (Sophisticated Modern)
+> 버전: v1.0.0 | 작성일: 2026-04-28 | 상태: Stable (Sophisticated Modern)
 
 ---
 
