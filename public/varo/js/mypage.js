@@ -755,8 +755,14 @@ const initMyPage = () => {
 
         if (!badge || !desc || !amountEl) return;
 
+        const gradeMap = {
+            'BRONZE': 'BRONZE',
+            'SILVER': 'SILVER', 'GOLD': 'GOLD',
+            'DIA': 'DIA',
+            'MANAGER': 'MANAGER', 'ADMIN': '관리자설정'
+        };
         const grade = (user.grade || 'BRONZE').toUpperCase();
-        const displayGrade = grade === 'ADMIN' ? '관리자설정' : grade;
+        const displayGrade = gradeMap[grade] || grade;
         badge.textContent = displayGrade;
 
         // 색상 동기화
