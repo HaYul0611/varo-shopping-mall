@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z'/><line x1='3' y1='6' x2='21' y2='6'/><path d='M16 10a4 4 0 0 1-8 0'/></svg>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VARO — 마이페이지</title>
+  <script src="./js/components.js"></script>
+
+  <!-- 보안 및 인증 체크: 로그인 안 되어 있으면 로그인 페이지로 리다이렉트 -->
+  <script>
+    (function () {
+      const user = localStorage.getItem('varo_user');
+      const params = new URLSearchParams(location.search);
+      if (!user && params.get('tab') !== 'wishlist') {
+        alert('로그인이 필요한 페이지입니다. 로그인 페이지로 이동합니다.');
+        location.replace('./login.html');
+      }
+    })();
+  </script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="./styles/reset.css">
+  <link rel="stylesheet" href="./styles/variables.css">
+  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/header.css">
+  <link rel="stylesheet" href="./styles/mega-menu.css">
+  <link rel="stylesheet" href="./styles/mypage.css">
+  <!-- mypage.js에서 이벤트 바인딩 처리 -->
+</head>
+
+<body class="mypage-page">
+
+
+
+  <div id="header-placeholder"></div>
+
+  <div id="overlay-placeholder"></div>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="mypage-layout">
+        <!-- 좌측: 사이드 메뉴 -->
+        <aside class="mypage-sidebar">
+          <div class="user-brief">
+            <div class="user-avatar" id="userAvatarWrap" style="cursor: pointer; position: relative;" title="프로필 사진 수정">
+              <img id="userAvatarImg" src="" alt="유저 아바타"
+                style="width:100%; height:100%; border-radius:50%; object-fit:cover; display:none;">
+              <svg id="userAvatarDefault" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <input type="file" id="avatarUpload" accept="image/*" style="display:none;">
+            </div>
+            <div class="user-info">
+              <span class="user-name" id="userNameLabel">사용자</span>님
+              <span class="user-grade" id="userGradeLabel">BASIC</span>
+            </div>
+          </div>
+
+          <nav class="mypage-nav">
+            <ul class="mypage-nav__list">
+              <li><a href="#" class="mypage-nav__link is-active" data-target="section-order">주문내역</a></li>
+              <li><a href="#" class="mypage-nav__link" data-target="section-wishlist">위시리스트</a></li>
+              <li><a href="#" class="mypage-nav__link" data-target="section-inquiry">내 문의내역</a></li>
+              <li><a href="#" class="mypage-nav__link" data-target="section-address">배송지 관리</a></li>
+              <li><a href="#" class="mypage-nav__link" data-target="section-coupon">쿠폰함</a></li>
+              <li><a href="#" class="mypage-nav__link" data-target="section-membership">멤버십 현황</a></li>
+              <li><a href="#" class="mypage-nav__link" data-target="section-profile">프로필 수정</a></li>
+              <li><a href="#" id="btnLogout" class="mypage-nav__link mypage-nav__link--logout">로그아웃</a></li>
+            </ul>
+          </nav>
+        </aside>
+
+        <!-- 우측: 메인 콘텐츠 -->
+        <div class="mypage-content">
+          <section class="mypage-section is-active" id="section-order">
+            <h2 class="mypage-section__title">주문 내역</h2>
+
+            <div class="order-table-wrapper">
+              <table class="order-table">
+                <thead>
+                  <tr>
+                    <th>주문일자</th>
+                    <th>상품 정보</th>
+                    <th>주문 금액</th>
+                    <th>진행 상태</th>
+                  </tr>
+                </thead>
+                <tbody id="orderHistoryList">
+                  <tr>
+                    <td>2026.04.24</td>
+                    <td>VARO 헤비 코튼 가디건</td>
+                    <td>65,000원</td>
+                    <td class="order-status-cell">
+                      <span style="font-weight:600; color:#D96B3C;">주문완료</span>
+                      <button type="button"
+                        class="btn btn--outline btn-order-action btn-track-delivery">배송조회</button>
+                      <button type="button" class="btn btn--outline btn-order-action btn-cancel-order">주문취소</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>2026.04.20</td>
+                    <td>VARO 와이드 데님 팬츠 외 1건</td>
+                    <td>89,000원</td>
+                    <td class="order-status-cell">
+                      <span style="font-weight:600; color:#1B2B4B;">배송중</span>
+                      <button type="button" class="btn btn--outline btn-order-action btn-track-delivery-custom">배송조회</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>2026.04.22</td>
+                    <td>해링턴 코튼 블루종</td>
+                    <td>128,000원</td>
+                    <td class="order-status-cell">
+                      <span style="font-weight:600; color:#888;">배송완료</span>
+                      <button type="button" class="btn btn--primary btn-order-action btn-confirm-purchase">구매확정</button>
+                      <button type="button" class="btn btn--outline btn-order-action btn-return-order">교환/반품</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="mypage-section" id="section-wishlist" style="display: none;">
+            <h2 class="mypage-section__title">위시리스트</h2>
+            <div class="wishlist-grid"
+              style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; font-size: 13px;">
+              <div class="wishlist-item" style="text-align: center;">
+                <img src="https://picsum.photos/seed/wish1/300/400" alt="상품"
+                  style="width: 100%; height: auto; object-fit: cover; border-radius: 4px;">
+                <p style="margin-top: 10px; font-weight: 700;">VARO 썸머 하프 셔츠</p>
+                <p style="color: #666; margin-top: 4px;">45,000원</p>
+              </div>
+              <div class="wishlist-item" style="text-align: center;">
+                <img src="https://picsum.photos/seed/wish2/300/400" alt="상품"
+                  style="width: 100%; height: auto; object-fit: cover; border-radius: 4px;">
+                <p style="margin-top: 10px; font-weight: 700;">VARO 와이드 데님 팬츠</p>
+                <p style="color: #666; margin-top: 4px;">54,000원</p>
+              </div>
+            </div>
+          </section>
+
+          </section>
+
+          <section class="mypage-section" id="section-membership" style="display: none;">
+            <h2 class="mypage-section__title">멤버십 현황</h2>
+
+            <div class="membership-summary-box"
+              style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px;">
+              <div class="status-box"
+                style="background: #fff; border: 1px solid #eee; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <p style="font-size: 13px; color: #888; margin-bottom: 10px;">현재 내 등급</p>
+                <div class="user-grade-big" id="myPageGradeBadge"
+                  style="display: inline-block; padding: 4px 12px; border-radius: 4px; color: #fff; font-weight: 800; font-size: 18px; letter-spacing: 0.05em; background: #1c1a16;">
+                  BRONZE</div>
+                <p id="myPageGradeDesc" style="margin-top: 15px; font-size: 14px; color: #333; font-weight: 500;">회원님은
+                  현재 <strong>BRONZE</strong> 등급입니다.</p>
+              </div>
+
+              <div class="status-box"
+                style="background: #fff; border: 1px solid #eee; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <p style="font-size: 13px; color: #888; margin-bottom: 10px;">누적 구매 금액</p>
+                <p style="font-size: 24px; font-weight: 800; color: #1c1a16;" id="myPageTotalOrderAmount">0원</p>
+                <p id="nextGradeGuide" style="margin-top: 10px; font-size: 12px; color: #666;">다음 등급(SILVER)까지
+                  <strong>100,000원</strong> 남았습니다.
+                </p>
+              </div>
+
+              <!-- 하이브리드 적립금 Mock -->
+              <div class="status-box"
+                style="background: #fff; border: 1px solid #eee; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <p style="font-size: 13px; color: #888; margin-bottom: 10px;">가용 적립금</p>
+                <p style="font-size: 24px; font-weight: 800; color: #D96B3C;" id="myPageAvailablePoints">0원</p>
+                <p style="margin-top: 10px; font-size: 12px; color: #333;"
+                  onclick="window.Utils.showToast('내역 조회는 적립금 시스템 오픈 시 제공됩니다 (하이브리드 모드).', 'info');"><a
+                    href="javascript:void(0)" style="text-decoration: underline; color: #888;">적립 내역 보기</a>
+                </p>
+              </div>
+            </div>
+
+            <div class="membership-full-info"
+              style="border: 1px solid #f0f0f0; border-radius: 8px; padding: 25px; background: #fafafa;">
+              <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 20px; color: #1c1a16;">등급별 혜택 소생하기</h3>
+              <div style="font-size: 13px; color: #555; line-height: 1.8;">
+                <p>• <strong>BRONZE</strong> : 신규 가입 시 부여 (기본 1% 적립)</p>
+                <p>• <strong>SILVER</strong> : 10만원 이상 구매 (3% 적립 + 5% 쿠폰)</p>
+                <p>• <strong>GOLD</strong> : 30만원 이상 구매 (5% 적립 + 10% 상시할인)</p>
+                <p>• <strong>DIA</strong> : 100만원 이상 구매 (7% 적립 + 15% 상시할인 + 무료배송)</p>
+              </div>
+              <div style="margin-top: 25px; text-align: center;">
+                <a href="./community.html?tab=membership"
+                  style="font-size: 12px; color: #888; text-decoration: underline;">멤버십 전체 혜택 자세히 보기</a>
+              </div>
+            </div>
+          </section>
+
+          <section class="mypage-section" id="section-address" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+              <h2 class="mypage-section__title" style="margin-bottom: 0;">배송지 관리</h2>
+              <button class="btn btn--primary" style="padding: 10px 20px; border-radius: 4px;"
+                onclick="openAddressModal()">새 배송지 추가</button>
+            </div>
+
+            <div id="addressList" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+              <!-- JS에서 렌더링 -->
+              <div class="empty-row"
+                style="grid-column: 1/-1; padding: 40px 0; text-align: center; color: #888; background: #fafafa; border-radius: 8px;">
+                등록된 배송지가 없습니다.</div>
+            </div>
+          </section>
+
+          <section class="mypage-section" id="section-coupon" style="display: none;">
+            <h2 class="mypage-section__title">쿠폰함</h2>
+
+            <div class="coupon-register"
+              style="background:#f8f9fa; padding:20px; border-radius:8px; margin-bottom:30px; display:flex; gap:10px; align-items:flex-end;">
+              <div style="flex:1;">
+                <label style="font-size:12px; font-weight:600; color:#666; display:block; margin-bottom:8px;">쿠폰 번호
+                  등록</label>
+                <input type="text" id="couponCodeInput" placeholder="쿠폰 번호를 입력해 주세요 (예: VARO2026)"
+                  style="width:100%; padding:12px; border:1px solid #ddd; border-radius:4px; font-size:13px;">
+              </div>
+              <button class="btn btn--primary" style="height:44px; padding:0 30px; border-radius:4px;"
+                onclick="registerCoupon()">등록하기</button>
+            </div>
+
+            <div id="couponList" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+              <!-- JS에서 렌더링 -->
+            </div>
+          </section>
+
+          <!-- 관리자 전용 섹션들 -->
+          <section class="mypage-section" id="section-activity" style="display: none;">
+            <h2 class="mypage-section__title">내 활동 로그</h2>
+            <div class="empty-row" style="padding: 40px 0; text-align: center; color: #888;">최근 처리한 운영 활동 내역이 없습니다. (준비
+              중)</div>
+          </section>
+
+          <section class="mypage-section" id="section-bookmarks" style="display: none;">
+            <h2 class="mypage-section__title">업무 즐겨찾기</h2>
+            <div class="admin-bookmark-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+              <a href="./admin.html"
+                style="background: #f8f9fa; border: 1px solid #eee; padding: 20px; border-radius: 8px; text-decoration: none; color: #333; transition: all 0.2s;">
+                <strong style="display: block; font-size: 14px; margin-bottom: 5px; color: #1B2B4B;">통합 대시보드 →</strong>
+                <span style="font-size: 12px; color: #888;">전체 운영 현황 및 매출 지표 확인</span>
+              </a>
+              <a href="./community.html?tab=qna"
+                style="background: #f8f9fa; border: 1px solid #eee; padding: 20px; border-radius: 8px; text-decoration: none; color: #333; transition: all 0.2s;">
+                <strong style="display: block; font-size: 14px; margin-bottom: 5px; color: #1B2B4B;">CS 문의 관리 →</strong>
+                <span style="font-size: 12px; color: #888;">고객 문의 답변 및 게시글 관리</span>
+              </a>
+            </div>
+          </section>
+
+          <section class="mypage-section" id="section-notes" style="display: none;">
+            <h2 class="mypage-section__title">업무 메모 (개인)</h2>
+            <textarea id="adminMemoArea" placeholder="운영 시 참고할 개인적인 업무 메모를 남기세요 (브라우저에 저장됩니다)."
+              style="width: 100%; height: 200px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; line-height: 1.6; resize: none; border-left: 4px solid #1B2B4B;"></textarea>
+            <div style="text-align: right; margin-top: 10px;">
+              <button type="button" id="btnSaveMemo"
+                style="padding: 10px 24px; background: #1B2B4B; color: #fff; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; font-weight: 600;">메모
+                저장</button>
+            </div>
+          </section>
+
+          <section class="mypage-section" id="section-profile" style="display: none;">
+            <h2 class="mypage-section__title">프로필 수정</h2>
+            <div class="profile-edit-layout"
+              style="display: grid; grid-template-columns: 200px 1fr; gap: 40px; align-items: start; max-width: 800px; margin: 0 auto;">
+
+              <!-- Left: Avatar -->
+              <div class="profile-avatar-area"
+                style="text-align: center; background: #fafafa; border: 1px solid #ebebeb; padding: 40px 20px; border-radius: 8px;">
+                <div class="user-avatar" id="editAvatarWrap"
+                  style="width: 100px; height: 100px; margin: 0 auto 15px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative;">
+                  <img id="editAvatarImgScale" src=""
+                    style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                  <svg id="editAvatarDefaultSVG" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ccc"
+                    stroke-width="2" style="display: block;">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+                <button type="button" id="btnTriggerAvatar"
+                  style="padding: 8px 16px; background: #fff; border: 1px solid #ddd; color: #333; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 4px;">사진
+                  변경</button>
+              </div>
+
+              <!-- Right: Form -->
+              <form id="profileEditForm" style="width: 100%;">
+                <div class="form-group" style="margin-bottom: 20px;">
+                  <label class="form-label"
+                    style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px;">이메일</label>
+                  <input type="email" class="form-input" id="profileEmail" readonly
+                    style="width: 100%; padding: 12px; border: 1px solid #ddd; background: #f9f9f9; border-radius: 4px; box-sizing: border-box; font-size: 14px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                  <label class="form-label"
+                    style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px;">이름</label>
+                  <input type="text" class="form-input" id="profileName"
+                    style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 14px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                  <label class="form-label"
+                    style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px;">연락처</label>
+                  <input type="tel" class="form-input" id="profilePhone" placeholder="010-0000-0000"
+                    style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 14px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <label class="form-label"
+                      style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px;">비밀번호 변경</label>
+                    <span id="mypagePwStrengthLabel"
+                      style="font-size: 11px; margin-bottom: 8px; color: #999; font-weight: 700;"></span>
+                  </div>
+                  <div class="px-input-wrap" style="position: relative;">
+                    <input type="password" class="form-input" id="profilePw" placeholder="새 비밀번호 입력"
+                      style="width: 100%; padding: 12px 40px 12px 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 14px;">
+                    <button type="button" class="pw-toggle-btn" data-target="profilePw"
+                      style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #999; display: flex; align-items: center; padding: 0;">
+                      <svg class="eye-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                          d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                        </path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                      </svg>
+                      <svg class="eye-on" style="display: none;" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="pw-strength" style="margin-top: 6px;">
+                    <div class="pw-meter"
+                      style="display: flex; height: 4px; gap: 4px; background: transparent; border-radius: 2px;">
+                      <div class="pw-strength__seg"
+                        style="flex: 1; height: 100%; background: #eee; transition: all 0.3s; border-radius: 2px;">
+                      </div>
+                      <div class="pw-strength__seg"
+                        style="flex: 1; height: 100%; background: #eee; transition: all 0.3s; border-radius: 2px;">
+                      </div>
+                      <div class="pw-strength__seg"
+                        style="flex: 1; height: 100%; background: #eee; transition: all 0.3s; border-radius: 2px;">
+                      </div>
+                      <div class="pw-strength__seg"
+                        style="flex: 1; height: 100%; background: #eee; transition: all 0.3s; border-radius: 2px;">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="px-input-wrap" style="position: relative; margin-top: 8px;">
+                    <input type="password" class="form-input" id="profilePwConfirm" placeholder="비밀번호 확인"
+                      style="width: 100%; padding: 12px 40px 12px 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 14px;">
+                    <button type="button" class="pw-toggle-btn" data-target="profilePwConfirm"
+                      style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #999; display: flex; align-items: center; padding: 0;">
+                      <svg class="eye-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                          d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                        </path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                      </svg>
+                      <svg class="eye-on" style="display: none;" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="form-group address-vertical-group" style="margin-bottom: 30px;">
+                  <label class="form-label"
+                    style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px;">배송지 주소</label>
+                  <div class="postcode-row">
+                    <input type="text" class="form-input" id="profileZipcode" placeholder="우편번호" readonly
+                      style="width: calc(100% - 100px); padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 14px; background: #f9f9f9; flex-shrink: 0;">
+                    <button type="button" id="btnSearchAddress"
+                      style="width: 90px; padding: 12px 0; background: #333; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">주소
+                      검색</button>
+                  </div>
+                  <input type="text" class="form-input" id="profileAddress1" placeholder="기본 주소" readonly
+                    style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 14px; background: #f9f9f9;">
+                  <input type="text" class="form-input" id="profileAddress2" placeholder="상세 주소 입력"
+                    style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 14px;">
+                </div>
+                <button type="button" id="btnProfileSave"
+                  style="width: 100%; padding: 16px; background: #000; color: #fff; font-size: 15px; font-weight: 700; border: none; cursor: pointer; border-radius: 4px;">수정
+                  완료</button>
+              </form>
+            </div>
+          </section>
+        </div>
+      </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <!-- 프로필 사진 모달 (수정/확대용) -->
+  <div class="varo-modal" id="avatarModal">
+    <div class="varo-modal__overlay"></div>
+    <div class="varo-modal__content">
+      <div class="varo-modal__header">
+        <h3>프로필 사진 설정</h3>
+        <button class="varo-modal__close">&times;</button>
+      </div>
+      <div class="varo-modal__body">
+        <div class="crop-container" id="cropContainer">
+          <img id="avatarPreviewLarge" class="crop-image" src="" alt="크게보기"
+            style="transform: translate(-50%, -50%) scale(1);">
+          <div class="crop-overlay"></div>
+          <div class="crop-guide"></div>
+        </div>
+        <div style="text-align: center; margin-top: 15px;">
+          <input type="file" id="avatarModalUpload" accept="image/*" style="display: none;">
+          <button id="btnSelectNewAvatar"
+            style="padding: 10px 20px; background: #000; color: #fff; border: none; font-size: 14px; cursor: pointer; border-radius: 4px; margin-right: 10px;">새
+            사진 선택</button>
+          <button id="btnSaveAvatar"
+            style="padding: 10px 20px; background: #D96B3C; color: #fff; border: none; font-size: 14px; cursor: pointer; border-radius: 4px; display: none;">업로드
+            및 저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+
+  <!-- 배송지 추가/수정 모달 -->
+  <div class="varo-modal" id="addressModal">
+    <div class="varo-modal__overlay"></div>
+    <div class="varo-modal__content" style="max-width: 500px;">
+      <div class="varo-modal__header">
+        <h3 id="addressModalTitle">배송지 추가</h3>
+        <button class="varo-modal__close">&times;</button>
+      </div>
+      <div class="varo-modal__body">
+        <form id="addressForm">
+          <input type="hidden" id="addrId">
+          <div class="form-group" style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-size: 13px; font-weight: 600;">배송지 식별명 (예: 집, 회사)
+              *</label>
+            <input type="text" id="addrName"
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-size: 13px; font-weight: 600;">수령인 *</label>
+            <input type="text" id="addrRecipient"
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-size: 13px; font-weight: 600;">연락처 *</label>
+            <input type="tel" id="addrPhone" placeholder="010-0000-0000"
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-size: 13px; font-weight: 600;">주소 *</label>
+            <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+              <input type="text" id="addrZipcode" placeholder="우편번호" readonly
+                style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;">
+              <button type="button" onclick="searchPostcode('addr')"
+                style="padding: 10px 15px; background: #333; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">주소
+                검색</button>
+            </div>
+            <input type="text" id="addrBase" placeholder="기본 주소" readonly
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9; margin-bottom: 8px;">
+            <input type="text" id="addrDetail" placeholder="상세 주소 입력"
+              style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+          </div>
+          <div style="margin-bottom: 20px;">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
+              <input type="checkbox" id="addrDefault">
+              <span>기본 배송지로 설정</span>
+            </label>
+          </div>
+          <button type="submit"
+            style="width: 100%; padding: 15px; background: #000; color: #fff; border: none; border-radius: 4px; font-weight: 700; cursor: pointer;">저장하기</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 교환/반품 신청 모달 ═══ -->
+  <div class="varo-modal" id="returnModal" aria-hidden="true">
+    <div class="varo-modal__overlay"></div>
+    <div class="varo-modal__content" style="max-width: 520px;">
+      <div class="varo-modal__header">
+        <h3 class="varo-modal__title" id="returnModalTitle">교환/반품 신청</h3>
+        <button class="varo-modal__close"
+          onclick="document.getElementById('returnModal').classList.remove('is-active')">&times;</button>
+      </div>
+      <form id="returnForm" style="padding: 20px;">
+        <input type="hidden" id="returnProductName">
+        <p id="returnProductLabel" style="font-weight:700; font-size:14px; margin-bottom:15px;"></p>
+        <div style="margin-bottom:15px;">
+          <label style="font-size:13px; font-weight:600; display:block; margin-bottom:5px;">신청 유형 *</label>
+          <select id="returnType"
+            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; font-size:13px;">
+            <option value="exchange">교환 (동일 상품 사이즈/색상 변경)</option>
+            <option value="return">반품 (환불)</option>
+          </select>
+        </div>
+        <div style="margin-bottom:15px;">
+          <label style="font-size:13px; font-weight:600; display:block; margin-bottom:5px;">사유 선택 *</label>
+          <select id="returnReason"
+            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; font-size:13px;">
+            <option value="size">사이즈가 맞지 않음</option>
+            <option value="color">색상이 상이함</option>
+            <option value="defect">상품 불량/파손</option>
+            <option value="wrong">오배송 (잘못된 상품 수령)</option>
+            <option value="mind">단순 변심</option>
+            <option value="other">기타</option>
+          </select>
+        </div>
+        <div style="margin-bottom:15px;">
+          <label style="font-size:13px; font-weight:600; display:block; margin-bottom:5px;">상세 사유</label>
+          <textarea id="returnDetail" rows="3" placeholder="상세 사유를 입력해 주세요."
+            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; font-size:13px; resize:vertical;"></textarea>
+        </div>
+        <div style="margin-bottom:15px;">
+          <label style="font-size:13px; font-weight:600; display:block; margin-bottom:5px;">반송 방법 *</label>
+          <select id="returnMethod"
+            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; font-size:13px;">
+            <option value="pickup">자택 수거 요청 (택배사 방문)</option>
+            <option value="direct">직접 반송 (지정 주소로 발송)</option>
+          </select>
+        </div>
+        <div
+          style="background:#f8f8f8; border-radius:6px; padding:12px; margin-bottom:20px; font-size:12px; color:#666; line-height:1.6;">
+          <strong style="color:#333; display: flex; align-items: center; gap: 4px;"><svg
+              xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="17" x2="12" y2="22" />
+              <path
+                d="M5 17h14v-1.76a2 2 0 0 0-.59-1.41l-2.17-2.18C15.46 10.88 15 9.7 15 8.5V4h-6v4.5c0 1.2-.46 2.38-1.24 3.15l-2.17 2.18A2 2 0 0 0 5 15.24V17z" />
+            </svg>교환/반품 안내</strong>
+          · 상품 수령 후 7일 이내 신청 가능합니다.<br>
+          · 고객 변심에 의한 반품 시 왕복 배송비(6,000원)가 차감됩니다.<br>
+          · 상품 불량/오배송의 경우 배송비는 VARO가 부담합니다.
+        </div>
+        <button type="submit"
+          style="width:100%; padding:14px; background:#000; color:#fff; border:none; border-radius:4px; font-weight:700; cursor:pointer; font-size:14px;">신청하기</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══ 리뷰 작성 모달 ═══ -->
+  <div class="varo-modal" id="reviewModal" aria-hidden="true">
+    <div class="varo-modal__overlay"></div>
+    <div class="varo-modal__content" style="max-width: 480px;">
+      <div class="varo-modal__header">
+        <h3 class="varo-modal__title">상품 리뷰 작성</h3>
+        <button class="varo-modal__close"
+          onclick="document.getElementById('reviewModal').classList.remove('is-active')">&times;</button>
+      </div>
+      <form id="reviewForm" style="padding: 20px;">
+        <input type="hidden" id="reviewProductName">
+        <p id="reviewProductLabel" style="font-weight:700; font-size:14px; margin-bottom:15px;"></p>
+        <div style="margin-bottom:15px;">
+          <label style="font-size:13px; font-weight:600; display:block; margin-bottom:8px;">별점을 선택해 주세요 *</label>
+          <div id="reviewStars" style="display:flex; gap:6px; font-size:28px; cursor:pointer; color:#ddd;">
+            <span data-star="1">★</span><span data-star="2">★</span><span data-star="3">★</span><span
+              data-star="4">★</span><span data-star="5">★</span>
+          </div>
+          <input type="hidden" id="reviewRating" value="0">
+        </div>
+        <div style="margin-bottom:15px;">
+          <label style="font-size:13px; font-weight:600; display:block; margin-bottom:5px;">한줄평 *</label>
+          <textarea id="reviewContent" rows="4" placeholder="상품에 대한 솔직한 후기를 남겨 주세요."
+            style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; font-size:13px; resize:vertical;"></textarea>
+        </div>
+        <div
+          style="background:#f0f7ff; border-radius:6px; padding:12px; margin-bottom:20px; font-size:12px; color:#4A7FA5; line-height:1.6; display: flex; align-items: center; gap: 6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 12 20 22 4 22 4 12" />
+            <rect x="2" y="7" width="20" height="5" />
+            <line x1="12" y1="22" x2="12" y2="7" />
+            <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+            <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+          </svg>
+          <span>리뷰 작성 시 <strong>500 적립금</strong>이 지급됩니다.</span>
+        </div>
+        <button type="submit"
+          style="width:100%; padding:14px; background:#000; color:#fff; border:none; border-radius:4px; font-weight:700; cursor:pointer; font-size:14px;">리뷰
+          등록</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══ 배송 추적 모달 ═══ -->
+  <div class="varo-modal" id="trackingModal" aria-hidden="true">
+    <div class="varo-modal__overlay"></div>
+    <div class="varo-modal__content" style="max-width: 480px;">
+      <div class="varo-modal__header">
+        <h3 class="varo-modal__title">배송 추적</h3>
+        <button class="varo-modal__close"
+          onclick="document.getElementById('trackingModal').classList.remove('is-active')">&times;</button>
+      </div>
+      <div style="padding: 20px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:13px;">
+          <span style="color:#888;">택배사</span>
+          <strong>CJ대한통운</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:13px;">
+          <span style="color:#888;">운송장 번호</span>
+          <strong id="trackingWaybill">640-1234-5678</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:13px;">
+          <span style="color:#888;">상품명</span>
+          <strong id="trackingProductName"></strong>
+        </div>
+        <hr style="border:none; border-top:1px solid #eee; margin-bottom:20px;">
+        <div id="trackingTimeline" style="position:relative; padding-left:24px;">
+          <!-- JS에서 렌더링 -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 스크립트 -->
+  <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+  <script src="./js/api.js"></script>
+  <script src="./js/data.js"></script>
+  <script src="./js/utils.js"></script>
+  <script src="./js/main.js"></script>
+  <script src="./js/mega-menu.js"></script>
+  <script src="./js/mypage.js?v=1.0.1"></script>
+
+  <!-- Virtual Delivery Tracking Modal -->
+  <div id="deliveryTrackingModal" class="delivery-modal-overlay" role="dialog" aria-modal="true">
+    <div class="delivery-modal-content">
+      <div class="delivery-modal-header">
+        <h3>CJ대한통운 배송조회 (하이브리드 시뮬레이션)</h3>
+        <span class="close" onclick="closeDeliveryModal()">&times;</span>
+      </div>
+      <div class="delivery-modal-body">
+        <div class="delivery-modal-info">
+          <label>운송장 번호</label>
+          <strong id="tracking-number">68429301582</strong>
+        </div>
+
+        <!-- Timeline -->
+        <div class="delivery-timeline">
+          <div class="delivery-timeline-line"></div>
+
+          <div class="delivery-timeline-step">
+            <div id="step-1-dot" class="delivery-timeline-dot is-active">✓</div>
+            <div class="delivery-timeline-text is-active">
+              <h4>상품인수</h4>
+              <p>2026.04.25 14:20 | 용인허브</p>
+            </div>
+          </div>
+
+          <div class="delivery-timeline-step">
+            <div id="step-2-dot" class="delivery-timeline-dot">2</div>
+            <div class="delivery-timeline-text">
+              <h4 id="step-2-text">배송중</h4>
+              <p id="step-2-time">-</p>
+            </div>
+          </div>
+
+          <div class="delivery-timeline-step">
+            <div id="step-3-dot" class="delivery-timeline-dot">3</div>
+            <div class="delivery-timeline-text">
+              <h4 id="step-3-text">배송완료</h4>
+              <p id="step-3-time">-</p>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn--primary btn--full"
+          style="margin-top: 30px; background: #D96B3C; border-color: #D96B3C;">닫기</button>
+      </div>
+    </div>
+  </div>
+  <!-- 주문 취소 커스텀 모달 -->
+  <div id="customCancelModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div
+      style="background: #fff; padding: 30px; border-radius: 8px; width: 400px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #1C1A16;">주문 취소</h3>
+      <p style="font-size: 14px; color: #666; margin-bottom: 25px; line-height: 1.5;">정말로 이 주문을 취소하시겠습니까?<br>취소 후에는 되돌릴
+        수 없습니다.</p>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button id="btnCancelConfirm"
+          style="background: #D96B3C; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;">취소하기</button>
+        <button
+          style="background: #eee; color: #333; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 구매 확정 커스텀 모달 -->
+  <div id="customConfirmModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div
+      style="background: #fff; padding: 30px; border-radius: 8px; width: 400px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #1C1A16;">구매 확정</h3>
+      <p style="font-size: 14px; color: #666; margin-bottom: 25px; line-height: 1.5;">구매 확정을 진행하시겠습니까?<br><span
+          style="color: #D96B3C; font-weight: 600;">포토 리뷰 200P / 일반 리뷰 100P 적립</span>됩니다.</p>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button id="btnPurchaseConfirm"
+          style="background: #1B2B4B; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;">구매확정</button>
+        <button
+          style="background: #eee; color: #333; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 리뷰 작성 커스텀 모달 -->
+  <div id="customReviewModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div
+      style="background: #fff; padding: 30px; border-radius: 8px; width: 450px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #1C1A16;">리뷰 작성</h3>
+      <p style="font-size: 13px; color: #888; margin-bottom: 20px;">상품은 어떠셨나요? 솔직한 후기를 남겨주세요.</p>
+
+      <div
+        style="display: flex; justify-content: center; gap: 5px; margin-bottom: 20px; font-size: 24px; color: #ddd; cursor: pointer;"
+        id="reviewStars">
+        <span data-value="1">★</span>
+        <span data-value="2">★</span>
+        <span data-value="3">★</span>
+        <span data-value="4">★</span>
+        <span data-value="5">★</span>
+      </div>
+
+      <textarea id="reviewText" placeholder="최소 10자 이상 작성해주세요. (포토 200P / 일반 100P 적립)"
+        style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: none; font-size: 13px; margin-bottom: 20px; box-sizing: border-box;"></textarea>
+
+      <div style="margin-bottom: 20px; text-align: left;">
+        <label for="reviewImages"
+          style="display: inline-block; padding: 8px 15px; background: #f4f4f4; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; cursor: pointer; font-weight: 600;">📷
+          사진 첨부 (다중 선택 가능)</label>
+        <input type="file" id="reviewImages" multiple accept="image/*" style="display: none;">
+        <span id="photoPointNotice" style="font-size: 12px; color: #D96B3C; margin-left: 10px; font-weight: 600;">* 사진
+          첨부 시 200P (미첨부 100P)</span>
+        <div id="imagePreviewContainer" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button id="btnReviewSubmit"
+          style="background: #1B2B4B; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;">리뷰
+          등록 및 구매확정</button>
+        <button
+          style="background: #eee; color: #333; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;">취소</button>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

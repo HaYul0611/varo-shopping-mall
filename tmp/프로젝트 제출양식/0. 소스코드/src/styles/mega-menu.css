@@ -1,0 +1,218 @@
+/* 경로: styles/mega-menu.css */
+/* VARO 2026 — 룩플 스타일 이미지 패널 메가메뉴 */
+
+/* ══════════════════════════════════════════════════════
+   기존 sub-menu 드롭다운 → 메가 패널로 교체
+══════════════════════════════════════════════════════ */
+
+/* ── 메가메뉴 컨테이너 (컴팩트 드롭다운 스타일) ────────────────────────────── */
+.mega-panel {
+  position: absolute;
+  background: #FFFFFF;
+  border: 1px solid #EBEBEB;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  display: none;
+  min-width: 200px;
+}
+
+.mega-panel.is-visible {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+  display: block;
+}
+
+.mega-panel__inner {
+  padding: 20px;
+  display: block;
+}
+
+.mega-panel__cats {
+  padding-bottom: 0;
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.mega-panel__cat-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #1C1A16;
+  margin-bottom: 14px;
+}
+
+.mega-panel__cat-list {
+  list-style: none;
+}
+
+.mega-panel__cat-item {
+  display: block;
+}
+
+.mega-panel__cat-link {
+  display: block;
+  padding: 6px 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+  text-decoration: none;
+  transition: color 0.12s, padding-left 0.12s;
+  letter-spacing: -0.01em;
+  border: none;
+  background: none;
+}
+
+.mega-panel__cat-link:hover,
+.mega-panel__cat-link.is-hovered {
+  color: #D96B3C;
+  padding-left: 8px;
+}
+
+.mega-panel__cat-link .cat-count {
+  font-size: 10px;
+  color: #BBB;
+  margin-left: 4px;
+}
+
+.mega-panel__products {
+  padding-left: 0;
+}
+
+.mega-panel__prod-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (max-width: 1200px) {
+  .mega-panel__prod-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* 텍스트 기반 빠른 링크 스타일 */
+.mega-text-link {
+  display: block;
+  text-decoration: none;
+  margin-bottom: 12px;
+}
+
+.mega-text-link__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-black);
+  margin-bottom: 6px;
+  display: block;
+  letter-spacing: -0.02em;
+}
+
+.mega-text-link__sub {
+  font-size: 11px;
+  color: var(--color-gray);
+  display: block;
+}
+
+.mega-text-link:hover .mega-text-link__title {
+  text-decoration: underline;
+}
+
+/* ── 패널 하단 (드롭다운에서는 숨김) ──────────────── */
+.mega-panel__footer {
+  display: none;
+}
+
+/* ── 오버레이 딤 ─────────────────────────────────── */
+.mega-overlay {
+  position: fixed;
+  inset: 0;
+  top: calc(var(--header-total-height, 122px));
+  background: rgba(28, 26, 22, .35);
+  z-index: 199;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.mega-overlay.is-visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── 커뮤니티 메가패널 (특수) ───────────────────────── */
+.mega-panel--community .mega-panel__inner {
+  grid-template-columns: 1fr;
+  padding: 20px 40px 24px;
+}
+
+.community-mega-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1200px) {
+  .community-mega-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.community-mega-item {
+  display: block;
+  text-decoration: none;
+  text-align: center;
+  padding: 16px 12px;
+  border: 1px solid #F0F0F0;
+  border-radius: 6px;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.community-mega-item:hover {
+  border-color: #D96B3C;
+  background: #FEF0E8;
+}
+
+.community-mega-item__icon {
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.community-mega-item__icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: #1C1A16;
+  fill: none;
+  stroke-width: 1.6;
+}
+
+.community-mega-item:hover .community-mega-item__icon svg {
+  stroke: #D96B3C;
+}
+
+.community-mega-item__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1C1A16;
+  margin-bottom: 3px;
+  letter-spacing: -0.01em;
+}
+
+.community-mega-item:hover .community-mega-item__name {
+  color: #D96B3C;
+}
+
+.community-mega-item__desc {
+  font-size: 10.5px;
+  color: #888;
+  line-height: 1.5;
+}

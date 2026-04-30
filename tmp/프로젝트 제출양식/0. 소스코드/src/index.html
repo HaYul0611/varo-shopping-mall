@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VARO — 지금, 바로 당신의 스타일. 2026 남성 패션 커뮤니티 쇼핑몰.">
+  <meta name="theme-color" content="#FFFFFF">
+  <title>VARO</title>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z'/><line x1='3' y1='6' x2='21' y2='6'/><path d='M16 10a4 4 0 0 1-8 0'/></svg>">
+  <script src="./js/init-theme.js"></script>
+  <script src="./js/components.js"></script>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="./styles/reset.css">
+  <link rel="stylesheet" href="./styles/variables.css">
+  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/header.css">
+  <link rel="stylesheet" href="./styles/mega-menu.css">
+  <link rel="stylesheet" href="./styles/index.css">
+</head>
+
+<body data-page="home">
+
+  <!-- ══════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════ -->
+  <div id="header-placeholder" data-path="./includes/header.html"></div>
+
+  <div id="overlay-placeholder"></div>
+
+  <!-- ══════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════ -->
+  <main id="main-content">
+
+    <!-- ① 단일 대형 화보 슬라이더 (사용자 와이드 이미지) -->
+    <section class="main-slider" aria-label="메인 슬라이더">
+      <!-- 좌/우 넘김 화살표 -->
+      <button class="main-slider__nav main-slider__nav--prev" id="sliderPrev" aria-label="이전 슬라이드">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+      </button>
+      <button class="main-slider__nav main-slider__nav--next" id="sliderNext" aria-label="다음 슬라이드">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 18l6-6-6-6" />
+        </svg>
+      </button>
+
+      <!-- 이미지들이 담길 트랙 영역 (JS에서 동적 생성 및 덮어씌움) -->
+      <div class="main-slider__track" id="sliderTrack">
+        <div class="main-slider__slide">
+          <a href="./shop.html" class="main-slider__panel">
+            <img
+              src="https://hanggi4043.cafe24.com/bin%20main/4.16%20%ED%94%BC%EC%94%A8/%EC%A0%9C%EC%9E%91-%EC%85%94%EC%B8%A0%20%ED%94%BC%EC%94%A8.jpg"
+              alt="메인 배너" class="slider-image">
+          </a>
+        </div>
+      </div>
+
+      <!-- 계절별 네비게이션 (01-12) -->
+      <div class="slider-months">
+        <span class="month-item month-item--active">01</span>
+        <span class="month-item">02</span>
+        <span class="month-item">03</span>
+        <span class="month-item">04</span>
+        <span class="month-item">05</span>
+        <span class="month-item">06</span>
+        <span class="month-item">07</span>
+        <span class="month-item">08</span>
+        <span class="month-item">09</span>
+        <span class="month-item">10</span>
+        <span class="month-item">11</span>
+        <span class="month-item">12</span>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════
+         [RESTORE] Lookple Style Middle Section
+         메인 슬라이더와 푸터 사이 영역만 VARO과 동일하게 구성
+         ══════════════════════════════════════════════════ -->
+
+    <!-- ① WEEKLY BEST (VARO 시그니처 1:8 비대칭 그리드) -->
+    <section class="home-section" id="weeklyBestSection">
+      <div class="container--lookple">
+        <div class="lookple-section-header">
+          <div class="lookple-section-header__text">
+            <h2 class="lookple-section-title">WEEKLY BEST</h2>
+            <p class="lookple-section-sub">한주간 고객님들이 가장 많이 찾으신 아이템들입니다.</p>
+          </div>
+          <nav class="lookple-tab-nav">
+            <button class="lookple-tab-btn is-active" data-category="best">ALL</button>
+            <button class="lookple-tab-btn" data-category="outer">OUTER</button>
+            <button class="lookple-tab-btn" data-category="top">TOP</button>
+            <button class="lookple-tab-btn" data-category="knit">KNIT</button>
+            <button class="lookple-tab-btn" data-category="bottom">BOTTOM</button>
+          </nav>
+        </div>
+
+        <div class="lookple-grid--weekly-best" id="weeklyBestGrid">
+          <!-- JS에서 렌더링: 1 Large(2x2) + 8 Small (1:8 구조) -->
+        </div>
+      </div>
+    </section>
+
+    <!-- [FLASH SALE] 타임 특가 섹션 (New Premium) -->
+    <section class="home-section home-section--flash" id="flashSaleSection" hidden>
+      <div class="container--lookple">
+        <div class="flash-sale-header">
+          <div class="flash-sale-badge">TIME SALE</div>
+          <h2 class="flash-sale-title">지금 놓치면 안 될 한정 특가</h2>
+          <div class="flash-sale-timer" id="flashSaleTimer">
+            <span class="timer-unit" id="timerHours">00</span>:
+            <span class="timer-unit" id="timerMinutes">00</span>:
+            <span class="timer-unit" id="timerSeconds">00</span>
+          </div>
+        </div>
+        <div class="flash-sale-grid" id="flashSaleGrid"></div>
+      </div>
+    </section>
+
+    <!-- ② NEW PRODUCT (VARO 스타일 3열 대형 그리드) -->
+    <section class="home-section home-section--border-top">
+      <div class="container--lookple">
+        <div class="lookple-section-header lookple-section-header--center">
+          <h2 class="lookple-section-title">NEW PRODUCT</h2>
+          <p class="lookple-section-sub">새롭게 업데이트된 상품은 5% 할인됩니다.</p>
+        </div>
+
+        <div class="lookple-grid--new-product" id="newProductGrid">
+          <!-- JS에서 렌더링: 3열 균등 그리드 -->
+        </div>
+
+        <div class="more-view-container">
+          <button class="btn-more-view" id="btnMoreNew">
+            MORE VIEW <span class="page-indicator">[1/2]</span> <svg viewBox="0 0 24 24" fill="none"
+              stroke="currentColor">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ③ VARO BEST (선택 사항: VARO 하단 추천 그리드) -->
+    <section class="home-section home-section--border-top">
+      <div class="container--lookple">
+        <div class="lookple-section-header lookple-section-header--center">
+          <h2 class="lookple-section-title">VARO BEST</h2>
+          <p class="lookple-section-sub">꾸준히 사랑받는 베스트 아이템입니다.</p>
+        </div>
+
+        <div class="lookple-grid--standard" id="lookpleBestGrid">
+          <!-- JS에서 렌더링: 표준 4열 그리드 -->
+        </div>
+
+        <div class="more-view-container">
+          <button class="btn-more-view" id="btnMoreBest">
+            MORE VIEW <span class="page-indicator">[1/2]</span> <svg viewBox="0 0 24 24" fill="none"
+              stroke="currentColor">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ④ RECENTLY VIEWED (최근 본 상품) -->
+    <section class="home-section home-section--border-top u-mb-100" id="recentlyViewedSection" hidden>
+      <div class="container--lookple">
+        <div class="lookple-section-header lookple-section-header--center">
+          <h2 class="lookple-section-title">RECENTLY VIEWED</h2>
+          <p class="lookple-section-sub">최근에 확인하신 상품들입니다.</p>
+        </div>
+        <div class="lookple-grid--standard" id="recentlyViewedGrid">
+          <!-- JS에서 렌더링: 표준 4열 그리드 -->
+        </div>
+      </div>
+    </section>
+
+
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="./js/api.js"></script>
+  <script type="module" src="./js/data.js"></script>
+  <script type="module" src="./js/utils.js"></script>
+  <script type="module" src="./js/main.js"></script>
+  <script type="module" src="./js/mega-menu.js"></script>
+  <script type="module" src="./js/index.js"></script>
+</body>
+
+</html>

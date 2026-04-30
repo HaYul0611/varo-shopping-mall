@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z'/><line x1='3' y1='6' x2='21' y2='6'/><path d='M16 10a4 4 0 0 1-8 0'/></svg>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VARO 이벤트 — 1+1 기획전, Flash Sale, GOLD 전용 혜택">
+  <title>VARO — 이벤트</title>
+  <script src="./js/components.js"></script>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="./styles/reset.css">
+  <link rel="stylesheet" href="./styles/variables.css">
+  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/header.css">
+  <link rel="stylesheet" href="./styles/mega-menu.css">
+  <link rel="stylesheet" href="./styles/event.css">
+</head>
+
+<body data-page="event">
+
+  <div id="header-placeholder"></div>
+  <div id="overlay-placeholder"></div>
+
+  <main id="main-content">
+
+    <!-- 이벤트 히어로 -->
+    <section class="ev-hero">
+      <img src="./assets/lookbook/lookbook_1.png" alt="이벤트 히어로" loading="eager">
+      <div class="ev-hero__content">
+        <p class="ev-hero__tag">2026 SS SPECIAL EVENT</p>
+        <h1 class="ev-hero__title">지금이 기회</h1>
+        <p class="ev-hero__sub">남친룩·커플룩 컬렉션 — 한정 기간 최대 혜택</p>
+      </div>
+    </section>
+
+    <!-- Flash Deal 카운트다운 -->
+    <section class="ev-flash container">
+      <div class="ev-flash__box">
+        <div class="ev-flash__left">
+          <span class="ev-flash__tag">TODAY ONLY</span>
+          <h2 class="ev-flash__title">FLASH DEAL — 최대 40% OFF</h2>
+          <p class="ev-flash__sub">24시간 한정 · 재고 소진 시 조기 종료</p>
+        </div>
+        <div class="ev-flash__timer" id="flashTimer">
+          <div class="ev-timer-unit"><span class="ev-timer-val" id="timerH">23</span><span
+              class="ev-timer-lb">HRS</span></div>
+          <span class="ev-timer-sep">:</span>
+          <div class="ev-timer-unit"><span class="ev-timer-val" id="timerM">59</span><span
+              class="ev-timer-lb">MIN</span></div>
+          <span class="ev-timer-sep">:</span>
+          <div class="ev-timer-unit"><span class="ev-timer-val" id="timerS">59</span><span
+              class="ev-timer-lb">SEC</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 진행중 이벤트 카드 -->
+    <section class="ev-section container">
+      <h2 class="ev-section__title">진행중인 이벤트</h2>
+      <div class="ev-cards">
+        <a href="./shop.html?filter=event" class="ev-card">
+          <div class="ev-card__img"><img src="./assets/lookbook/lookbook_3.png" alt="1+1 이벤트" loading="lazy"></div>
+          <div class="ev-card__info"><span class="ev-badge ev-badge--new">1+1</span>
+            <p class="ev-card__title">상의 전품목 1+1 이벤트</p>
+            <p class="ev-card__period">2026.04.19 – 04.25 · D-6</p>
+          </div>
+        </a>
+        <a href="./shop.html?filter=new" class="ev-card">
+          <div class="ev-card__img"><img src="./assets/lookbook/lookbook_4.png" alt="신상 5% 할인" loading="lazy"></div>
+          <div class="ev-card__info"><span class="ev-badge ev-badge--sale">-5%</span>
+            <p class="ev-card__title">2026 SS 신상 런칭 + 5% 할인</p>
+            <p class="ev-card__period">2026.04.15 – 04.30</p>
+          </div>
+        </a>
+        <a href="./mypage.html" class="ev-card">
+          <div class="ev-card__img"><img src="./assets/lookbook/lookbook_5.png" alt="GOLD 전용" loading="lazy"></div>
+          <div class="ev-card__info"><span class="ev-badge ev-badge--gold">GOLD+</span>
+            <p class="ev-card__title">VIP 프리뷰 위크 — GOLD 이상 10% 추가</p>
+            <p class="ev-card__period">2026.04.20 – 04.27</p>
+          </div>
+        </a>
+        <a href="./shop.html?filter=sale" class="ev-card">
+          <div class="ev-card__img"><img src="./assets/lookbook/lookbook_6.png" alt="커플룩 SALE" loading="lazy"></div>
+          <div class="ev-card__info"><span class="ev-badge ev-badge--sale">SALE</span>
+            <p class="ev-card__title">커플룩 세트업 최대 -20%</p>
+            <p class="ev-card__period">2026.04.20 – 04.28</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- 1+1 이벤트 상품 -->
+    <section class="ev-section ev-section--gray">
+      <div class="container">
+        <div class="ev-section__head">
+          <h2 class="ev-section__title u-color-event-blue">1+1 이벤트 상품</h2>
+          <p class="ev-section__sub">상의 전품목 구매 시 동일 상품 1개 추가 증정</p>
+        </div>
+        <div class="product-grid" id="eventProductGrid">
+          <div class="skeleton skeleton--card"></div>
+          <div class="skeleton skeleton--card"></div>
+          <div class="skeleton skeleton--card"></div>
+          <div class="skeleton skeleton--card"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 멤버십 혜택 CTA -->
+    <section class="ev-member-cta container">
+      <div class="ev-member-inner">
+        <div>
+          <p class="ev-member-tag">MEMBERSHIP BENEFIT</p>
+          <h2 class="ev-member-title">GOLD 등급이 되면<br>모든 이벤트에서 추가 혜택</h2>
+          <p class="ev-member-body">누적 구매 30만원 이상 달성 시 GOLD로 자동 승급.<br>상시 10% 할인 + 무료배송 + 전용 이벤트 우선 참여</p>
+          <a href="./community.html?tab=membership" class="btn btn--primary">멤버십 혜택 보기</a>
+        </div>
+        <img src="./assets/lookbook/lookbook_7.png" alt="멤버십 혜택" loading="lazy">
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/data.js"></script>
+  <script src="./js/utils.js"></script>
+  <script src="./js/main.js"></script>
+  <script src="./js/mega-menu.js"></script>
+  <script src="./js/event.js"></script>
+</body>
+
+</html>

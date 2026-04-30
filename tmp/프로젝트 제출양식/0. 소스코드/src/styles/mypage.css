@@ -1,0 +1,689 @@
+/* 경로: styles/mypage.css */
+.mypage-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 60px;
+  padding: 60px 0;
+}
+
+.mypage-sidebar {
+  border-right: 1px solid #eee;
+  padding-right: 40px;
+}
+
+.user-brief {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  background: #f5f5f5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.user-avatar:hover {
+  background: #f8f8f8;
+  border-color: #A87C6C;
+  /* 브론즈 기본 컬러 활용 */
+  box-shadow: 0 0 15px rgba(168, 124, 108, 0.25), 0 0 0 1px #A87C6C;
+  transform: scale(1.02);
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info .user-name {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.user-info .user-grade {
+  display: inline-block;
+  background: #1C1A16;
+  color: #FFF;
+  text-transform: uppercase;
+  font-size: 9px;
+  font-weight: 800;
+  margin-top: 6px;
+  padding: 3px 8px;
+  border-radius: 3px;
+}
+
+.user-info .user-grade.is-bronze {
+  background: #A87C6C !important;
+}
+
+.user-info .user-grade.is-silver {
+  background: #A0A0A0 !important;
+}
+
+.user-info .user-grade.is-gold {
+  background: #D4AF37 !important;
+}
+
+.user-info .user-grade.is-dia {
+  background: #00D1FF !important;
+  color: #111 !important;
+}
+
+.user-info .user-grade.is-manager {
+  background: #D1D1FF;
+  color: #111;
+}
+
+.user-info .user-grade.is-admin {
+  background: #1B2B4B;
+}
+
+.mypage-nav__list {
+  list-style: none;
+  padding: 0;
+}
+
+.mypage-nav__link {
+  display: block;
+  padding: 12px 0;
+  font-size: 14px;
+  color: #666;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.mypage-nav__link:hover,
+.mypage-nav__link.is-active {
+  color: #000;
+  font-weight: 700;
+}
+
+.mypage-nav__link--logout {
+  margin-top: 40px;
+  color: #999;
+}
+
+.mypage-section__title {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #000;
+}
+
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.order-table th {
+  padding: 15px 10px;
+  background: #f9f9f9;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+  font-weight: 600;
+}
+
+.order-table td {
+  padding: 20px 10px;
+  border-bottom: 1px solid #f5f5f5;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.empty-row {
+  padding: 80px 0 !important;
+  color: #999;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.status-badge {
+  background: #eee;
+  padding: 4px 10px;
+  font-size: 11px;
+  border-radius: 4px;
+  color: #666;
+}
+
+/* ── 프로필 업로드 및 미리보기 ── */
+.profile-upload-area {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #fdfdfd;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px dashed #ddd;
+  margin-top: 5px;
+}
+
+.profile-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #eee;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.profile-preview.has-image {
+  border-color: var(--color-accent);
+}
+
+/* 주소 수직 정렬 시스템 */
+.address-vertical-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.postcode-row {
+  display: flex;
+  gap: 10px;
+}
+
+.postcode-row .form-input {
+  width: 120px;
+  flex-shrink: 0;
+}
+
+/* ── 모달 및 인터랙티브 크롭 시스템 ── */
+.varo-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.varo-modal.is-active {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+}
+
+.varo-modal__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+}
+
+.varo-modal__content {
+  position: relative;
+  background: #fff;
+  width: 95%;
+  max-width: 500px;
+  border-radius: 16px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  transform: translateY(30px);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.varo-modal.is-active .varo-modal__content {
+  transform: translateY(0);
+}
+
+.varo-modal__header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.varo-modal__header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.varo-modal__body {
+  padding: 24px;
+}
+
+/* 크롭 컨테이너 엔진 */
+.crop-container {
+  position: relative;
+  width: 100%;
+  height: 350px;
+  background: #e0e0e0;
+  overflow: hidden;
+  border-radius: 8px;
+  user-select: none;
+}
+
+.crop-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: move;
+  max-width: none;
+}
+
+.crop-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 250px;
+  height: 250px;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.65);
+  pointer-events: none;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.crop-guide {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 250px;
+  height: 250px;
+  border: 1px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 11;
+}
+
+.varo-modal__footer {
+  padding: 16px 24px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background: #fafafa;
+}
+
+.varo-modal__close {
+  background: none;
+  border: none;
+  font-size: 30px;
+  cursor: pointer;
+  color: #ccc;
+}
+
+@media (max-width: 768px) {
+  .mypage-layout {
+    flex-direction: column;
+    gap: 30px;
+    padding: 30px 15px;
+  }
+
+  .mypage-sidebar {
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    padding-right: 0;
+    padding-bottom: 30px;
+  }
+}
+
+/* ── 위시리스트 삭제 버튼 ── */
+.wishlist-item {
+  position: relative;
+}
+
+.btn-wishlist-delete {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: transparent !important;
+  border: none !important;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.wishlist-item:hover .btn-wishlist-delete {
+  opacity: 1;
+}
+
+.btn-wishlist-delete:hover {
+  color: #000;
+  transform: scale(1.15);
+}
+
+/* ── 주문 내역 버튼 스타일 ── */
+.btn-order-action {
+  padding: 4px 8px !important;
+  font-size: 11px !important;
+  margin-left: 5px !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-track-delivery {
+  color: #D96B3C !important;
+  border-color: #D96B3C !important;
+  background: transparent !important;
+}
+
+.btn-track-delivery:hover {
+  background: #D96B3C !important;
+  color: #fff !important;
+}
+
+.btn-cancel-order {
+  color: #ff4d4f !important;
+  border-color: #ff4d4f !important;
+  background: transparent !important;
+}
+
+.btn-cancel-order:hover {
+  background: #ff4d4f !important;
+  color: #fff !important;
+}
+
+.btn-confirm-purchase {
+  background: #111 !important;
+  color: #fff !important;
+  border: 1px solid #111 !important;
+}
+
+.btn-confirm-purchase:hover {
+  background: #333 !important;
+  border-color: #333 !important;
+  color: #fff !important;
+}
+
+.btn-return-order {
+  color: #888 !important;
+  border-color: #888 !important;
+  background: transparent !important;
+}
+
+.btn-return-order:hover {
+  background: #888 !important;
+  color: #fff !important;
+}
+
+/* ── 가상 배송 추적 모달 타임라인 (세련된 디자인) ── */
+.tracking-timeline {
+  position: relative;
+  padding-left: 30px;
+  margin-top: 20px;
+}
+
+.tracking-timeline::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 5px;
+  bottom: 5px;
+  width: 2px;
+  background: #F0F0F0;
+  z-index: 1;
+}
+
+.tracking-step {
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.tracking-step:last-child {
+  margin-bottom: 0;
+}
+
+.tracking-dot {
+  position: absolute;
+  left: -25px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #DDD;
+  border: 2px solid #FFF;
+  box-shadow: 0 0 0 2px #DDD;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.tracking-step.is-done .tracking-dot {
+  background: #D96B3C;
+  box-shadow: 0 0 0 2px #D96B3C;
+}
+
+.tracking-step.is-current .tracking-dot {
+  background: #FFF;
+  border: 3px solid #D96B3C;
+  box-shadow: 0 0 0 2px #D96B3C;
+  width: 12px;
+  height: 12px;
+  left: -26px;
+  top: 3px;
+}
+
+.tracking-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.tracking-info {
+  flex: 1;
+}
+
+.tracking-status {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.tracking-step.is-done .tracking-status {
+  color: #111;
+}
+
+.tracking-step.is-current .tracking-status {
+  color: #D96B3C;
+  font-weight: 700;
+}
+
+.tracking-location {
+  font-size: 11px;
+  color: #888;
+}
+
+.tracking-date {
+  font-size: 11px;
+  color: #AAA;
+  text-align: right;
+  white-space: nowrap;
+  margin-left: 15px;
+}
+
+.tracking-step.is-done .tracking-date {
+  color: #666;
+}
+
+/* ── 가상 배송 추적 모달 ── */
+.delivery-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.delivery-modal-overlay.is-active {
+  display: flex;
+}
+
+.delivery-modal-content {
+  background: #fff;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  animation: pgModalUp 0.3s ease-out;
+}
+
+.delivery-modal-header {
+  background: var(--color-primary, #D96B3C);
+  color: #fff;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.delivery-modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.delivery-modal-header .close {
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.delivery-modal-body {
+  padding: 30px 20px;
+}
+
+.delivery-modal-info {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #EEE;
+}
+
+.delivery-modal-info label {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.delivery-modal-info strong {
+  font-size: 16px;
+  color: #333;
+}
+
+.delivery-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+}
+
+.delivery-timeline-line {
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  bottom: 10px;
+  width: 2px;
+  background: #EEE;
+  z-index: 1;
+}
+
+.delivery-timeline-step {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: relative;
+  z-index: 2;
+}
+
+.delivery-timeline-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #EEE;
+  border: 4px solid #FFF;
+  box-shadow: 0 0 0 1px #CCC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 12px;
+}
+
+.delivery-timeline-dot.is-active {
+  background: var(--color-primary, #D96B3C);
+  box-shadow: 0 0 0 1px var(--color-primary, #D96B3C);
+  color: #fff;
+  font-weight: bold;
+}
+
+.delivery-timeline-text h4 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 2px 0;
+  color: #999;
+}
+
+.delivery-timeline-text.is-active h4 {
+  color: #333;
+}
+
+.delivery-timeline-text p {
+  font-size: 12px;
+  color: #AAA;
+  margin: 0;
+}
+
+.delivery-timeline-text.is-active p {
+  color: #888;
+}

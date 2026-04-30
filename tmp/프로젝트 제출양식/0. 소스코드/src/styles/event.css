@@ -1,0 +1,46 @@
+/* 경로: styles/event.css — VARO 이벤트 페이지 */
+
+.ev-hero { position:relative; height:clamp(280px,40vh,440px); overflow:hidden; background:#1C1A16; }
+.ev-hero img { width:100%; height:100%; object-fit:cover; opacity:.45; }
+.ev-hero__content { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+.ev-hero__tag { font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:#D96B3C; margin-bottom:10px; }
+.ev-hero__title { font-size:clamp(28px,5vw,52px); font-weight:800; color:#fff; letter-spacing:-.05em; margin-bottom:8px; }
+.ev-hero__sub { font-size:14px; color:rgba(255,255,255,.6); }
+
+.ev-flash { padding:24px 0; }
+.ev-flash__box { background:#1C1A16; border-radius:8px; padding:22px 28px; display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap; }
+.ev-flash__tag { font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:#D96B3C; margin-bottom:5px; display:block; }
+.ev-flash__title { font-size:clamp(15px,2.5vw,20px); font-weight:700; color:#fff; letter-spacing:-.03em; margin-bottom:4px; }
+.ev-flash__sub { font-size:11px; color:rgba(255,255,255,.5); }
+.ev-flash__timer { display:flex; gap:10px; align-items:center; }
+.ev-timer-unit { text-align:center; }
+.ev-timer-val { display:block; font-size:clamp(24px,4vw,34px); font-weight:800; color:#D96B3C; line-height:1; font-variant-numeric:tabular-nums; min-width:2ch; }
+.ev-timer-lb { font-size:8px; color:rgba(255,255,255,.45); letter-spacing:.1em; text-transform:uppercase; }
+.ev-timer-sep { font-size:24px; color:rgba(255,255,255,.3); font-weight:700; margin-bottom:4px; }
+
+.ev-section { padding:48px 0; }
+.ev-section--gray { background:#F7F6F2; }
+.ev-section__head { margin-bottom:20px; }
+.ev-section__title { font-size:13px; font-weight:800; letter-spacing:.18em; text-transform:uppercase; margin-bottom:4px; }
+.ev-section__sub { font-size:12px; color:#999; }
+.ev-cards { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+@media(max-width:600px){ .ev-cards{grid-template-columns:1fr;} }
+.ev-card { display:block; text-decoration:none; color:inherit; border:.5px solid #EBEBEB; border-radius:6px; overflow:hidden; }
+.ev-card__img { aspect-ratio:16/7; overflow:hidden; background:#EEE; }
+.ev-card__img img { width:100%; height:100%; object-fit:cover; transition:transform .4s; }
+.ev-card:hover .ev-card__img img { transform:scale(1.04); }
+.ev-card__info { padding:14px 16px; background:#fff; }
+.ev-badge { display:inline-block; font-size:9px; font-weight:800; letter-spacing:.08em; padding:3px 8px; border-radius:2px; margin-bottom:6px; }
+.ev-badge--new  { background:#4A7FA5; color:#fff; }
+.ev-badge--sale { background:#D96B3C; color:#fff; }
+.ev-badge--gold { background:#BFA14A; color:#fff; }
+.ev-card__title { font-size:15px; font-weight:700; color:#1C1A16; letter-spacing:-.02em; margin-bottom:4px; }
+.ev-card__period { font-size:12px; color:#888; }
+
+.ev-member-cta { padding:64px 0; }
+.ev-member-inner { display:grid; grid-template-columns:1fr 380px; gap:48px; align-items:center; background:#1C1A16; border-radius:12px; padding:40px 48px; }
+@media(max-width:768px){ .ev-member-inner{grid-template-columns:1fr; padding:28px 24px;} .ev-member-inner img{display:none;} }
+.ev-member-tag { font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:#D96B3C; margin-bottom:12px; display:block; }
+.ev-member-title { font-size:clamp(20px,3vw,30px); font-weight:800; color:#fff; letter-spacing:-.04em; line-height:1.25; margin-bottom:12px; }
+.ev-member-body { font-size:13px; color:rgba(255,255,255,.6); line-height:1.8; margin-bottom:20px; }
+.ev-member-inner img { width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:8px; opacity:.85; }

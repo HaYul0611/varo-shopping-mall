@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VARO ADMIN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="./styles/admin.css">
+  <script src="./js/admin-auth.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+
+  <!-- TOP NAV -->
+  <nav class="top-nav">
+    <div class="nav-logo">
+      <span class="brand">VARO</span>
+      <span class="badge">ADMIN</span>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showPage('dashboard',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" />
+        </svg>
+        <span>대시보드</span>
+      </button>
+      <button class="nav-tab" onclick="showPage('banners', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <path d="M8 12h8" />
+          <path d="M12 8v8" />
+        </svg>
+        <span>배너/팝업</span>
+      </button>
+      <button class="nav-tab" onclick="showPage('products',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path
+            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+          <line x1="12" y1="22.08" x2="12" y2="12" />
+        </svg>
+        <span>상품 관리</span>
+      </button>
+      <button class="nav-tab" onclick="showPage('orders',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+        </svg>
+        <span>주문 관리</span>
+      </button>
+      <button class="nav-tab" onclick="showPage('members',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        <span>회원 관리</span>
+      </button>
+      <button class="nav-tab" onclick="showPage('coupons', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+          <line x1="7" y1="7" x2="7.01" y2="7" />
+        </svg>
+        <span>쿠폰</span>
+      </button>
+      <button class="nav-tab" onclick="showPage('community', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+        <span>커뮤니티</span>
+      </button>
+      <button class="nav-tab" onclick="showPage('analytics',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="20" x2="18" y2="10" />
+          <line x1="12" y1="20" x2="12" y2="4" />
+          <line x1="6" y1="20" x2="6" y2="14" />
+        </svg>
+        <span>통계/분석</span>
+      </button>
+      <button class="nav-tab" onclick="showPage('settings',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
+        <span>설정/알림</span>
+      </button>
+    </div>
+    <div class="nav-right">
+      <div class="nav-notif" onclick="toggleNotifications(event)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
+        <span class="notif-dot" id="notifDot"></span>
+
+        <!-- Alaram Dropdown -->
+        <div class="notif-dropdown" id="notifDropdown">
+          <div class="notif-header">
+            <h4>실시간 알림</h4>
+            <span style="font-size:12px;color:var(--info);cursor:pointer;" onclick="readAllNotifications(event)">모두
+              읽음</span>
+          </div>
+          <div class="notif-list" id="notifList">
+            <!-- JS에서 렌더링 -->
+            <div style="padding:40px 20px; text-align:center; color:var(--gray-400); font-size:13px;">
+              새로운 알림이 없습니다.
+            </div>
+          </div>
+          <div class="notif-footer">
+            <a href="#">모든 알림 보기</a>
+          </div>
+        </div>
+      </div>
+      <button class="nav-btn" onclick="window.open('./index.html','_self')">쇼핑몰 보기</button>
+      <span style="font-size:13px;font-weight:600;color:var(--gray-700)">관리자</span>
+      <button class="nav-btn" onclick="showToast('로그아웃 되었습니다.','success')">로그아웃</button>
+    </div>
+  </nav>
+
+  <div class="layout">
+    <div class="main-content">
+
+      <!-- ══════════════════════ DASHBOARD ══════════════════════ -->
+      <div id="page-dashboard" class="page active">
+        <div class="section-header">
+          <div>
+            <div class="section-title">대시보드</div>
+            <div class="section-sub">2025년 04월 기준 · 실시간 현황</div>
+          </div>
+          <div class="header-actions">
+            <div class="date-range">
+              <input type="date" value="2025-04-01">
+              <span style="color:var(--gray-400)">~</span>
+              <input type="date" value="2025-04-23">
+            </div>
+            <button class="btn btn-outline" onclick="exportDashboardData()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              내보내기
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI CARDS -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">전체 상품</div>
+            <div class="stat-value">247</div>
+            <div class="stat-change up">▲ 12개 이번 달 신규</div>
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+              </svg></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">이번 달 주문</div>
+            <div class="stat-value">1,284</div>
+            <div class="stat-change up">▲ 18.3% 전월 대비</div>
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">전체 회원</div>
+            <div class="stat-value">3,891</div>
+            <div class="stat-change up">▲ 156명 신규 가입</div>
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+              </svg></div>
+          </div>
+          <div class="stat-card dark">
+            <div class="stat-label">이번 달 매출</div>
+            <div class="stat-value">₩48,720,000</div>
+            <div class="stat-change up">▲ 23.5% 전월 대비</div>
+            <div class="stat-icon"><svg viewBox="0 0 24 24" fill="currentColor">
+                <line x1="12" y1="1" x2="12" y2="23" />
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg></div>
+          </div>
+        </div>
+
+        <!-- SECONDARY KPI -->
+        <div class="stats-grid" style="grid-template-columns: repeat(4,1fr); margin-bottom:24px;">
+          <div class="stat-card">
+            <div class="stat-label">처리 대기 주문</div>
+            <div class="stat-value" style="color:var(--warning)">23</div>
+            <div class="stat-change" style="color:var(--warning)">즉시 처리 필요</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">재고 부족 상품</div>
+            <div class="stat-value" style="color:var(--danger)">8</div>
+            <div class="stat-change down">재입고 필요</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">미답변 문의</div>
+            <div class="stat-value" style="color:var(--info)">12</div>
+            <div class="stat-change" style="color:var(--info)">48시간 이내 답변 필요</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">평균 주문 금액</div>
+            <div class="stat-value">₩37,900</div>
+            <div class="stat-change up">▲ ₩2,300 상승</div>
+          </div>
+        </div>
+
+        <div class="three-col">
+          <!-- SALES CHART -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">월별 매출 현황</span>
+              <div class="inner-tabs" style="margin:0; border:none;">
+                <span class="inner-tab active" style="padding:4px 10px; font-size:12px;">매출</span>
+                <span class="inner-tab" style="padding:4px 10px; font-size:12px;">주문수</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div style="font-size:11px; color:var(--gray-400); margin-bottom:8px; display:flex; gap:16px;">
+                <span>최고: <b style="color:var(--black)">4월 ₩48.7M</b></span>
+                <span>목표 달성률: <b style="color:var(--success)">97.4%</b></span>
+              </div>
+              <div class="chart-area" style="height: 250px; position: relative;">
+                <canvas id="salesChartCanvas"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- QUICK STATS -->
+          <div class="card">
+            <div class="card-header"><span class="card-title">카테고리별 매출 비중</span></div>
+            <div class="card-body">
+              <div id="categoryStats"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <!-- RECENT ORDERS -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">최근 주문</span>
+              <a class="card-link" onclick="showPage('orders',document.querySelectorAll('.nav-tab')[2])">전체 보기 →</a>
+            </div>
+            <div class="tbl-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>주문번호</th>
+                    <th>주문자</th>
+                    <th>금액</th>
+                    <th>상태</th>
+                    <th>일시</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboardOrders"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ACTIVITY + QUICK ACTIONS -->
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div class="card">
+              <div class="card-header"><span class="card-title">빠른 실행</span></div>
+              <div class="card-body">
+                <div class="quick-grid">
+                  <div class="quick-card" onclick="openAddProductModal()">
+                    <div class="quick-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg></div>
+                    <div class="quick-label">상품 등록</div>
+                  </div>
+                  <div class="quick-card" onclick="showPage('orders',document.querySelectorAll('.nav-tab')[2])">
+                    <div class="quick-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      </svg></div>
+                    <div class="quick-label">주문 처리</div>
+                  </div>
+                  <div class="quick-card" onclick="openModal('modal-add-coupon')">
+                    <div class="quick-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <rect x="1" y="4" width="22" height="16" rx="2" />
+                        <line x1="1" y1="10" x2="23" y2="10" />
+                      </svg></div>
+                    <div class="quick-label">쿠폰 발급</div>
+                  </div>
+                  <div class="quick-card" onclick="showToast('공지 등록 페이지로 이동')">
+                    <div class="quick-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      </svg></div>
+                    <div class="quick-label">공지 등록</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><span class="card-title">최근 활동</span></div>
+              <div class="card-body" style="padding-top:8px; padding-bottom:8px;">
+                <div id="activityFeed"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════ PRODUCTS ══════════════════════ -->
+      <div id="page-products" class="page">
+        <div class="section-header">
+          <div>
+            <div class="section-title">상품 관리</div>
+            <div class="section-sub">총 <span id="productCount">0</span>개 상품</div>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="exportProducts()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              엑셀 내보내기
+            </button>
+            <button class="btn btn-primary" onclick="openAddProductModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              상품 등록
+            </button>
+          </div>
+        </div>
+        <div class="filter-bar">
+          <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input class="search-input" placeholder="상품명, SKU 검색..." oninput="filterProducts(this.value)">
+          </div>
+          <select id="pFilterCategory" class="form-control" style="width:140px;"
+            onchange="filterByCategory(this.value)">
+            <option value="">전체 카테고리</option>
+            <!-- Generated by JS -->
+          </select>
+          <select id="pFilterStatus" class="form-control" style="width:130px;" onchange="filterByStatus(this.value)">
+            <option value="">전체 상태</option>
+            <option value="판매중">판매중</option>
+            <option value="품절">품절</option>
+            <option value="숨김">숨김</option>
+          </select>
+          <select id="pSort" class="form-control" style="width:130px;" onchange="sortBy(this.value)">
+            <option value="최신순">최신순</option>
+            <option value="판매량순">판매량순</option>
+            <option value="가격높은순">가격높은순</option>
+            <option value="가격낮은순">가격낮은순</option>
+          </select>
+        </div>
+        <div class="card">
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th><input type="checkbox" onclick="toggleAllCheck(this,'prod-check')"></th>
+                  <th>상품</th>
+                  <th>SKU</th>
+                  <th>카테고리</th>
+                  <th>판매가</th>
+                  <th>재고</th>
+                  <th>판매수</th>
+                  <th>상태</th>
+                  <th>관리</th>
+                </tr>
+              </thead>
+              <tbody id="productTable"></tbody>
+            </table>
+          </div>
+          <div class="pagination" id="productPagination"></div>
+        </div>
+      </div>
+
+
+      <!-- ══════════════════════ ORDERS ══════════════════════ -->
+      <div id="page-orders" class="page">
+        <div class="section-header">
+          <div>
+            <div class="section-title">주문 관리</div>
+            <div class="section-sub">총 <span id="orderCount">0</span>건 주문</div>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="exportOrders()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              엑셀 내보내기
+            </button>
+          </div>
+        </div>
+        <!-- order status tabs -->
+        <div class="inner-tabs">
+          <span class="inner-tab active" onclick="filterOrders('all',this)">전체 (<span id="cnt-all">0</span>)</span>
+          <span class="inner-tab" onclick="filterOrders('결제완료',this)">결제완료 (<span id="cnt-결제완료">0</span>)</span>
+          <span class="inner-tab" onclick="filterOrders('배송준비',this)">배송준비 (<span id="cnt-배송준비">0</span>)</span>
+          <span class="inner-tab" onclick="filterOrders('배송중',this)">배송중 (<span id="cnt-배송중">0</span>)</span>
+          <span class="inner-tab" onclick="filterOrders('배송완료',this)">배송완료 (<span id="cnt-배송완료">0</span>)</span>
+          <span class="inner-tab" onclick="filterOrders('취소/반품',this)">취소/반품 (<span id="cnt-취소/반품">0</span>)</span>
+        </div>
+        <div class="filter-bar">
+          <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input class="search-input" placeholder="주문번호, 주문자명, 연락처 검색...">
+          </div>
+          <div class="date-range">
+            <input type="date" value="2025-04-01">
+            <span style="color:var(--gray-400)">~</span>
+            <input type="date" value="2025-04-23">
+          </div>
+          <button class="btn btn-outline btn-sm">조회</button>
+        </div>
+        <div class="card">
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th><input type="checkbox" onclick="toggleAllCheck(this,'order-check')"></th>
+                  <th>주문번호</th>
+                  <th>주문자</th>
+                  <th>상품명</th>
+                  <th>금액</th>
+                  <th>결제방법</th>
+                  <th>주문상태</th>
+                  <th>주문일시</th>
+                  <th>관리</th>
+                </tr>
+              </thead>
+              <tbody id="orderTable"></tbody>
+            </table>
+          </div>
+          <div id="orderSummary" class="summary-row"></div>
+          <div class="pagination" id="orderPagination"></div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════ MEMBERS ══════════════════════ -->
+      <div id="page-members" class="page">
+        <div class="section-header">
+          <div>
+            <div class="section-title">회원 관리</div>
+            <div class="section-sub">총 <span id="memberCount">0</span>명 회원</div>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="exportMembers()">내보내기</button>
+            <button class="btn btn-primary" onclick="openModal('modal-add-member')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              회원 등록
+            </button>
+          </div>
+        </div>
+        <div class="filter-bar">
+          <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input class="search-input" placeholder="이름, 이메일, 연락처 검색...">
+          </div>
+          <select class="form-control" style="width:130px;">
+            <option>전체 등급</option>
+            <option>BRONZE</option>
+            <option>SILVER</option>
+            <option>GOLD</option>
+            <option>DIA</option>
+            <option>MANAGER</option>
+          </select>
+          <select class="form-control" style="width:130px;">
+            <option>가입일순</option>
+            <option>구매금액순</option>
+            <option>구매횟수순</option>
+          </select>
+        </div>
+        <div class="card">
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th><input type="checkbox" onclick="toggleAllCheck(this,'mem-check')"></th>
+                  <th>회원</th>
+                  <th>이메일</th>
+                  <th>연락처</th>
+                  <th>등급</th>
+                  <th>누적 구매</th>
+                  <th>포인트</th>
+                  <th>가입일</th>
+                  <th>최근 접속</th>
+                  <th>상태</th>
+                  <th>관리</th>
+                </tr>
+              </thead>
+              <tbody id="memberTable"></tbody>
+            </table>
+          </div>
+          <div class="pagination" id="memberPagination"></div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════ COUPONS ══════════════════════ -->
+      <div id="page-coupons" class="page">
+        <div class="section-header">
+          <div>
+            <div class="section-title">쿠폰 / 이벤트</div>
+          </div>
+          <button class="btn btn-primary" onclick="openCouponModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            쿠폰 생성
+          </button>
+        </div>
+        <div class="inner-tabs" style="margin-bottom:20px;">
+          <button class="inner-tab active" onclick="showCouponTab('진행중', this)">진행 중 쿠폰</button>
+          <button class="inner-tab" onclick="showCouponTab('만료', this)">만료된 쿠폰</button>
+          <button class="inner-tab" onclick="showCouponTab('발급', this)">발급 내역</button>
+        </div>
+        <div id="couponGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px;"></div>
+      </div>
+
+      <!-- PAGE: COMMUNITY (REVIEWS + QNA + NOTICE + FAQ) -->
+      <div id="page-community" class="page">
+        <div class="page-header">
+          <div>
+            <h2 class="page-title">커뮤니티 관리</h2>
+            <p class="page-subtitle">리뷰, Q&A, 공지사항 및 자주 묻는 질문을 관리합니다.</p>
+          </div>
+        </div>
+
+        <div class="inner-tabs" style="margin-bottom:20px;">
+          <button class="inner-tab active" onclick="showCommunityTab('notice', this)">공지사항</button>
+          <button class="inner-tab" onclick="showCommunityTab('faq', this)">FAQ</button>
+          <button class="inner-tab" onclick="showCommunityTab('review', this)">리뷰 관리</button>
+          <button class="inner-tab" onclick="showCommunityTab('qna', this)">Q&A 관리</button>
+        </div>
+
+        <!-- Community Sub Pages will be rendered here via JS -->
+        <div id="community-content">
+          <!-- Render review content by default or sync with JS -->
+        </div>
+      </div>
+
+
+      <!-- PAGE: BANNERS & SECTIONS -->
+      <div id="page-banners" class="page">
+        <div class="page-header">
+          <div>
+            <h2 class="page-title">배너 및 섹션 관리</h2>
+            <p class="page-subtitle">홈 화면 배너와 섹션 노출 여부를 관리합니다.</p>
+          </div>
+        </div>
+
+        <div class="inner-tabs" style="margin-bottom:20px;">
+          <button class="inner-tab active" onclick="showBannerTab('banner', this)">메인 배너</button>
+          <button class="inner-tab" onclick="showBannerTab('category', this)">카테고리 관리</button>
+        </div>
+
+        <div id="banner-content">
+          <!-- Banner Content -->
+          <div id="sub-page-banner">
+            <!-- Banner Preview Box -->
+            <div id="bannerPreviewContainer" class="banner-preview-box">
+              <div class="preview-badge">SLIDE 1</div>
+              <div id="bannerPreviewContent" class="preview-placeholder">
+                배너를 선택하면 미리보기가 표시됩니다
+              </div>
+            </div>
+
+            <div class="section-header" style="margin: 30px 0 15px 0;">
+              <div>
+                <div class="section-title" style="font-size: 16px;">배너 목록</div>
+              </div>
+              <div class="badge badge-outline">드래그로 순서 변경 가능</div>
+            </div>
+
+            <div id="bannerSortableList" class="banner-list-container">
+              <!-- JS Render (Banners with toggles, thumbnails, edit/delete) -->
+            </div>
+
+            <div style="margin-top: 20px; text-align: right;">
+              <button class="btn btn-primary" onclick="openModal('modal-add-banner')">배너 추가</button>
+            </div>
+          </div>
+
+
+          <div id="sub-page-category" style="display:none;">
+            <div class="section-header" style="margin-bottom: 20px;">
+              <div>
+                <div class="section-title" style="font-size: 16px;">전체 카테고리 체계</div>
+                <p class="section-sub">카테고리 순서를 드래그하여 조정할 수 있습니다.</p>
+              </div>
+              <button class="btn btn-primary"
+                onclick="document.getElementById('categoryModalTitle').textContent='카테고리 추가'; openModal('modal-add-category')">
+                카테고리 추가
+              </button>
+            </div>
+            <div class="card">
+              <div class="card-body" id="categoryContainer" style="padding:15px;">
+                <!-- Accordion List rendered via JS -->
+                <div class="tbl-empty">카테고리를 불러오는 중...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE: NOTIFICATIONS -->
+      <div id="page-notifications" class="page">
+        <div class="page-header">
+          <div>
+            <h2 class="page-title">알림 센터</h2>
+            <p class="page-subtitle">전체 시스템 알림 및 실시간 로그를 확인합니다.</p>
+          </div>
+          <button class="btn btn-outline" onclick="markAllNotifRead()">모두 읽음 처리</button>
+        </div>
+        <div class="card">
+          <div id="notif-full-list">
+            <!-- JS Render -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════ ANALYTICS ══════════════════════ -->
+      <div id="page-analytics" class="page">
+        <div class="section-header">
+          <div>
+            <div class="section-title">통계 / 분석</div>
+          </div>
+          <div class="date-range">
+            <select class="form-control" style="width:130px;">
+              <option>이번 달</option>
+              <option>지난 달</option>
+              <option>최근 3개월</option>
+              <option>올해</option>
+            </select>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">방문자 수</div>
+            <div class="stat-value">24,891</div>
+            <div class="stat-change up">▲ 12.4%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">전환율</div>
+            <div class="stat-value">5.16%</div>
+            <div class="stat-change up">▲ 0.8%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">장바구니 이탈률</div>
+            <div class="stat-value">62.3%</div>
+            <div class="stat-change down">▼ 3.1% 개선</div>
+          </div>
+          <div class="stat-card dark">
+            <div class="stat-label">총 매출 (누적)</div>
+            <div class="stat-value">₩487.2M</div>
+            <div class="stat-change up">▲ 연간 목표 81.2%</div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-header"><span class="card-title">시간대별 주문 분포</span></div>
+            <div class="card-body">
+              <div id="hourlyChart" style="display:flex; align-items:flex-end; gap:4px; height:160px;">
+              </div>
+              <div style="display:flex; gap:4px; margin-top:4px;" id="hourlyLabel"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">인기 상품 TOP 5</span></div>
+            <div class="card-body" id="topProducts"></div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-header"><span class="card-title">유입 경로 분석</span></div>
+            <div class="card-body" id="trafficSource"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">재구매율 분석</span></div>
+            <div class="card-body">
+              <div style="display:flex; align-items:center; gap:20px; margin-bottom:16px;">
+                <div style="font-size:48px; font-weight:800; font-family:'Inter';">38%</div>
+                <div>
+                  <div style="font-size:13px; font-weight:600; margin-bottom:4px;">재구매 고객</div>
+                  <div style="font-size:12px; color:var(--gray-400);">업계 평균 대비 +8% 높음</div>
+                </div>
+              </div>
+              <div class="progress" style="height:10px; margin-bottom:8px;">
+                <div class="progress-bar" style="width:38%"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--gray-400);">
+                <span>신규 62%</span><span>재구매 38%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════ SETTINGS ══════════════════════ -->
+      <div id="page-settings" class="page">
+        <div class="section-header">
+          <div>
+            <div class="section-title">설정</div>
+          </div>
+          <button class="btn btn-primary" onclick="showToast('설정이 저장되었습니다.','success')">저장</button>
+        </div>
+        <div class="two-col">
+          <div>
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-header"><span class="card-title">쇼핑몰 기본 정보</span></div>
+              <div class="card-body">
+                <div class="form-group"><label class="form-label">쇼핑몰 이름</label><input class="form-control"
+                    value="VARO"></div>
+                <div class="form-group"><label class="form-label">대표 이메일</label><input class="form-control"
+                    value="admin@varo.kr"></div>
+                <div class="form-group"><label class="form-label">고객센터 번호</label><input class="form-control"
+                    value="1588-0000"></div>
+                <div class="form-group"><label class="form-label">운영 시간</label><input class="form-control"
+                    value="평일 09:00 ~ 18:00 (주말/공휴일 휴무)"></div>
+                <div class="form-group"><label class="form-label">사업자 번호</label><input class="form-control"
+                    value="123-45-67890"></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><span class="card-title">배송 설정</span></div>
+              <div class="card-body">
+                <div class="form-group"><label class="form-label">기본 배송비</label><input class="form-control"
+                    value="3,000"></div>
+                <div class="form-group"><label class="form-label">무료배송 기준금액</label><input class="form-control"
+                    value="50,000"></div>
+                <div class="form-group"><label class="form-label">도서산간 추가 배송비</label><input class="form-control"
+                    value="5,000"></div>
+                <div class="form-group"><label class="form-label">택배사</label><select class="form-control">
+                    <option>CJ대한통운</option>
+                    <option>한진택배</option>
+                    <option>롯데택배</option>
+                    <option>우체국</option>
+                  </select></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-header"><span class="card-title">알림 설정</span></div>
+              <div class="card-body">
+                <div id="notiSettings">
+                  <div class="form-group"
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div>
+                      <div style="font-weight:600; font-size:14px;">신규 주문 알림</div>
+                      <div style="font-size:12px; color:var(--gray-400);">새로운 주문 발생 시 관리자에게 알림</div>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" checked>
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  <div class="form-group"
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div>
+                      <div style="font-weight:600; font-size:14px;">회원가입 알림</div>
+                      <div style="font-size:12px; color:var(--gray-400);">신규 회원 가입 시 알림</div>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" checked>
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  <div class="form-group"
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div>
+                      <div style="font-weight:600; font-size:14px;">1:1 문의 알림</div>
+                      <div style="font-size:12px; color:var(--gray-400);">고객 문의 등록 시 알림</div>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  <div class="form-group" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                      <div style="font-weight:600; font-size:14px;">재고 부족 알림</div>
+                      <div style="font-size:12px; color:var(--gray-400);">품절 임박 상품 발생 시 알림</div>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" checked>
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-header"><span class="card-title">결제 수단 관리</span></div>
+              <div class="card-body">
+                <div id="paymentSettings">
+                  <div class="form-group"
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div>
+                      <div style="font-weight:600; font-size:14px;">신용카드 결제</div>
+                      <div style="font-size:12px; color:var(--gray-400);">KG이니시스 연동</div>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" checked>
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  <div class="form-group"
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div>
+                      <div style="font-weight:600; font-size:14px;">무통장 입금</div>
+                      <div style="font-size:12px; color:var(--gray-400);">신한은행 100-000-000000</div>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" checked>
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  <div class="form-group"
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div>
+                      <div style="font-weight:600; font-size:14px;">카카오페이</div>
+                      <div style="font-size:12px; color:var(--gray-400);">간편 결제 서비스</div>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" checked>
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  <div class="form-group" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                      <div style="font-weight:600; font-size:14px;">네이버페이</div>
+                      <div style="font-size:12px; color:var(--gray-400);">NPay 구매 버튼 연동</div>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><span class="card-title">관리자 계정</span></div>
+              <div class="card-body">
+                <div class="form-group"><label class="form-label">관리자 이름</label><input class="form-control" value="관리자">
+                </div>
+                <div class="form-group"><label class="form-label">이메일</label><input class="form-control"
+                    value="admin@varo.kr"></div>
+                <div class="form-group"><label class="form-label">현재 비밀번호</label><input class="form-control"
+                    type="password" placeholder="현재 비밀번호 입력"></div>
+                <div class="form-group"><label class="form-label">새 비밀번호</label><input class="form-control"
+                    type="password" placeholder="새 비밀번호 입력"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- main-content -->
+  </div><!-- layout -->
+
+  <!-- ══════════════════════ MODALS ══════════════════════ -->
+
+  <!-- ADD PRODUCT -->
+  <div class="modal-overlay" id="modal-add-product">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <span class="modal-title" id="productModalTitle">상품 등록</span>
+        <button class="modal-close" onclick="closeModal('modal-add-product')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group" style="grid-column:1/-1"><label class="form-label">상품명 *</label><input
+              class="form-control" id="pName" placeholder="상품명 입력"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">카테고리 *</label>
+            <select class="form-control" id="pCategory">
+              <option value="">선택</option>
+              <!-- JS Render -->
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">SKU</label><input class="form-control" id="pSku"
+              placeholder="자동 생성"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">정가 (원래 가격) *</label><input class="form-control" id="pPrice"
+              placeholder="0" type="number"></div>
+          <div class="form-group"><label class="form-label">판매가 (할인 가격)</label><input class="form-control"
+              id="pSalePrice" placeholder="0" type="number"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">재고 수량 *</label><input class="form-control" id="pStock"
+              placeholder="0" type="number"></div>
+          <div class="form-group"><label class="form-label">상품 배지 (다중 선택 가능)</label>
+            <div id="badgeGroup" style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button type="button" class="btn btn-outline btn-sm badge-toggle" data-value="new"
+                onclick="toggleBadge(this)" style="border-color:#10b981; color:#10b981; font-weight:600;">NEW
+                5%</button>
+              <button type="button" class="btn btn-outline btn-sm badge-toggle" data-value="md"
+                onclick="toggleBadge(this)" style="border-color:#3b82f6; color:#3b82f6; font-weight:600;">MD추천</button>
+              <button type="button" class="btn btn-outline btn-sm badge-toggle" data-value="best"
+                onclick="toggleBadge(this)" style="border-color:#6366f1; color:#6366f1; font-weight:600;">주문폭주</button>
+              <button type="button" class="btn btn-outline btn-sm badge-toggle" data-value="sale"
+                onclick="toggleBadge(this)" style="border-color:#ef4444; color:#ef4444; font-weight:600;">SALE</button>
+            </div>
+            <input type="hidden" id="pBadge" value="">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">노출 상태</label>
+            <select class="form-control" id="pStatus">
+              <option>판매중</option>
+              <option>입고 예정</option>
+              <option>품절</option>
+              <option>숨기기</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">SKU (관리 코드)</label><input class="form-control"
+              id="pSkuDisplay" placeholder="자동 생성" readonly></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">상품 설명</label>
+          <div class="editor-toolbar" style="margin-bottom:8px; display:flex; gap:8px; align-items:center;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="execEditorCommand('bold')"
+              title="굵게"><b>B</b></button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="execEditorCommand('italic')"
+              title="기울임"><i>I</i></button>
+            <input type="color" class="color-picker" onchange="execEditorCommand('foreColor', this.value)" title="글자 색상"
+              style="width:30px; height:30px; padding:2px; cursor:pointer;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="execEditorCommand('removeFormat')"
+              title="서식 지우기">Clear</button>
+          </div>
+          <div class="form-control editor-area" id="pDescEditor" contenteditable="true"
+            style="min-height:150px; height:auto; overflow-y:auto; padding:12px; line-height:1.6;"
+            data-placeholder="상품 설명을 입력하세요"></div>
+          <textarea id="pDesc" style="display:none"></textarea>
+        </div>
+        <div class="form-group"><label class="form-label">태그 (쉼표 구분)</label><input class="form-control" id="pTags"
+            placeholder="예: 봄신상, 베스트, 할인"></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">상품 이미지 (대표) *</label>
+            <div class="upload-zone" onclick="document.getElementById('pMainImgFile').click()">
+              <input type="file" id="pMainImgFile" style="display:none" accept="image/*"
+                onchange="previewImage(this, 'pImgPreview')">
+              <div id="pImgPreview" class="preview-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+                <span>대표 이미지 업로드</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">상품 상세 이미지 (추가)</label>
+            <div class="upload-zone" onclick="document.getElementById('pSubImgFiles').click()">
+              <input type="file" id="pSubImgFiles" style="display:none" accept="image/*" multiple
+                onchange="previewImages(this, 'pSubImgPreview')">
+              <div id="pSubImgPreview" class="preview-box" style="flex-wrap:wrap; gap:5px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                <span>상세 이미지 업로드 (다중 선택 가능)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="pMainImgUrl">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-add-product')">취소</button>
+        <button class="btn btn-primary" onclick="saveProduct()">등록하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDER DETAIL -->
+  <div class="modal-overlay" id="modal-order-detail">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <span class="modal-title">주문 상세</span>
+        <button class="modal-close" onclick="closeModal('modal-order-detail')">✕</button>
+      </div>
+      <div class="modal-body" id="orderDetailBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-order-detail')">닫기</button>
+        <button class="btn btn-primary"
+          onclick="showToast('운송장이 등록되었습니다.','success'); closeModal('modal-order-detail')">운송장 등록</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD MEMBER -->
+  <div class="modal-overlay" id="modal-add-member">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">회원 등록</span>
+        <button class="modal-close" onclick="closeModal('modal-add-member')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group"><label class="form-label">이름 *</label><input class="form-control" id="mName">
+        </div>
+        <div class="form-group"><label class="form-label">이메일 *</label><input class="form-control" id="mEmail"
+            type="email"></div>
+        <div class="form-group"><label class="form-label">연락처</label><input class="form-control" id="mPhone"
+            placeholder="010-0000-0000"></div>
+        <div class="form-group"><label class="form-label">등급</label><select class="form-control" id="mRole">
+            <option>BRONZE</option>
+            <option>SILVER</option>
+            <option>GOLD</option>
+            <option>DIA</option>
+            <option>MANAGER</option>
+          </select></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-add-member')">취소</button>
+        <button class="btn btn-primary" onclick="saveMember()">등록</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEMBER DETAIL -->
+  <div class="modal-overlay" id="modal-member-detail">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <span class="modal-title">회원 상세</span>
+        <button class="modal-close" onclick="closeModal('modal-member-detail')">✕</button>
+      </div>
+      <div class="modal-body" id="memberDetailBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-member-detail')">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD COUPON -->
+  <div class="modal-overlay" id="modal-add-coupon">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">쿠폰 생성</span>
+        <button class="modal-close" onclick="closeModal('modal-add-coupon')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">쿠폰명 *</label><input class="form-control" id="cName"></div>
+          <div class="form-group"><label class="form-label">프로모션 코드 (선택)</label><input class="form-control" id="cCode"
+              placeholder="예: WELCOME2026"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">할인 유형</label><select class="form-control" id="cType">
+              <option>정액 할인</option>
+              <option>정률 할인</option>
+            </select></div>
+          <div class="form-group"><label class="form-label">할인 금액/율 *</label><input class="form-control" id="cDiscount"
+              placeholder="예: 5000 또는 10(%)"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">최소 주문금액</label><input class="form-control" id="cMinOrder"
+              placeholder="0"></div>
+          <div class="form-group"><label class="form-label">만료일</label><input class="form-control" id="cExpiry"
+              type="date"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">발급 수량 *</label><input class="form-control" id="cTotal"
+              type="number" placeholder="1000"></div>
+          <div class="form-group"><label class="form-label">발급 대상</label><select class="form-control" id="cTarget">
+              <option>전체 회원</option>
+              <option>DIA 회원</option>
+              <option>GOLD 회원</option>
+              <option>SILVER 회원</option>
+              <option>BRONZE 회원</option>
+              <option>신규 회원</option>
+              <option>리뷰 작성자</option>
+              <option>선택 회원</option>
+            </select></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-add-coupon')">취소</button>
+        <button class="btn btn-primary" onclick="saveCoupon()">생성</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVIEW REPLY -->
+  <div class="modal-overlay" id="modal-review-reply">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">리뷰 답변</span>
+        <button class="modal-close" onclick="closeModal('modal-review-reply')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="reviewDetailBody" style="margin-bottom:16px;"></div>
+        <div class="form-group"><label class="form-label">답변 내용</label><textarea class="form-control" id="replyText"
+            style="min-height:100px;" placeholder="고객에게 보여질 답변을 입력하세요..."></textarea></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-review-reply')">취소</button>
+        <button class="btn btn-primary" onclick="saveReply()">답변 등록</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPORT MEMBERS MODAL -->
+  <div class="modal-overlay" id="modal-export-members">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">회원 데이터 내보내기</span>
+        <button class="modal-close" onclick="closeModal('modal-export-members')">✕</button>
+      </div>
+      <div class="modal-body" style="text-align:center; padding:30px 20px;">
+        <div style="margin-bottom:20px; color:var(--gray-600);">다운로드할 파일 형식을 선택해주세요.</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <button class="btn btn-outline"
+            style="display:flex; flex-direction:column; align-items:center; gap:10px; padding:20px; height:auto;"
+            onclick="exportMembersToXLSX()">
+            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="var(--success)" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <path d="M8 13h8M8 17h8" />
+            </svg>
+            <span style="font-weight:600; font-size:15px;">Excel (.xlsx)</span>
+          </button>
+
+          <button class="btn btn-outline"
+            style="display:flex; flex-direction:column; align-items:center; gap:10px; padding:20px; height:auto;"
+            onclick="exportMembersToPDF()">
+            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="var(--danger)" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <circle cx="10" cy="13" r="2" />
+              <path d="M12 15l4 4" />
+            </svg>
+            <span style="font-weight:600; font-size:15px;">PDF (.pdf)</span>
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" style="width:100%" onclick="closeModal('modal-export-members')">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- [NEW] MODAL: ADD CATEGORY -->
+  <div id="modal-add-category" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="categoryModalTitle">카테고리 추가/수정</span>
+        <button class="modal-close" onclick="closeModal('modal-add-category')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">분류 이름 *</label>
+          <input type="text" id="catName" class="form-control" placeholder="예: 아우터">
+        </div>
+        <div class="form-group">
+          <label class="form-label">영문 코드 명칭 (URL용) *</label>
+          <input type="text" id="catSlug" class="form-control" placeholder="예: outer">
+        </div>
+        <div class="form-group">
+          <label class="form-label">상위 카테고리</label>
+          <select id="catParent" class="form-control">
+            <option value="">없음 (최상위)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">노출 순서</label>
+          <input type="number" id="catOrder" class="form-control" value="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">폰트 색상</label>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <input type="color" id="catColor" class="form-control" value="#000000"
+              style="width:60px; padding:2px; height:38px;">
+            <input type="text" id="catColorText" class="form-control" value="#000000" placeholder="#000000"
+              style="flex:1;">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-add-category')">취소</button>
+        <button class="btn btn-primary" onclick="saveCategory()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- [NEW] MODAL: ADD BANNER -->
+  <div id="modal-add-banner" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="bannerModalTitle">배너 추가/수정</span>
+        <button class="modal-close" onclick="closeModal('modal-add-banner')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">배너 제목 (관리용)</label>
+          <input type="text" id="bannerTitle" class="form-control" placeholder="예: 봄 신상 기획전">
+        </div>
+        <div class="form-group">
+          <label class="form-label">이미지 URL *</label>
+          <input type="text" id="bannerImg" class="form-control" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">링크 URL</label>
+          <input type="text" id="bannerLink" class="form-control" placeholder="/varo/shop.html">
+        </div>
+        <div class="form-group">
+          <label class="form-label">노출 순서</label>
+          <input type="number" id="bannerOrder" class="form-control" value="0">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-add-banner')">취소</button>
+        <button class="btn btn-primary" onclick="saveBanner()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="./js/utils.js"></script>
+  <script src="./js/data.js"></script>
+  <script src="./js/api.js"></script>
+  <script src="./js/admin.js?v=1714532000"></script>
+</body>
+
+</html>

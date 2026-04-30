@@ -1,0 +1,381 @@
+/* styles/cart.css - VARO Shopping Bag Premium Styling */
+
+.cart-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 60px;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .cart-layout {
+    grid-template-columns: 1fr 380px;
+  }
+}
+
+/* ── 빈 장바구니 ── */
+.cart-empty {
+  padding: 100px 0;
+  text-align: center;
+}
+
+.cart-empty__inner {
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cart-empty svg {
+  color: #ddd;
+  margin-bottom: 24px;
+}
+
+.cart-empty__text {
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--color-black);
+}
+
+.cart-empty__sub {
+  color: var(--color-gray);
+  line-height: 1.6;
+}
+
+.recommend-title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 400;
+  margin: 80px 0 30px;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+
+/* ── 장바구니 아이템 ── */
+.cart-items__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 30px;
+}
+
+#cartDeleteSelected {
+  color: #111 !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+}
+
+.cart-check-all {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cart-list {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: auto 100px 1fr auto;
+  gap: 24px;
+  padding-bottom: 30px;
+  border-bottom: 0.5px solid var(--color-border-light);
+  align-items: center;
+}
+
+.cart-item__img {
+  width: 100px;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  background: var(--color-light);
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.cart-item__info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 10px;
+}
+
+.cart-item__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-black);
+}
+
+.cart-item__option {
+  font-size: 11px;
+  color: var(--color-gray);
+}
+
+.cart-item__price {
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: auto;
+}
+
+.cart-item__qty {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  width: fit-content;
+}
+
+.qty-control {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  height: 30px;
+}
+
+.qty-control button {
+  width: 30px;
+  height: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.qty-control span {
+  width: 40px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.cart-item__remove {
+  color: #bbb;
+  cursor: pointer;
+  font-size: 11px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: 0 12px;
+  width: auto;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-left: none;
+  line-height: 1;
+}
+
+.cart-item__remove:hover {
+  color: var(--color-black);
+}
+
+/* ── 주문 요약 (Sticky) ── */
+.cart-summary-container {
+  position: relative;
+}
+
+.cart-summary {
+  position: sticky;
+  top: 120px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  padding: 30px 30px 20px;
+}
+
+.cart-summary__title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  letter-spacing: 0.05em;
+}
+
+.cart-summary__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cart-summary__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--color-gray);
+}
+
+.cart-summary__row dd {
+  color: var(--color-black);
+  font-weight: 600;
+}
+
+.cart-summary__total {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.cart-summary__total dd {
+  font-size: 20px;
+  color: var(--color-accent);
+}
+
+.cart-summary__free-ship {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f9f9f9;
+}
+
+.free-ship-progress {
+  height: 2px;
+  background: #eee;
+  margin-bottom: 10px;
+}
+
+.free-ship-bar {
+  height: 100%;
+  background: var(--color-accent);
+  transition: width 0.5s ease;
+}
+
+.cart-summary__coupon .coupon-field {
+  display: flex;
+  gap: 5px;
+}
+
+.cart-summary__coupon input {
+  flex: 1;
+  height: 44px;
+  border: 1px solid var(--color-border);
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.cart-summary__benefits {
+  list-style: none;
+  padding: 0;
+}
+
+.cart-summary__benefits li {
+  font-size: 11px;
+  color: var(--color-gray);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cart-summary__benefits li::before {
+  content: '✓';
+  color: var(--color-accent);
+}
+
+.btn--wide {
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+/* ── 애니메이션 ── */
+.cart-item {
+  animation: fadeIn 0.5s ease both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cart-summary__benefits {
+  list-style: none;
+  padding: 0;
+  border-top: 1px solid #eee;
+  margin-top: 20px !important;
+}
+
+.cart-summary__benefits li {
+  padding-top: 12px;
+  font-size: 13px;
+  color: #666;
+  display: flex;
+  align-items: center;
+}
+
+.cart-item__price-block {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-black);
+}
+
+/* 커스텀 컨펌 모달 */
+.varo-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.varo-modal-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.varo-modal-text {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.varo-modal-btns {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.varo-modal-btn {
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.varo-modal-btn--cancel {
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #666;
+}
+
+.varo-modal-btn--confirm {
+  border: none;
+  background: #111;
+  color: #fff;
+}

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z'/><line x1='3' y1='6' x2='21' y2='6'/><path d='M16 10a4 4 0 0 1-8 0'/></svg>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VARO 커뮤니티 — 공지사항, FAQ, Q&A, 리뷰, 이벤트, 멤버십">
+  <title>VARO — 커뮤니티</title>
+  <script src="./js/components.js"></script>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="./styles/reset.css">
+  <link rel="stylesheet" href="./styles/variables.css">
+  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/header.css">
+  <link rel="stylesheet" href="./styles/mega-menu.css">
+  <link rel="stylesheet" href="./styles/community.css">
+</head>
+
+<body data-page="community">
+
+  <div id="header-placeholder"></div>
+  <div id="overlay-placeholder"></div>
+
+  <main id="main-content">
+
+    <!-- ── 커뮤니티 히어로 ─────────────────────────── -->
+    <div class="comm-hero">
+      <div class="container">
+        <p class="comm-hero__eyebrow">VARO COMMUNITY</p>
+        <h1 class="comm-hero__title">소통하고, 공유하고, 함께 스타일링</h1>
+        <p class="comm-hero__sub">공지사항부터 멤버 리뷰까지 — VARO의 모든 소식을 확인하세요</p>
+      </div>
+    </div>
+
+    <!-- ── 커뮤니티 탭 네비 ───────────────────────── -->
+    <div class="comm-tab-wrap">
+      <div class="container">
+        <nav class="comm-tabs" id="commTabs" aria-label="커뮤니티 탭">
+          <button class="comm-tab is-active" data-tab="notice" aria-selected="true">공지사항</button>
+          <button class="comm-tab" data-tab="faq" aria-selected="false">FAQ</button>
+          <button class="comm-tab" data-tab="qna" aria-selected="false">Q&A</button>
+          <button class="comm-tab" data-tab="review" aria-selected="false">리뷰 <span class="comm-tab__count"
+              id="reviewCount">214</span></button>
+          <button class="comm-tab" data-tab="event" aria-selected="false">이벤트</button>
+          <button class="comm-tab comm-tab--membership" data-tab="membership" aria-selected="false">멤버십</button>
+        </nav>
+      </div>
+    </div>
+
+    <!-- ── 탭 콘텐츠 ─────────────────────────────── -->
+    <div class="container comm-body">
+
+      <!-- 1. 공지사항 -->
+      <section class="comm-panel is-active" id="panel-notice">
+        <div class="comm-board">
+          <div class="comm-board__head">
+            <h2 class="comm-board__title">공지사항</h2>
+            <p class="comm-board__desc">VARO의 새로운 소식과 업데이트를 확인하세요.</p>
+          </div>
+          <ul class="notice-list" id="noticeList">
+            <!-- 자바스크립트로 동적 렌더링됨 -->
+          </ul>
+          <div class="board-pagination">
+            <button class="board-page-btn board-page-btn--nav" aria-label="이전">‹</button>
+            <button class="board-page-btn is-active">1</button>
+            <button class="board-page-btn">2</button>
+            <button class="board-page-btn">3</button>
+            <button class="board-page-btn board-page-btn--nav" aria-label="다음">›</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. FAQ -->
+      <section class="comm-panel" id="panel-faq">
+        <div class="comm-board">
+          <div class="comm-board__head">
+            <h2 class="comm-board__title">자주 묻는 질문</h2>
+            <p class="comm-board__desc">궁금한 점을 빠르게 확인하세요.</p>
+          </div>
+          <div class="faq-category-tabs">
+            <button class="faq-cat is-active" data-faq="all">전체</button>
+            <button class="faq-cat" data-faq="order">주문/결제</button>
+            <button class="faq-cat" data-faq="delivery">배송</button>
+            <button class="faq-cat" data-faq="return">교환/반품</button>
+            <button class="faq-cat" data-faq="member">회원/멤버십</button>
+            <button class="faq-cat" data-faq="product">상품</button>
+          </div>
+          <ul class="faq-list" id="faqList">
+            <!-- 자바스크립트로 동적 렌더링됨 -->
+          </ul>
+        </div>
+      </section>
+
+      <!-- 3. Q&A -->
+      <section class="comm-panel" id="panel-qna">
+        <div class="comm-board">
+          <div class="comm-board__head comm-board__head--flex">
+            <div>
+              <h2 class="comm-board__title">Q&A</h2>
+              <p class="comm-board__desc">상품 및 쇼핑 관련 문의사항을 남겨주세요.</p>
+            </div>
+            <button type="button" id="btnOpenQnaWrite" class="btn btn--primary btn--sm">문의하기</button>
+          </div>
+
+          <!-- 인라인 문의 작성 폼 (기본 숨김) -->
+          <div id="qnaWriteForm" class="qna-write-wrap" style="display: none;">
+            <div class="qna-write-box">
+              <input type="text" id="qnaSubject" class="form-input" placeholder="문의 제목을 입력해주세요" maxlength="100">
+              <textarea id="qnaContent" class="form-textarea"
+                placeholder="문의 내용을 상세히 작성해주세요. 비밀글 설정 시 본인과 관리자만 확인 가능합니다." rows="5"></textarea>
+              <div class="qna-write-footer">
+                <div class="qna-write-options">
+                  <label class="qna-checkbox">
+                    <input type="checkbox" id="qnaIsSecret">
+                    <span>비밀글로 설정</span>
+                  </label>
+                  <div id="qnaPasswordWrap" style="display: none; align-items: center; gap: 8px;">
+                    <span style="font-size: 12px; color: #666; margin-left: 10px;">비밀번호:</span>
+                    <input type="password" id="qnaPassword" class="form-input"
+                      style="width: 100px; margin-bottom: 0; padding: 6px 10px;" placeholder="숫자 4자리" maxlength="4">
+                  </div>
+                </div>
+                <div class="qna-write-btns">
+                  <button type="button" id="btnCancelQna" class="btn btn--outline btn--sm">취소</button>
+                  <button type="button" id="btnSubmitQna" class="btn btn--primary btn--sm">문의 등록</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ul class="qna-list" id="qnaList">
+            <li class="qna-item">
+              <div class="qna-q-row">
+                <span class="qna-badge qna-badge--q">Q</span>
+                <div class="qna-q-content">
+                  <p class="qna-subject">P003 코트 카멜 L사이즈 재입고 예정인가요?</p>
+                  <p class="qna-meta"><span class="qna-author">민준***</span> · 2026.04.18</p>
+                </div>
+                <span class="qna-status qna-status--done">답변완료</span>
+              </div>
+              <div class="qna-a-row">
+                <span class="qna-badge qna-badge--a">A</span>
+                <div class="qna-a-content">
+                  <p>안녕하세요 VARO입니다. 해당 상품은 <strong>4월 25일</strong> 재입고 예정입니다. 위시리스트에 추가해 두시면 재입고 알림을 받으실 수 있습니다. 감사합니다.
+                  </p>
+                  <p class="qna-meta">VARO · 2026.04.18</p>
+                </div>
+              </div>
+            </li>
+            <li class="qna-item">
+              <div class="qna-q-row">
+                <span class="qna-badge qna-badge--q">Q</span>
+                <div class="qna-q-content">
+                  <p class="qna-subject">와이드 카고 팬츠 키 180에 M사이즈 어떻게 나올까요?</p>
+                  <p class="qna-meta"><span class="qna-author">도현***</span> · 2026.04.17</p>
+                </div>
+                <span class="qna-status qna-status--done">답변완료</span>
+              </div>
+              <div class="qna-a-row">
+                <span class="qna-badge qna-badge--a">A</span>
+                <div class="qna-a-content">
+                  <p>안녕하세요! 키 180cm 기준 M사이즈는 와이드하게 착용 가능하며, 기장은 약간 크롭된 느낌으로 나올 수 있습니다. 넉넉한 핏 선호 시 M, 정핏 선호 시 L을 추천드립니다.
+                  </p>
+                  <p class="qna-meta">VARO · 2026.04.17</p>
+                </div>
+              </div>
+            </li>
+            <li class="qna-item">
+              <div class="qna-q-row">
+                <span class="qna-badge qna-badge--q">Q</span>
+                <div class="qna-q-content">
+                  <p class="qna-subject">교환 신청했는데 진행 상황 확인이 어려워요</p>
+                  <p class="qna-meta"><span class="qna-author">해찬***</span> · 2026.04.16</p>
+                </div>
+                <span class="qna-status qna-status--pending">답변대기</span>
+              </div>
+            </li>
+          </ul>
+          <div class="board-pagination">
+            <button class="board-page-btn board-page-btn--nav">‹</button>
+            <button class="board-page-btn is-active">1</button>
+            <button class="board-page-btn">2</button>
+            <button class="board-page-btn board-page-btn--nav">›</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. 리뷰 -->
+      <section class="comm-panel" id="panel-review">
+        <div class="comm-board">
+          <div class="comm-board__head comm-board__head--flex">
+            <div>
+              <h2 class="comm-board__title">리뷰</h2>
+              <p class="comm-board__desc">구매 후 실착 후기를 남겨주세요. 포인트를 드립니다!</p>
+            </div>
+            <div class="review-summary-box">
+              <span class="review-avg-big">4.7</span>
+              <div>
+                <div class="stars-row" aria-label="평점 4.7점">★★★★★</div>
+                <p class="review-total-cnt">전체 214개 리뷰</p>
+              </div>
+            </div>
+          </div>
+          <div class="review-filter-bar">
+            <button class="review-filter is-active" data-rating="all">전체</button>
+            <button class="review-filter" data-rating="5">★ 5점</button>
+            <button class="review-filter" data-rating="4">★ 4점</button>
+            <button class="review-filter" data-rating="3">★ 3점 이하</button>
+            <button class="review-filter" data-rating="photo">포토리뷰</button>
+          </div>
+          <ul class="review-grid" id="communityReviewList">
+            <!-- JS로 채워짐 -->
+          </ul>
+          <div class="board-pagination" id="reviewPagination"></div>
+        </div>
+      </section>
+
+      <!-- 5. 이벤트 -->
+      <section class="comm-panel" id="panel-event">
+        <div class="comm-board">
+          <div class="comm-board__head">
+            <h2 class="comm-board__title">이벤트</h2>
+            <p class="comm-board__desc">VARO의 다양한 이벤트와 기획전을 만나보세요.</p>
+          </div>
+          <div class="event-grid">
+            <a href="./event.html" class="event-banner-card event-banner-card--primary">
+              <div class="event-banner-card__img">
+                <img src="./assets/lookbook/lookbook_3.png" alt="1+1 이벤트" loading="lazy" width="700" height="380">
+              </div>
+              <div class="event-banner-card__info">
+                <span class="event-badge event-badge--live">진행중</span>
+                <h3 class="event-banner-card__title">상의 전품목 1+1 이벤트</h3>
+                <p class="event-banner-card__period">2026.04.19 – 04.25 · D-6</p>
+              </div>
+            </a>
+            <a href="./event.html" class="event-banner-card">
+              <div class="event-banner-card__img">
+                <img src="./assets/lookbook/lookbook_4.png" alt="2026 SS 런칭" loading="lazy" width="700" height="380">
+              </div>
+              <div class="event-banner-card__info">
+                <span class="event-badge event-badge--live">진행중</span>
+                <h3 class="event-banner-card__title">2026 SS 신상 런칭 + 5% 할인</h3>
+                <p class="event-banner-card__period">2026.04.15 – 04.30</p>
+              </div>
+            </a>
+            <a href="./event.html" class="event-banner-card">
+              <div class="event-banner-card__img">
+                <img src="./assets/lookbook/lookbook_5.png" alt="GOLD 전용" loading="lazy" width="700" height="380">
+              </div>
+              <div class="event-banner-card__info">
+                <span class="event-badge event-badge--gold">GOLD+</span>
+                <h3 class="event-banner-card__title">VIP 프리뷰 위크 — GOLD 이상 10% 추가</h3>
+                <p class="event-banner-card__period">2026.04.20 – 04.27</p>
+              </div>
+            </a>
+            <a href="./event.html" class="event-banner-card">
+              <div class="event-banner-card__img">
+                <img src="./assets/lookbook/lookbook_6.png" alt="콜라보" loading="lazy" width="700" height="380">
+              </div>
+              <div class="event-banner-card__info">
+                <span class="event-badge event-badge--collab">COLLAB</span>
+                <h3 class="event-banner-card__title">VARO × Studio N 한정 컬래버</h3>
+                <p class="event-banner-card__period">2026.05.01 예정</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. 멤버십 -->
+      <section class="comm-panel" id="panel-membership">
+        <div class="comm-board">
+          <div class="comm-board__head">
+            <h2 class="comm-board__title">VARO 멤버십</h2>
+            <p class="comm-board__desc">등급이 올라갈수록 더 큰 혜택. 지금 바로 확인하세요.</p>
+          </div>
+
+          <!-- 등급 혜택 비교표 -->
+          <div class="membership-tiers">
+            <div class="tier-card tier-card--bronze">
+              <div class="tier-card__icon">
+                <!-- BRONZE: Badge -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                  style="color: #A87C6C;">
+                  <path
+                    d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z">
+                  </path>
+                </svg>
+              </div>
+              <p class="tier-card__name">BRONZE</p>
+              <p class="tier-card__cond">누적 구매 0원~</p>
+              <ul class="tier-card__benefits">
+                <li>전 상품 1% 적립금 지급</li>
+                <li>생일 축하 기념 쿠폰 증정</li>
+                <li>회원가입 즉시 웰컴 쿠폰</li>
+              </ul>
+            </div>
+            <div class="tier-card tier-card--silver">
+              <div class="tier-card__icon">
+                <!-- SILVER: Medal -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                  style="color: #A0A0A0;">
+                  <circle cx="12" cy="8" r="6"></circle>
+                  <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path>
+                </svg>
+              </div>
+              <p class="tier-card__name">SILVER</p>
+              <p class="tier-card__cond">누적 구매 10만원~</p>
+              <ul class="tier-card__benefits">
+                <li>전 상품 3% 적립금 지급</li>
+                <li>매월 상시 5% 할인 쿠폰</li>
+                <li>신상품 선공개 알림 서비스</li>
+                <li>생일 쿠폰 2배 혜택</li>
+              </ul>
+            </div>
+            <div class="tier-card tier-card--gold">
+              <div class="tier-card__icon">
+                <!-- GOLD: Crown -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                  style="color: #D4AF37;">
+                  <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7Z"></path>
+                  <path d="M19 16v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-2"></path>
+                </svg>
+              </div>
+              <p class="tier-card__name">GOLD</p>
+              <p class="tier-card__cond">누적 구매 30만원~</p>
+              <ul class="tier-card__benefits">
+                <li>전 상품 5% 적립금 지급</li>
+                <li><strong>모든 주문 상시 10% 자동 할인</strong></li>
+                <li>전 지역 무료배송 혜택</li>
+                <li>VIP 한정 이벤트 우선 참여</li>
+                <li>전 전 전담 CS 채널 이용</li>
+              </ul>
+            </div>
+            <div class="tier-card tier-card--dia">
+              <div class="tier-card__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                  style="color: #00D1FF;">
+                  <path d="M6 3h12l4 8-10 10L2 11z"></path>
+                  <path d="M11 3 8 11l4 10 4-10-3-8"></path>
+                  <path d="M2 11h20"></path>
+                </svg>
+              </div>
+              <p class="tier-card__name">DIA</p>
+              <p class="tier-card__cond">누적 구매 100만원~</p>
+              <ul class="tier-card__benefits">
+                <li>전 상품 7% 적립금 지급</li>
+                <li><strong>모든 주문 상시 15% 자동 할인</strong></li>
+                <li>무료배송 및 당일 우선 출고</li>
+                <li>시즌 룩북 프리뷰 대상</li>
+                <li>퍼스널 스타일리스트 매칭</li>
+                <li>연 2회 스페셜 기프트</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="membership-cta">
+            <p class="membership-cta__text">현재 내 등급을 확인하고 다음 등급까지 얼마나 남았는지 알아보세요.</p>
+            <a href="./mypage.html?tab=membership" id="btnCheckMembership" class="btn btn--primary">내 멤버십 확인하기</a>
+            <a href="./signup.html" id="btnGoSignup" class="btn btn--outline u-ml-10">회원가입하기</a>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /comm-body -->
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/data.js"></script>
+  <script src="./js/utils.js"></script>
+  <script src="./js/main.js"></script>
+  <script src="./js/mega-menu.js"></script>
+  <script src="./js/community-page.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,88 @@
+/* 경로: styles/modal.css */
+.varo-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.varo-modal.is-active,
+.varo-modal[aria-hidden="false"] {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.varo-modal__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  /* blur 제거: 성능 개선 */
+}
+
+.varo-modal__content {
+  position: relative;
+  width: 90%;
+  max-width: 540px;
+  background: #fff;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.4);
+  transform: translateY(40px);
+  transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+  z-index: 10000;
+}
+
+.varo-modal.is-active .varo-modal__content,
+.varo-modal[aria-hidden="false"] .varo-modal__content {
+  transform: translateY(0);
+}
+
+.varo-modal__header {
+  padding: 30px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.varo-modal__title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.varo-modal__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  color: #000;
+  transition: transform 0.3s;
+}
+
+.varo-modal__body {
+  padding: 30px;
+  max-height: 60vh;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #444;
+}
+
+.varo-modal__body strong {
+  display: block;
+  margin-top: 24px;
+  color: #000;
+  font-weight: 700;
+}
+
+.varo-modal__body strong:first-child {
+  margin-top: 0;
+}

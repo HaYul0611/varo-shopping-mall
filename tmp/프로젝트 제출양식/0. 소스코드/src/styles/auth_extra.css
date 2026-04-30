@@ -1,0 +1,470 @@
+/* styles/auth_extra.css — 로그인/회원가입 추가 스타일 */
+
+.auth-body {
+  background-color: var(--color-bg, #f9f9f9);
+}
+
+.auth-main {
+  padding: 60px 0;
+  min-height: calc(100vh - 400px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.auth-card {
+  background: #fff;
+  border: 1px solid var(--color-border, #eee);
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.auth-title {
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.auth-subtitle {
+  font-size: 14px;
+  color: var(--color-gray, #888);
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.social-login {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 48px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.social-btn:hover {
+  opacity: 0.9;
+}
+
+.social-btn--kakao {
+  background: #fee500;
+  color: #191919;
+}
+
+.social-btn--naver {
+  background: #03c75a;
+  color: #fff;
+}
+
+.social-btn--google {
+  background: #fff;
+  color: #757575;
+  border: 1px solid #ddd;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  color: #ccc;
+  font-size: 12px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #eee;
+}
+
+.auth-divider span {
+  padding: 0 10px;
+}
+
+.auth-card__footer {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}
+
+.auth-link {
+  color: var(--color-accent, #D96B3C);
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+/* ── 토글 스위치 (로그인 유지 등) ────────────────── */
+.auth-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px 0 24px;
+}
+
+
+.toggle-switch {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  gap: 12px;
+}
+
+.toggle-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background-color: #e5e7eb;
+  border-radius: 24px;
+  transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-slider:before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-switch input:checked+.toggle-slider {
+  background-color: #03c75a;
+  /* Naver-like Green */
+}
+
+/* ── 애니메이션 방지 클래스 (새로고침 시 잔상 제거용) ── */
+.no-transition,
+.no-transition .toggle-slider,
+.no-transition .toggle-slider:before {
+  transition: none !important;
+}
+
+.toggle-switch input:checked+.toggle-slider:before {
+  transform: translateX(20px);
+}
+
+.toggle-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4b5563;
+  transition: color 0.2s;
+}
+
+.toggle-switch:hover .toggle-label {
+  color: #111827;
+}
+
+/* ── Find ID/PW Modal & Helper Links ──────────────── */
+.auth-helper-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.auth-helper-link {
+  color: #888;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.auth-helper-link:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.auth-helper-sep {
+  width: 1px;
+  height: 10px;
+  background: #eee;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content.find-modal {
+  background: #fff;
+  width: 90%;
+  max-width: 400px;
+  padding: 40px;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #ccc;
+  cursor: pointer;
+}
+
+.find-tabs {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 24px;
+}
+
+.find-tab {
+  flex: 1;
+  padding: 12px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #999;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.find-tab.active {
+  color: #0d0d0d;
+  border-bottom-color: #0d0d0d;
+}
+
+.find-desc {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.find-result {
+  margin-top: 30px;
+  padding: 24px;
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  border: 1px solid #eee;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 500;
+  color: #333;
+  box-shadow: 10px 10px 20px #e6e6e6, -10px -10px 20px #ffffff;
+  animation: fadeInDown 0.4s ease-out;
+}
+
+.find-result strong {
+  color: var(--color-accent);
+  font-weight: 700;
+  display: block;
+  font-size: 18px;
+  margin-top: 8px;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.input-with-timer {
+  position: relative;
+}
+
+.auth-timer {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #D96B3C;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.u-hidden {
+  display: none !important;
+}
+
+/* Utilities */
+.u-mb-15 {
+  margin-bottom: 15px !important;
+}
+
+.u-mb-20 {
+  margin-bottom: 20px !important;
+}
+
+.u-mb-30 {
+  margin-bottom: 30px !important;
+}
+
+/* ── 소셜 로그인 시뮬레이션 모달 ── */
+.social-modal-content {
+  max-width: 400px;
+  text-align: center;
+  padding: 40px 20px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.social-modal-logo {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.social-modal-text {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.social-spinner {
+  display: none;
+  margin: 0 auto 30px;
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #D96B3C;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+#socialLoginModal .social-modal-content {
+  animation: modalUp 0.3s ease-out;
+}
+
+@keyframes modalUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ── 소셜 로그인 안내 문구 스타일 ── */
+.social-notice {
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.social-notice__main {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1C1A16;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.social-notice__box {
+  background: #F9F9F9;
+  border: 1px solid #EAEAEA;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.social-notice__title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #888;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.social-notice__list {
+  font-size: 13.5px;
+  color: #333;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.social-notice__list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.social-notice__list li::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  background-color: currentColor;
+  border-radius: 50%;
+}
+
+.social-notice__sub {
+  font-size: 12px;
+  color: #AAA;
+  line-height: 1.5;
+  text-align: center;
+}
