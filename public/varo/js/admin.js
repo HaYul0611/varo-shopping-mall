@@ -100,7 +100,35 @@ function openModal(id) {
   document.getElementById(id).classList.add('open');
 }
 function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('open');
+}
+
+// 사용자 정의 확인창 (브라우저 기본 confirm 대체용)
+function showCustomConfirm(message, onConfirm) {
+  let modal = document.getElementById('modal-custom-confirm');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-custom-confirm';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal" style="width: 400px; padding: 24px; text-align: center;">
+        <h3 id="customConfirmMessage" style="margin-bottom: 24px; font-size: 16px; font-weight: 600;"></h3>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+          <button class="btn btn-outline" onclick="closeModal('modal-custom-confirm')" style="flex:1;">취소</button>
+          <button class="btn btn-danger" id="btn-custom-confirm-ok" style="flex:1;">삭제</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+  document.getElementById('customConfirmMessage').innerHTML = message.replace(/\n/g, '<br>');
+  const okBtn = document.getElementById('btn-custom-confirm-ok');
+  okBtn.onclick = () => {
+    closeModal('modal-custom-confirm');
+    if (onConfirm) onConfirm();
+  };
+  openModal('modal-custom-confirm');
 }
 // close on overlay click
 document.querySelectorAll('.modal-overlay').forEach(m => {
@@ -830,9 +858,6 @@ async function syncAllData() {
       if (typeof window.updateHeaderOrder === 'function') {
         window.updateHeaderOrder();
       }
-      if (typeof adminSyncChannel !== 'undefined') {
-        adminSyncChannel.postMessage({ type: 'categories', action: 'update', reordered: true });
-      }
     }
     if (bRes.success) {
       API_BANNERS = bRes.data || [];
@@ -1045,7 +1070,10 @@ function renderProducts(list) {
       <td>
         <div style="display:flex;align-items:center;gap:12px;">
           <div class="product-thumb">
-            <img src="${p.img.startsWith('http') ? p.img : (p.img.startsWith('./') ? '/varo/' + p.img.substring(2) : p.img)}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;">
+            <img src="${p.img}" 
+                 alt="${p.name}" 
+                 style="width:100%;height:100%;object-fit:cover;" 
+                 onerror="window.Utils.handleImgError(this)">
           </div>
           <div style="font-weight:600">${p.name}</div>
         </div>
@@ -1061,10 +1089,10 @@ function renderProducts(list) {
       <td>${statusBadge(p.status)}</td>
       <td>
         <div style="display:flex;gap:4px;">
-          <button class="btn btn-outline btn-sm btn-icon" title="수정" onclick="editProduct(${p.id})">
+          <button class="btn btn-outline btn-sm btn-icon" title="수정" onclick="editProduct('${p.id}')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
-          <button class="btn btn-danger btn-sm btn-icon" title="삭제" onclick="deleteProduct(${p.id})">
+          <button class="btn btn-danger btn-sm btn-icon" title="삭제" onclick="deleteProduct('${p.id}')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
           </button>
         </div>
@@ -1189,15 +1217,18 @@ function toggleBadge(el) {
 }
 
 function editProduct(id) {
-  // API 데이터 또는 더미 데이터에서 검색
-  const p = API_PRODUCTS.find(x => x.id === id) || DATA.products.find(x => x.id === id);
-  if (!p) return;
-  document.getElementById('productModalTitle').textContent = '상품 수정';
-  document.getElementById('pName').value = p.name || '';
-  document.getElementById('pSku').value = p.product_code || p.sku || '';
-  document.getElementById('pCategory').value = p.category_id || p.category || '';
-  document.getElementById('pPrice').value = p.price || 0;
-  document.getElementById('pSalePrice').value = p.sale_price || '';
+  console.log('editProduct clicked:', id);
+  const p = (API_PRODUCTS || []).find(x => String(x.id) === String(id)) || (DATA.products || []).find(x => String(x.id) === String(id));
+  if (!p) { console.warn('Product not found:', id); return; }
+  const setV = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+  const setH = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+
+  setH('productModalTitle', '상품 수정');
+  setV('pName', p.name || '');
+  setV('pSku', p.product_code || p.sku || '');
+  setV('pCategory', p.category_id || p.category || '');
+  setV('pPrice', p.price || 0);
+  setV('pSalePrice', p.sale_price || '');
 
   // 배지 버튼 활성화 (다중)
   const badgeStr = p.badge || '';
@@ -1208,17 +1239,22 @@ function editProduct(id) {
     else btn.classList.remove('is-active');
   });
 
-  document.getElementById('pStock').value = p.stock || 0;
-  document.getElementById('pStatus').value = p.isActive ? '판매중' : (p.status || '판매중');
-  document.getElementById('pDescEditor').innerHTML = p.description || '';
+  setV('pStock', p.stock || 0);
+  setV('pStatus', p.status === '숨김' ? '숨기기' : (p.status || '판매중'));
+  setH('pDescEditor', p.description || '');
+
+  if (document.getElementById('pSkuDisplay')) {
+    document.getElementById('pSkuDisplay').value = p.product_code || p.sku || '';
+  }
 
   // 신규 필드 (adminadd 연동)
-  document.getElementById('pMaterial').value = p.material || '';
+  setV('pMaterial', p.material || '');
 
-  // 상세 옵션 초기화
-  productTags = p.tags ? p.tags.split(',').filter(Boolean) : [];
-  selectedColors = p.colors ? p.colors.split(',').filter(Boolean) : [];
-  selectedSizes = p.sizes ? p.sizes.split(',').filter(Boolean) : [];
+  // 상세 옵션 초기화 (배열/문자열 모두 대응)
+  const parseArr = (val) => Array.isArray(val) ? val : (val ? String(val).split(',').filter(Boolean) : []);
+  productTags = parseArr(p.tags || p.product_tags);
+  selectedColors = parseArr(p.colors || p.color);
+  selectedSizes = parseArr(p.sizes || p.size);
 
   renderTags();
   renderStockTable();
@@ -1376,14 +1412,33 @@ function renderFullNotifications() {
   </div>`).join('');
 }
 
-function deleteProduct(id) {
-  const idx = DATA.products.findIndex(x => x.id === id);
-  if (idx > -1) {
-    const name = DATA.products[idx].name;
-    DATA.products.splice(idx, 1);
-    renderProducts();
-    showToast(`"${name}" 상품이 삭제되었습니다.`);
-  }
+async function deleteProduct(id) {
+  console.log('deleteProduct function triggered for id:', id);
+
+  // Custom confirm dialog to bypass browser blocking
+  showCustomConfirm('정말 이 상품을 삭제하시겠습니까?', async () => {
+    const idx = DATA.products.findIndex(x => String(x.id) === String(id));
+    if (idx > -1) {
+      const name = DATA.products[idx].name;
+      DATA.products.splice(idx, 1);
+      renderProducts();
+      showToast(`"${name}" 상품이 삭제되었습니다.`, 'success');
+      return;
+    }
+
+    // API 데이터 삭제 시도
+    try {
+      const res = await API.products.delete(id);
+      if (res.success) {
+        showToast('상품이 삭제되었습니다.', 'success');
+        syncAllData();
+      } else {
+        showToast('삭제 실패: ' + (res.error || '권한이 없습니다.'), 'error');
+      }
+    } catch (e) {
+      showToast('삭제 중 오류가 발생했습니다.', 'error');
+    }
+  });
 }
 
 // ════════════════════════════════════════════════════════
@@ -1544,6 +1599,35 @@ function exportProducts() {
   } catch (e) {
     console.error(e);
     showToast('엑셀 다운로드 중 오류가 발생했습니다.', 'error');
+  }
+}
+
+// 대시보드 통계 엑셀 내보내기
+function exportDashboardData() {
+  try {
+    if (typeof XLSX === 'undefined') {
+      showToast('XLSX 라이브러리가 로드되지 않았습니다.', 'error');
+      return;
+    }
+
+    const exportData = [
+      { '구분': '전체 상품', '값': document.querySelector('.stat-card:nth-child(1) .stat-value')?.textContent || '0' },
+      { '구분': '이번 달 주문', '값': document.querySelector('.stat-card:nth-child(2) .stat-value')?.textContent || '0' },
+      { '구분': '전체 회원', '값': document.querySelector('.stat-card:nth-child(3) .stat-value')?.textContent || '0' },
+      { '구분': '이번 달 매출', '값': document.querySelector('.stat-card:nth-child(4) .stat-value')?.textContent || '0' }
+    ];
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "DashboardStats");
+
+    const filename = `varo_dashboard_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(workbook, filename);
+
+    showToast('대시보드 통계가 엑셀로 다운로드되었습니다.', 'success');
+  } catch (e) {
+    console.error(e);
+    showToast('다운로드 중 오류가 발생했습니다.', 'error');
   }
 }
 
@@ -1710,8 +1794,8 @@ function renderMembers() {
       <td>${m.status === '정지' ? statusBadge('정지') : statusBadge('정상')}</td>
       <td>
         <div style="display:flex;gap:4px;">
-          <button class="btn btn-outline btn-sm" onclick="viewMember(${m.id})">상세</button>
-          <button class="btn btn-outline btn-sm" onclick="toggleMemberStatus(${m.id})">${m.status === '정지' ? '활성화' : '정지'}</button>
+          <button class="btn btn-outline btn-sm" onclick="viewMember('${m.id}')">상세</button>
+          <button class="btn btn-outline btn-sm" onclick="toggleMemberStatus('${m.id}')">${m.status === '정지' ? '활성화' : '정지'}</button>
         </div>
       </td>
     </tr>`).join('');
@@ -1813,8 +1897,12 @@ function exportMembersToPDF() {
 }
 
 function toggleMemberStatus(id) {
-  const m = DATA.members.find(x => x.id === id);
-  if (m) { m.status = m.status === '정지' ? '정상' : '정지'; renderMembers(); showToast(`${m.name}님 계정이 ${m.status} 처리되었습니다.`); }
+  const m = DATA.members.find(x => String(x.id) === String(id));
+  if (m) {
+    m.status = m.status === '정지' ? '정상' : '정지';
+    renderMembers();
+    showToast(`${m.name}님 계정이 ${m.status} 처리되었습니다.`, 'success');
+  }
 }
 
 function saveMember() {
@@ -1828,7 +1916,7 @@ function saveMember() {
 }
 
 function viewMember(id) {
-  const m = DATA.members.find(x => x.id === id);
+  const m = DATA.members.find(x => String(x.id) === String(id));
   if (!m) return;
   const orders = DATA.orders.filter(o => o.customer === m.name);
   document.getElementById('memberDetailBody').innerHTML = `
@@ -1874,7 +1962,7 @@ function viewMember(id) {
     </div>` : '<div style="text-align:center;color:var(--gray-400);padding:16px;">주문 내역이 없습니다.</div>'}
     <div style="margin-top:16px;display:flex;gap:8px;">
       <label class="form-label" style="margin-bottom:0;align-self:center;">등급 변경</label>
-      <select class="form-control" style="width:120px;" onchange="updateMemberRole(${m.id},this.value)">
+      <select class="form-control" style="width:120px;" onchange="updateMemberRole('${m.id}',this.value)">
         ${['BRONZE', 'SILVER', 'GOLD', 'DIA', 'MANAGER'].map(r => `<option${m.role === r ? ' selected' : ''}>${r}</option>`).join('')}
       </select>
     </div>`;
@@ -1882,7 +1970,7 @@ function viewMember(id) {
 }
 
 function updateMemberRole(id, newRole) {
-  const m = DATA.members.find(x => x.id === id);
+  const m = DATA.members.find(x => String(x.id) === String(id));
   if (m) { m.role = newRole; renderMembers(); showToast(`${m.name}님 등급이 ${newRole}로 변경되었습니다.`, 'success'); }
 }
 
@@ -1924,7 +2012,7 @@ function renderReviews() {
       <div style="margin:10px 0;font-size:13.5px;line-height:1.6">${r.content}</div>
       ${r.replied ? `<div style="background:var(--gray-50);border-left:3px solid var(--black);padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:var(--gray-600);">↳ ${r.reply}</div>` : ''}
       <div style="display:flex;gap:8px;margin-top:10px;">
-        <button class="btn btn-outline btn-sm" onclick="replyReview(${r.id})">${r.replied ? '답변 수정' : '답변 작성'}</button>
+        <button class="btn btn-outline btn-sm" onclick="replyReview('${r.id}')">${r.replied ? '답변 수정' : '답변 작성'}</button>
         <button class="btn btn-outline btn-sm" onclick="showToast('리뷰가 숨김 처리되었습니다.')">숨김</button>
         <button class="btn btn-danger btn-sm" onclick="showToast('리뷰가 삭제되었습니다.')">삭제</button>
       </div>
@@ -1932,7 +2020,7 @@ function renderReviews() {
 }
 
 function replyReview(id) {
-  const r = DATA.reviews.find(x => x.id === id);
+  const r = (DATA.reviews || []).find(x => String(x.id) === String(id));
   if (!r) return;
   document.getElementById('reviewDetailBody').innerHTML = `
     <div style="background:var(--gray-50);padding:12px;border-radius:8px;font-size:13px;">
@@ -1999,8 +2087,13 @@ function renderCategories() {
       { id: 36, parent_id: 14, name: '로퍼', slug: 'loafer', sort_order: 2 },
       { id: 37, parent_id: 14, name: '샌들', slug: 'sandal', sort_order: 3 },
       { id: 38, parent_id: 14, name: '부츠', slug: 'boots', sort_order: 4 },
-      { id: 15, parent_id: null, name: '1+1 EVENT', slug: 'event', sort_order: 10 },
-      { id: 16, parent_id: null, name: 'COMMUNITY', slug: 'community', sort_order: 11 }
+      { id: 39, parent_id: null, name: 'ACC', slug: 'acc', sort_order: 10 },
+      { id: 40, parent_id: 39, name: '가방', slug: 'bag', sort_order: 1 },
+      { id: 41, parent_id: 39, name: '모자', slug: 'hat', sort_order: 2 },
+      { id: 42, parent_id: 39, name: '주얼리', slug: 'jewelry', sort_order: 3 },
+      { id: 43, parent_id: 39, name: '잡화', slug: 'etc', sort_order: 4 },
+      { id: 15, parent_id: null, name: '1+1 EVENT', slug: 'event', sort_order: 11 },
+      { id: 16, parent_id: null, name: 'COMMUNITY', slug: 'community', sort_order: 12 }
     ];
 
   const outerCat = categoryData.find(c => c.name.toUpperCase() === 'OUTER');
@@ -2068,9 +2161,9 @@ function renderCategories() {
           </span>
           <span class="name">${p.name} <small style="color:var(--gray-400); font-weight:400; margin-left:8px;">(${p.slug})</small></span>
           <div class="category-actions" onclick="event.stopPropagation()">
-            <button class="add-sub-btn" onclick="addSubCategory(${p.id})">+ 서브 추가</button>
-            <button class="btn btn-outline btn-sm" style="margin-left:8px" onclick="editCategory(${p.id})">수정</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteCategory(${p.id})">삭제</button>
+            <button class="add-sub-btn" onclick="addSubCategory('${p.id}')">+ 서브 추가</button>
+            <button class="btn btn-outline btn-sm" style="margin-left:8px" onclick="editCategory('${p.id}')">수정</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteCategory('${p.id}')">삭제</button>
           </div>
         </div>
         <div class="sub-category-list" data-parent-id="${p.id}">
@@ -2083,8 +2176,8 @@ function renderCategories() {
               </div>
               <span class="name">${c.name} <small style="color:var(--gray-400); margin-left:6px;">(${c.slug})</small></span>
               <div class="category-actions">
-                <button class="btn btn-outline btn-sm" onclick="editCategory(${c.id})">수정</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.id})">삭제</button>
+                <button class="btn btn-outline btn-sm" onclick="editCategory('${c.id}')">수정</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteCategory('${c.id}')">삭제</button>
               </div>
             </div>
           `).join('') || '<div style="padding:15px 52px; font-size:12px; color:var(--gray-400);">서브 카테고리가 없습니다.</div>'}
@@ -2105,6 +2198,8 @@ function addSubCategory(parentId) {
   document.getElementById('catSlug').value = '';
   document.getElementById('catOrder').value = '0';
   document.getElementById('catParent').value = parentId;
+  document.getElementById('catColor').value = '#000000';
+  document.getElementById('catColorText').value = '#000000';
   delete document.getElementById('modal-add-category').dataset.editId;
   openModal('modal-add-category');
 }
@@ -2156,49 +2251,111 @@ function initCategorySortable() {
 async function saveReorder(orders) {
   showToast('순서를 저장 중...', 'info');
   try {
-    const res = await API.req('PUT', '/categories/reorder', { orders }, true);
-    if (res.success) {
-      showToast('순서가 변경되었습니다.', 'success');
-      localStorage.setItem('VARO_CATEGORIES_ORDER', JSON.stringify(orders));
+    // 1. 로컬 스토리지 즉시 업데이트 (API 실패 대비 및 빠른 반응성)
+    localStorage.setItem('VARO_CATEGORIES_ORDER', JSON.stringify(orders));
 
-      const currentCats = JSON.parse(localStorage.getItem('varo_categories') || '[]');
-      if (currentCats.length > 0) {
-        const outerCat = currentCats.find(c => c.name.toUpperCase() === 'OUTER');
-        const outerId = outerCat ? outerCat.id : 4;
-
-        orders.forEach(o => {
-          const idx = currentCats.findIndex(c => c.id == o.id);
-          if (idx > -1) {
-            currentCats[idx].sort_order = o.sort_order;
-            if (currentCats[idx].name === '패딩' || currentCats[idx].name === '점퍼' || currentCats[idx].name === '레더/무스탕') {
-              currentCats[idx].parent_id = outerId;
-            } else if (o.parent_id !== undefined) {
-              currentCats[idx].parent_id = o.parent_id;
-            }
-          }
-        });
-        localStorage.setItem('varo_categories', JSON.stringify(currentCats));
-      }
-
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'varo_categories',
-        newValue: localStorage.getItem('varo_categories')
-      }));
-
-      syncAllData(); // [ADD] 즉시 데이터 동기화 및 렌더링
-      if (typeof window.updateHeaderOrder === 'function') {
-        window.updateHeaderOrder();
-      }
-
-      // [ADD] 실시간 동기화 브로드캐스트 전송
-      if (typeof adminSyncChannel !== 'undefined') {
-        adminSyncChannel.postMessage({ type: 'categories', action: 'reorder', reordered: true });
-      }
-    } else {
-      showToast(res.message || '순서 저장 실패', 'error');
+    let currentCats = JSON.parse(localStorage.getItem('varo_categories') || '[]');
+    if (currentCats.length === 0 && typeof API_CATEGORIES !== 'undefined' && API_CATEGORIES && API_CATEGORIES.length > 0) {
+      currentCats = JSON.parse(JSON.stringify(API_CATEGORIES));
     }
+
+    // 데이터가 없다면 기본 데이터 생성
+    if (currentCats.length === 0) {
+      currentCats = [
+        { id: 1, parent_id: null, name: 'BEST', slug: 'best', sort_order: 1 },
+        { id: 2, parent_id: null, name: 'NEW 5%', slug: 'new', sort_order: 2 },
+        { id: 3, parent_id: null, name: 'COLLECTION', slug: 'collection', sort_order: 3 },
+        { id: 4, parent_id: null, name: 'OUTER', slug: 'outer', sort_order: 4 },
+        { id: 5, parent_id: 4, name: '자켓', slug: 'jacket', sort_order: 1 },
+        { id: 6, parent_id: 4, name: '코트', slug: 'coat', sort_order: 2 },
+        { id: 7, parent_id: 4, name: '패딩', slug: 'padding', sort_order: 3 },
+        { id: 8, parent_id: 4, name: '점퍼', slug: 'jumper', sort_order: 4 },
+        { id: 9, parent_id: 4, name: '레더/무스탕', slug: 'leather', sort_order: 5 },
+        { id: 10, parent_id: null, name: 'SHIRT', slug: 'shirt', sort_order: 5 },
+        { id: 17, parent_id: 10, name: '반팔셔츠', slug: 'shortshirt', sort_order: 1 },
+        { id: 18, parent_id: 10, name: '긴팔셔츠', slug: 'longshirt', sort_order: 2 },
+        { id: 19, parent_id: 10, name: '오버셔츠', slug: 'overshirt', sort_order: 3 },
+        { id: 20, parent_id: 10, name: '데님셔츠', slug: 'denimshirt', sort_order: 4 },
+        { id: 11, parent_id: null, name: 'TOP', slug: 'top', sort_order: 6 },
+        { id: 21, parent_id: 11, name: '반팔티', slug: 'shorttee', sort_order: 1 },
+        { id: 22, parent_id: 11, name: '긴팔티', slug: 'longtee', sort_order: 2 },
+        { id: 23, parent_id: 11, name: '맨투맨', slug: 'sweatshirt', sort_order: 3 },
+        { id: 24, parent_id: 11, name: '후드티', slug: 'hoodie', sort_order: 4 },
+        { id: 25, parent_id: 11, name: '민소매', slug: 'sleeveless', sort_order: 5 },
+        { id: 12, parent_id: null, name: 'BOTTOM', slug: 'bottom', sort_order: 7 },
+        { id: 26, parent_id: 12, name: '데님팬츠', slug: 'denim', sort_order: 1 },
+        { id: 27, parent_id: 12, name: '슬랙스', slug: 'slacks', sort_order: 2 },
+        { id: 28, parent_id: 12, name: '카고팬츠', slug: 'cargo', sort_order: 3 },
+        { id: 29, parent_id: 12, name: '조거팬츠', slug: 'jogger', sort_order: 4 },
+        { id: 30, parent_id: 12, name: '반바지', slug: 'shorts', sort_order: 5 },
+        { id: 13, parent_id: null, name: 'KNIT', slug: 'knit', sort_order: 8 },
+        { id: 31, parent_id: 13, name: '풀오버', slug: 'pullover', sort_order: 1 },
+        { id: 32, parent_id: 13, name: '집업니트', slug: 'zipup', sort_order: 2 },
+        { id: 33, parent_id: 13, name: '가디건', slug: 'cardigan', sort_order: 3 },
+        { id: 34, parent_id: 13, name: '니트베스트', slug: 'vest', sort_order: 4 },
+        { id: 14, parent_id: null, name: 'SHOES', slug: 'shoes', sort_order: 9 },
+        { id: 35, parent_id: 14, name: '스니커즈', slug: 'sneakers', sort_order: 1 },
+        { id: 36, parent_id: 14, name: '로퍼', slug: 'loafer', sort_order: 2 },
+        { id: 37, parent_id: 14, name: '샌들', slug: 'sandal', sort_order: 3 },
+        { id: 38, parent_id: 14, name: '부츠', slug: 'boots', sort_order: 4 },
+        { id: 15, parent_id: null, name: '1+1 EVENT', slug: 'event', sort_order: 10 },
+        { id: 16, parent_id: null, name: 'COMMUNITY', slug: 'community', sort_order: 11 }
+      ];
+    }
+
+    const outerCat = currentCats.find(c => c.name.toUpperCase() === 'OUTER');
+    const outerId = outerCat ? outerCat.id : 4;
+
+    orders.forEach(o => {
+      let idx = currentCats.findIndex(c => c.id == o.id);
+      if (idx === -1 && o.name) {
+        // 이름으로 매칭 (공백 제거 및 대문자 변환)
+        const oName = o.name.trim().replace(/\s+/g, '').toUpperCase();
+        idx = currentCats.findIndex(c => c.name.trim().replace(/\s+/g, '').toUpperCase() === oName);
+      }
+
+      if (idx > -1) {
+        currentCats[idx].sort_order = o.sort_order;
+        if (currentCats[idx].name === '패딩' || currentCats[idx].name === '점퍼' || currentCats[idx].name === '레더/무스탕') {
+          currentCats[idx].parent_id = outerId;
+        } else if (o.parent_id !== undefined) {
+          currentCats[idx].parent_id = o.parent_id;
+        }
+      }
+    });
+
+    localStorage.setItem('varo_categories', JSON.stringify(currentCats));
+
+    // 2. 실시간 동기화 브로드캐스트 전송
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: 'varo_categories',
+      newValue: localStorage.getItem('varo_categories')
+    }));
+
+    try {
+      const syncChannel = new BroadcastChannel('varo_admin_sync');
+      syncChannel.postMessage({ type: 'categories', action: 'reorder', reordered: true });
+    } catch (e) {
+      console.error('BroadcastChannel error:', e);
+    }
+
+    syncAllData(); // 즉시 데이터 동기화 및 렌더링
+    if (typeof window.updateHeaderOrder === 'function') {
+      window.updateHeaderOrder();
+    }
+
+    showToast('순서가 변경되었습니다.', 'success');
+
+    // 3. 백엔드 API 호출 (실패해도 무방하도록)
+    try {
+      await API.req('PUT', '/categories/reorder', { orders }, true);
+    } catch (apiErr) {
+      console.warn('Backend API /categories/reorder failed, but local storage updated.', apiErr);
+    }
+
   } catch (err) {
-    showToast('네트워크 오류', 'error');
+    console.error('Error in saveReorder:', err);
+    showToast('순서 변경 중 오류가 발생했습니다.', 'error');
   }
 }
 
@@ -2215,6 +2372,7 @@ async function saveCategory() {
     slug,
     sort_order: parseInt(order),
     parent_id: parentId ? parseInt(parentId) : null,
+    font_color: document.getElementById('catColor').value || '#000000',
     is_active: 1
   };
 
@@ -2240,27 +2398,30 @@ async function saveCategory() {
 }
 
 async function editCategory(id) {
-  const c = API_CATEGORIES.find(x => x.id == id);
+  const c = API_CATEGORIES.find(x => String(x.id) === String(id));
   if (!c) return;
   document.getElementById('categoryModalTitle').textContent = '카테고리 수정';
   document.getElementById('catName').value = c.name || c.label;
   document.getElementById('catSlug').value = c.slug || c.id;
   document.getElementById('catOrder').value = c.sort_order || 0;
   document.getElementById('catParent').value = c.parent_id || '';
+  const fColor = c.font_color || '#000000';
+  document.getElementById('catColor').value = fColor;
+  document.getElementById('catColorText').value = fColor;
   document.getElementById('modal-add-category').dataset.editId = id;
   openModal('modal-add-category');
 }
 
 async function deleteCategory(id) {
-  if (!confirm('정말 삭제하시겠습니까? 하위 카테고리도 함께 삭제될 수 있습니다.')) return;
-
-  try {
-    const res = await API.categories.delete(id);
-    if (res.success) {
-      showToast('카테고리가 삭제되었습니다.');
-      syncAllData();
-    }
-  } catch (e) { showToast('오류: ' + e.message, 'error'); }
+  showCustomConfirm('정말 삭제하시겠습니까? 하위 카테고리도 함께 삭제될 수 있습니다.', async () => {
+    try {
+      const res = await API.categories.delete(id);
+      if (res.success) {
+        showToast('카테고리가 삭제되었습니다.');
+        syncAllData();
+      }
+    } catch (e) { showToast('오류: ' + e.message, 'error'); }
+  });
 }
 
 // ════════════════════════════════════════════════════════
@@ -2292,7 +2453,7 @@ function renderBanners() {
   }
 
   container.innerHTML = allBanners.map(b => `
-    <div class="banner-item-card" onclick="selectBannerForPreview(${b.id})" style="display:flex !important; visibility:visible !important; opacity:1 !important;">
+    <div class="banner-item-card" onclick="selectBannerForPreview('${b.id}')" style="display:flex !important; visibility:visible !important; opacity:1 !important;">
       <div class="drag-handle" style="padding-right:10px; cursor:grab;">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/>
@@ -2308,11 +2469,11 @@ function renderBanners() {
       </div>
       <div class="banner-actions" onclick="event.stopPropagation()" style="display:flex; align-items:center; gap:10px;">
         <label class="ios-switch">
-          <input type="checkbox" ${b.is_active !== false ? 'checked' : ''} onchange="toggleBannerStatus(${b.id}, this.checked)">
+          <input type="checkbox" ${b.is_active !== false ? 'checked' : ''} onchange="toggleBannerStatus('${b.id}', this.checked)">
           <span class="ios-slider"></span>
         </label>
-        <button class="btn btn-outline btn-sm" onclick="editBanner(${b.id})">수정</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteBanner(${b.id})">삭제</button>
+        <button class="btn btn-outline btn-sm" onclick="editBanner('${b.id}')">수정</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteBanner('${b.id}')">삭제</button>
       </div>
     </div>`).join('');
 
@@ -2323,7 +2484,7 @@ function renderBanners() {
 }
 
 function selectBannerForPreview(id) {
-  const banner = API_BANNERS.find(b => b.id === id) || DATA.banners.find(b => b.id === id);
+  const banner = API_BANNERS.find(b => String(b.id) === String(id)) || DATA.banners.find(b => String(b.id) === String(id));
   if (!banner) return;
 
   const content = document.getElementById('bannerPreviewContent');
@@ -2353,28 +2514,49 @@ async function saveBanner() {
   const img = document.getElementById('bannerImg').value;
   const link = document.getElementById('bannerLink').value;
   const order = document.getElementById('bannerOrder').value || 0;
+  const editId = document.getElementById('modal-add-banner').dataset.editId;
 
   if (!img) { showToast('이미지 URL은 필수입니다.', 'error'); return; }
 
   try {
-    const res = await API.banners.create({ title, img_url: img, link_url: link, sort_order: order });
+    let res;
+    if (editId) {
+      res = await API.banners.update(editId, { title, img_url: img, link_url: link, sort_order: order });
+    } else {
+      res = await API.banners.create({ title, img_url: img, link_url: link, sort_order: order });
+    }
+
     if (res.success) {
       showToast('배너가 저장되었습니다.', 'success');
       closeModal('modal-add-banner');
+      delete document.getElementById('modal-add-banner').dataset.editId;
       syncAllData();
     }
   } catch (e) { showToast('오류: ' + e.message, 'error'); }
 }
 
+function editBanner(id) {
+  const b = (API_BANNERS || []).find(x => String(x.id) === String(id)) || (DATA.banners || []).find(x => String(x.id) === String(id));
+  if (!b) return;
+  document.getElementById('bannerModalTitle').textContent = '배너 수정';
+  document.getElementById('bannerTitle').value = b.title || '';
+  document.getElementById('bannerImg').value = b.img_url || '';
+  document.getElementById('bannerLink').value = b.link_url || '';
+  document.getElementById('bannerOrder').value = b.sort_order || 0;
+  document.getElementById('modal-add-banner').dataset.editId = id;
+  openModal('modal-add-banner');
+}
+
 async function deleteBanner(id) {
-  if (!confirm('정말 삭제하시겠습니까?')) return;
-  try {
-    const res = await API.banners.delete(id);
-    if (res.success) {
-      showToast('배너가 삭제되었습니다.');
-      syncAllData();
-    }
-  } catch (e) { showToast('오류: ' + e.message, 'error'); }
+  showCustomConfirm('정말 배너를 삭제하시겠습니까?', async () => {
+    try {
+      const res = await API.banners.delete(id);
+      if (res.success) {
+        showToast('배너가 삭제되었습니다.');
+        syncAllData();
+      }
+    } catch (e) { showToast('오류: ' + e.message, 'error'); }
+  });
 }
 
 // ════════════════════════════════════════════════════════
@@ -2699,7 +2881,7 @@ function renderNotifications() {
   };
 
   list.innerHTML = filteredNotifs.map(n => `
-    <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="readNotification(${n.id}, event)">
+    <div class="notif-item ${n.unread ? 'unread' : ''}" onclick="readNotification('${n.id}', event)">
       <div class="notif-icon-circle" style="background:${bgColors[n.category] || '#eee'}; color:${iconColors[n.category] || '#666'}">
         ${icons[n.category] || ''}
       </div>
@@ -2719,7 +2901,7 @@ function renderNotifications() {
 
 function readNotification(id, e) {
   if (e) e.stopPropagation();
-  const index = NOTIFICATIONS.findIndex(n => n.id === id);
+  const index = NOTIFICATIONS.findIndex(n => String(n.id) === String(id));
   if (index !== -1) {
     NOTIFICATIONS[index].unread = false;
     saveNotifications();
@@ -2790,7 +2972,7 @@ function renderFullNotifications() {
               <td style="font-size:13px; color:var(--gray-600);">${n.desc}</td>
               <td style="font-size:12px; color:var(--gray-400);">${n.time}</td>
               <td>
-                ${n.unread ? `<button class="btn btn-outline btn-sm" onclick="readNotification(${n.id}); renderFullNotifications();">읽음</button>` : '<span style="color:var(--gray-300); font-size:12px;">읽음</span>'}
+                ${n.unread ? `<button class="btn btn-outline btn-sm" onclick="readNotification('${n.id}'); renderFullNotifications();">읽음</button>` : '<span style="color:var(--gray-300); font-size:12px;">읽음</span>'}
               </td>
             </tr>
           `).join('')}
@@ -2799,3 +2981,15 @@ function renderFullNotifications() {
     </div>
   `;
 }
+
+// 카테고리 모달 색상 필드 동기화
+document.addEventListener('input', (e) => {
+  if (e.target.id === 'catColor') {
+    document.getElementById('catColorText').value = e.target.value.toUpperCase();
+  } else if (e.target.id === 'catColorText') {
+    const val = e.target.value;
+    if (/^#[0-9A-F]{6}$/i.test(val)) {
+      document.getElementById('catColor').value = val;
+    }
+  }
+});

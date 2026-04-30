@@ -817,18 +817,18 @@
   width: 100%;
   height: auto;
   /* 가변 높이로 변경 */
-  max-height: 75%;
-  /* 사진을 너무 많이 가리지 않도록 제한 */
+  max-height: 50%;
+  /* 사진의 절반까지만 올라오도록 제한 */
   background: rgba(0, 0, 0, 0.4);
   /* 은은하게 비치는 투명도(블러 제거됨) */
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  /* 아래쪽 밀착 */
+  justify-content: center;
+  /* 상하 여백이 균등하도록 수직 중앙 정렬 */
   align-items: flex-start;
   text-align: left;
-  padding: 30px 20px 20px;
-  /* 상단 여백을 늘려 안정감 확보 */
+  padding: 12px 12px;
+  /* 상하 대칭 패딩으로 균형 확보 */
   opacity: 0;
   visibility: hidden;
   transform: translateY(15%);
@@ -838,6 +838,8 @@
   z-index: 5;
   pointer-events: none;
   /* 클릭 방해 금지 */
+  overflow: hidden;
+  /* 배경 영역 밖으로 텍스트가 나가지 않도록 제한 */
 }
 
 /* Weekly Best 등 특정 영역에서만 평상시 텍스트 숨김 */
@@ -849,18 +851,18 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 2px;
 }
 
 .overlay-event {
   font-family: 'EB Garamond', serif;
-  font-size: 24px;
-  font-weight: 300;
+  font-size: 15px;
+  font-weight: 400;
   line-height: 1;
 }
 
 .overlay-name {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1.4;
   word-break: keep-all;
@@ -877,8 +879,8 @@
   color: rgba(255, 255, 255, 0.85);
   margin: 4px 0;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

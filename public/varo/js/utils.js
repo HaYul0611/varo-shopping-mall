@@ -74,7 +74,22 @@ const Utils = (() => {
     }
   };
 
-  return { formatPrice, discountRate, icon, showToast, storage, icons, debounce, escapeHTML, lockScroll, unlockScroll };
+  const handleImgError = (img) => {
+    if (!img) return;
+    img.onerror = null; // 무한 루프 방지
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+      <rect width="300" height="300" fill="#f3f4f6"/>
+      <g transform="translate(100, 80) scale(4)" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+      </g>
+      <text x="150" y="210" font-family="Arial" font-size="16" fill="#9ca3af" text-anchor="middle" font-weight="600">NO IMAGE</text>
+    </svg>`;
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  };
+
+  return { formatPrice, discountRate, icon, showToast, storage, icons, debounce, escapeHTML, lockScroll, unlockScroll, handleImgError };
 })();
 
 window.Utils = Utils;

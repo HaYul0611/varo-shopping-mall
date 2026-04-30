@@ -68,8 +68,8 @@
 
     const updateMergedProducts = () => {
       const staticList = (window.VARO_DATA && window.VARO_DATA.PRODUCTS) ? window.VARO_DATA.PRODUCTS : [];
-      // 하이브리드 병합
-      const merged = [...(LIVE_PRODUCTS.map(p => ({
+
+      const liveList = LIVE_PRODUCTS.map(p => ({
         id: String(p.id),
         name: p.name,
         mainImg: p.main_img || p.mainImg || '../../assets/placeholder.png',
@@ -82,7 +82,11 @@
         reviewCount: p.reviewCount || 0,
         colors: p.colors || [],
         sizes: p.sizes || []
-      }))), ...staticList];
+      }));
+
+      // 중복 제거: liveList에 이미 존재하는 ID는 staticList에서 제외
+      const filteredStatic = staticList.filter(sp => !liveList.some(lp => lp.id === String(sp.id)));
+      const merged = [...liveList, ...filteredStatic];
 
       state.products = merged;
       applyFilters();
@@ -103,7 +107,7 @@
         state.filters.badge = quickFilter;
       }
       state.filters.sub = params.get('sub') || null;
-      state.filters.query = params.get('q') || '';
+      state.filters.query = params.get('search') || params.get('q') || '';
 
       // UI 동기화 (카테고리 탭)
       filterTabs.forEach(tab => {
@@ -261,7 +265,7 @@
                 <div class="overlay-name">${name}</div>
                 <div class="overlay-colors">${p.colors ? p.colors.length : 0}color / Free Size</div>
                 <div class="overlay-desc">${p.description || 'VARO의 감성을 담은 데일리 아이템입니다.'}</div>
-                <div class="overlay-marketing">${badge === 'best' ? 'MD추천 / 주문폭주' : 'VARO BEST ITEM'}</div>
+                <div class="overlay-marketing">${badge === 'best' ? 'MD추천 / 주문폭주' : ''}</div>
                 <div class="overlay-price">
                   ${isSale ? `<span class="original">${fmt(price)}</span>` : ''}
                   <span class="current">${fmt(currentPrice)}</span>

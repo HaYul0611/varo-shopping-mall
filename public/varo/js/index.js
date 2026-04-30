@@ -158,7 +158,7 @@ const IndexPage = (() => {
         <div class="overlay-name">${product.name}</div>
         <div class="overlay-colors">${product.colors ? product.colors.length : 0}color / Free Size</div>
         <div class="overlay-desc">${product.description || 'VARO의 감성을 담은 데일리 아이템입니다.'}</div>
-        <div class="overlay-marketing">${product.badge === 'best' ? 'MD추천 / 주문폭주' : 'VARO BEST ITEM'}</div>
+        <div class="overlay-marketing">${product.badge === 'best' ? 'MD추천 / 주문폭주' : ''}</div>
         <div class="overlay-price">
           ${product.salePrice ? `<span class="original">${fmt(product.price)}</span>` : ''}
           <span class="current">${fmt(product.salePrice ?? product.price)}</span>
@@ -382,14 +382,29 @@ const IndexPage = (() => {
     });
   };
 
+  let newLimit = 6;
+  let bestLimit = 8;
+
   // 3열 그리드 렌더링 (New Product)
   const renderNewProduct = () => {
     const grid = document.getElementById('newProductGrid');
     if (!grid) return;
     grid.innerHTML = '';
     const products = getProducts();
-    const filtered = products.filter(p => p.badge === 'new' || p.isNew).slice(0, 6);
+    const allFiltered = products.filter(p => p.badge === 'new' || p.isNew);
+    const filtered = allFiltered.slice(0, newLimit);
     filtered.forEach(p => grid.appendChild(buildCard(p)));
+
+    const btn = document.getElementById('btnMoreNew');
+    if (btn) {
+      if (newLimit >= allFiltered.length) {
+        btn.style.display = 'none';
+      } else {
+        btn.style.display = 'inline-flex';
+        const indicator = btn.querySelector('.page-indicator');
+        if (indicator) indicator.textContent = `[${Math.ceil(newLimit / 6)}/${Math.ceil(allFiltered.length / 6) || 1}]`;
+      }
+    }
   };
 
   // 표준 4열 그리드 렌더링 (Lookple Best)
@@ -398,8 +413,20 @@ const IndexPage = (() => {
     if (!grid) return;
     grid.innerHTML = '';
     const products = getProducts();
-    const filtered = products.filter(p => p.badge === 'best' || p.isSteady).slice(0, 8);
+    const allFiltered = products.filter(p => p.badge === 'best' || p.isSteady);
+    const filtered = allFiltered.slice(0, bestLimit);
     filtered.forEach(p => grid.appendChild(buildCard(p)));
+
+    const btn = document.getElementById('btnMoreBest');
+    if (btn) {
+      if (bestLimit >= allFiltered.length) {
+        btn.style.display = 'none';
+      } else {
+        btn.style.display = 'inline-flex';
+        const indicator = btn.querySelector('.page-indicator');
+        if (indicator) indicator.textContent = `[${Math.ceil(bestLimit / 8)}/${Math.ceil(allFiltered.length / 8) || 1}]`;
+      }
+    }
   };
 
   // 최근 본 상품 렌더링
@@ -457,6 +484,23 @@ const IndexPage = (() => {
 
     // 초기 데이터 동기화 (MySQL 실시간 데이터 가져오기)
     await syncLiveData();
+
+    // 버튼 이벤트 리스너 추가
+    const btnNew = document.getElementById('btnMoreNew');
+    if (btnNew) {
+      btnNew.addEventListener('click', () => {
+        newLimit += 6;
+        renderNewProduct();
+      });
+    }
+
+    const btnBest = document.getElementById('btnMoreBest');
+    if (btnBest) {
+      btnBest.addEventListener('click', () => {
+        bestLimit += 8;
+        renderLookpleBest();
+      });
+    }
 
     // 초기 렌더링 수행
     renderAll();

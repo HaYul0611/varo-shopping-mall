@@ -246,12 +246,15 @@ const MegaMenu = (() => {
 
   /* ── 초기화 ──────────────────────────────────────── */
   const init = () => {
-    // 오버레이 생성
-    const overlay = document.createElement('div');
-    overlay.id = 'megaOverlay';
-    overlay.className = 'mega-overlay';
-    document.body.appendChild(overlay);
-    overlay.addEventListener('mouseenter', () => hidePanel(0));
+    // 오버레이 생성 (중복 방지)
+    let overlay = document.getElementById('megaOverlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'megaOverlay';
+      overlay.className = 'mega-overlay';
+      document.body.appendChild(overlay);
+      overlay.addEventListener('mouseenter', () => hidePanel(0));
+    }
 
     // 카테고리 nav 항목에 이벤트 연결 (has-sub, has-mega 모두 포함)
     const navItems = document.querySelectorAll('.category-nav__item.has-mega');
@@ -284,7 +287,13 @@ const MegaMenu = (() => {
 
     // 헤더 높이 설정
     updateHeaderHeight();
-    window.addEventListener('resize', updateHeaderHeight);
+    if (!window._megaMenuResizeAttached) {
+      window.addEventListener('resize', updateHeaderHeight);
+      window._megaMenuResizeAttached = true;
+    }
+
+    // [ADD] 외부에서 재초기화할 수 있도록 전역 노출
+    window.MegaMenu = { init };
   };
 
   /* ── 카테고리 키 추론 ────────────────────────────── */

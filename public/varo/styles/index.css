@@ -729,3 +729,35 @@
 .home-section--flash .product-card__price--original {
   color: #666;
 }
+/* 式式 MORE VIEW 幗が 式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式式 */
+.more-view-container {
+  text-align: center;
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.btn-more-view {
+  padding: 12px 40px;
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #6b7280;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-more-view:hover {
+  border-color: #1c1a16;
+  color: #1c1a16;
+}
+
+.btn-more-view svg {
+  margin-left: 4px;
+  width: 12px;
+  height: 12px;
+  stroke-width: 2;
+}

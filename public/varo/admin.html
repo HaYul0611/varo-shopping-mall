@@ -145,7 +145,7 @@
               <span style="color:var(--gray-400)">~</span>
               <input type="date" value="2025-04-23">
             </div>
-            <button class="btn btn-outline" onclick="showToast('데이터를 내보냈습니다.')">
+            <button class="btn btn-outline" onclick="exportDashboardData()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="7 10 12 15 17 10" />
@@ -331,7 +331,7 @@
             <div class="section-sub">총 <span id="productCount">0</span>개 상품</div>
           </div>
           <div class="header-actions">
-            <button class="btn btn-outline" onclick="showToast('엑셀로 내보내기 완료')">
+            <button class="btn btn-outline" onclick="exportProducts()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="7 10 12 15 17 10" />
@@ -406,7 +406,7 @@
             <div class="section-sub">총 <span id="orderCount">0</span>건 주문</div>
           </div>
           <div class="header-actions">
-            <button class="btn btn-outline" onclick="showToast('주문 데이터 내보내기 완료')">
+            <button class="btn btn-outline" onclick="exportOrders()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="7 10 12 15 17 10" />
@@ -951,8 +951,8 @@
               <option>숨기기</option>
             </select>
           </div>
-          <div class="form-group"><label class="form-label">SKU (관리 코드)</label><input class="form-control" id="pSku"
-              placeholder="자동 생성" readonly></div>
+          <div class="form-group"><label class="form-label">SKU (관리 코드)</label><input class="form-control"
+              id="pSkuDisplay" placeholder="자동 생성" readonly></div>
         </div>
         <div class="form-group">
           <label class="form-label">상품 설명</label>
@@ -1205,6 +1205,15 @@
           <label class="form-label">노출 순서</label>
           <input type="number" id="catOrder" class="form-control" value="0">
         </div>
+        <div class="form-group">
+          <label class="form-label">폰트 색상</label>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <input type="color" id="catColor" class="form-control" value="#000000"
+              style="width:60px; padding:2px; height:38px;">
+            <input type="text" id="catColorText" class="form-control" value="#000000" placeholder="#000000"
+              style="flex:1;">
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeModal('modal-add-category')">취소</button>
@@ -1251,7 +1260,7 @@
   <script src="./js/utils.js"></script>
   <script src="./js/data.js"></script>
   <script src="./js/api.js"></script>
-  <script src="./js/admin.js"></script>
+  <script src="./js/admin.js?v=1714532000"></script>
 </body>
 
 </html>

@@ -245,65 +245,7 @@ const Auth = (() => {
       overlay?.addEventListener('click', close, { once: true });
     };
 
-    // 소셜 로그인 가상 시뮬레이션 모달 제어 (하이브리드 API)
-    window.openSocialModal = (provider) => {
-      const modal = document.getElementById('socialLoginModal');
-      const logo = document.getElementById('socialModalLogo');
-      const text = document.getElementById('socialModalText');
-      const btnConfirm = document.getElementById('btnSocialConfirm');
-      const spinner = document.getElementById('socialSpinner');
 
-      if (!modal || !logo || !text || !btnConfirm) return;
-
-      spinner.style.display = 'none';
-      btnConfirm.disabled = false;
-
-      logo.textContent = `${provider} 로그인`;
-      logo.style.color = provider === '카카오' ? '#3C1E1E' : provider === '네이버' ? '#03C75A' : '#4285F4';
-      text.innerHTML = `
-        <div class="social-notice">
-          <p class="social-notice__main"><strong>VARO</strong> 서비스 이용을 위해<br><strong>${provider}</strong> 계정 인증이 필요합니다.</p>
-          <div class="social-notice__box">
-            <p class="social-notice__title">제공 항목</p>
-            <ul class="social-notice__list">
-              <li>이름 (닉네임)</li>
-              <li>이메일 주소</li>
-            </ul>
-          </div>
-          <p class="social-notice__sub">위 정보는 회원가입 및 본인 확인을 위해서만 사용되며, 안전하게 보호됩니다.</p>
-        </div>
-      `;
-
-      modal.classList.remove('u-hidden');
-
-      btnConfirm.onclick = () => {
-        spinner.style.display = 'block';
-        btnConfirm.disabled = true;
-
-        setTimeout(() => {
-          const dummyUser = {
-            email: `social_user@varo.com`,
-            name: `${provider} 사용자`,
-            role: 'USER',
-            grade: 'BASIC',
-            is_admin: false
-          };
-
-          localStorage.setItem('varo_user', JSON.stringify(dummyUser));
-          localStorage.setItem('varo_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy_hybrid_token');
-
-          window.dispatchEvent(new CustomEvent('varo:dataChange', { detail: { type: 'auth', data: dummyUser } }));
-
-          alert(`${provider} 계정으로 간편 로그인이 완료되었습니다!`);
-          location.replace('./index.html');
-        }, 1500);
-      };
-    };
-
-    window.closeSocialModal = () => {
-      const modal = document.getElementById('socialLoginModal');
-      if (modal) modal.classList.add('u-hidden');
-    };
 
     // 주소 검색 (하이브리드 API 연동)
     const addrSearchBtn = document.getElementById('signupAddrSearch');
@@ -482,6 +424,66 @@ const Auth = (() => {
         }
       }
     });
+  };
+
+  // 소셜 로그인 가상 시뮬레이션 모달 제어 (하이브리드 API)
+  window.openSocialModal = (provider) => {
+    const modal = document.getElementById('socialLoginModal');
+    const logo = document.getElementById('socialModalLogo');
+    const text = document.getElementById('socialModalText');
+    const btnConfirm = document.getElementById('btnSocialConfirm');
+    const spinner = document.getElementById('socialSpinner');
+
+    if (!modal || !logo || !text || !btnConfirm) return;
+
+    spinner.style.display = 'none';
+    btnConfirm.disabled = false;
+
+    logo.textContent = `${provider} 로그인`;
+    logo.style.color = provider === '카카오' ? '#3C1E1E' : provider === '네이버' ? '#03C75A' : '#4285F4';
+    text.innerHTML = `
+      <div class="social-notice">
+        <p class="social-notice__main"><strong>VARO</strong> 서비스 이용을 위해<br><strong>${provider}</strong> 계정 인증이 필요합니다.</p>
+        <div class="social-notice__box">
+          <p class="social-notice__title">제공 항목</p>
+          <ul class="social-notice__list">
+            <li>이름 (닉네임)</li>
+            <li>이메일 주소</li>
+          </ul>
+        </div>
+        <p class="social-notice__sub">위 정보는 회원가입 및 본인 확인을 위해서만 사용되며, 안전하게 보호됩니다.</p>
+      </div>
+    `;
+
+    modal.classList.remove('u-hidden');
+
+    btnConfirm.onclick = () => {
+      spinner.style.display = 'block';
+      btnConfirm.disabled = true;
+
+      setTimeout(() => {
+        const dummyUser = {
+          email: `social_user@varo.com`,
+          name: `${provider} 사용자`,
+          role: 'USER',
+          grade: 'BASIC',
+          is_admin: false
+        };
+
+        localStorage.setItem('varo_user', JSON.stringify(dummyUser));
+        localStorage.setItem('varo_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy_hybrid_token');
+
+        window.dispatchEvent(new CustomEvent('varo:dataChange', { detail: { type: 'auth', data: dummyUser } }));
+
+        alert(`${provider} 계정으로 간편 로그인이 완료되었습니다!`);
+        location.replace('./index.html');
+      }, 1500);
+    };
+  };
+
+  window.closeSocialModal = () => {
+    const modal = document.getElementById('socialLoginModal');
+    if (modal) modal.classList.add('u-hidden');
   };
 
   return { init };

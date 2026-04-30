@@ -44,7 +44,7 @@ const ComponentLoader = (() => {
     await Promise.all(tasks);
 
     // [ADD] 헤더 로드 후 카테고리 순서 재배치 로직
-    const updateHeaderOrder = async () => {
+    const updateHeaderOrder = async (retryCount = 0) => {
       try {
         let catsStr = localStorage.getItem('varo_categories');
         let cats = [];
@@ -67,43 +67,72 @@ const ComponentLoader = (() => {
 
         if (!Array.isArray(cats) || !cats.length) return;
 
-        console.log('[HeaderSync] Cats raw data:', JSON.stringify(cats));
-
         const parents = cats.filter(c => !c.parent_id || c.parent_id === 'null' || c.parent_id === '').sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
-        console.log('[HeaderSync] Parents ordered:', parents.map(p => `${p.name}(${p.sort_order})`));
 
         const navList = document.querySelector('.category-nav__list');
         if (!navList) {
-          console.warn('[HeaderSync] navList not found');
+          if (retryCount < 10) {
+            setTimeout(() => updateHeaderOrder(retryCount + 1), 200);
+            return;
+          }
           return;
         }
 
-        const items = Array.from(navList.querySelectorAll('.category-nav__item'));
-        if (!items.length) {
-          console.warn('[HeaderSync] items not found');
-          return;
+        // [FIX] 기존 DOM의 구조와 클래스를 유지하면서 서브 메뉴까지 포함하여 렌더링합니다.
+        const children = cats.filter(c => c.parent_id && c.parent_id !== 'null' && c.parent_id !== '');
+
+        navList.innerHTML = parents.map(p => {
+          const subItems = children.filter(c => String(c.parent_id) === String(p.id)).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+          const hasSub = subItems.length > 0;
+          const nameUpper = p.name.toUpperCase();
+
+          let itemClass = 'category-nav__item';
+          if (hasSub) itemClass += ' has-sub';
+          if (nameUpper.includes('NEW')) itemClass += ' category-nav__item--new';
+          if (nameUpper.includes('EVENT')) itemClass += ' category-nav__item--event';
+
+          // [FIX] 모든 카테고리를 ACC처럼 일반 서브메뉴 스타일로 통일 (오버레이 제거)
+
+          const colorStyle = p.font_color ? ` style="color:${p.font_color} !important"` : '';
+          const slug = p.slug || p.id;
+
+          // 링크 URL 매핑 (원본 header.html 방식 준수)
+          let linkUrl = `./shop.html?cat=${slug}`;
+          if (nameUpper === 'BEST') linkUrl = './shop.html?filter=best';
+          else if (nameUpper.includes('NEW')) linkUrl = './shop.html?filter=new';
+          else if (nameUpper === 'COLLECTION') linkUrl = './shop.html';
+          else if (nameUpper === 'ACC') linkUrl = './shop.html?category=acc';
+          else if (nameUpper === 'COMMUNITY') linkUrl = './community.html';
+          else if (nameUpper.includes('EVENT')) linkUrl = './event.html';
+          else if (hasSub) linkUrl = `./shop.html?category=${slug.toLowerCase()}`;
+
+          let subHtml = '';
+          if (hasSub) {
+            subHtml = `<ul class="sub-menu">` +
+              subItems.map(s => {
+                const sSlug = s.slug || s.id;
+                // 하위 카테고리 링크 구조 (원본: ?sub=...)
+                return `<li><a href="./shop.html?sub=${sSlug.toLowerCase()}">${s.name}</a></li>`;
+              }).join('') +
+              `</ul>`;
+          }
+
+          return `
+            <li class="${itemClass}">
+              <a href="${linkUrl}"${colorStyle}>${p.name}</a>
+              ${subHtml}
+            </li>
+          `;
+        }).join('');
+
+        // [ADD] 메뉴가 새로 생성되었으므로 메가메뉴 리스너 재등록
+        if (window.MegaMenu && typeof window.MegaMenu.init === 'function') {
+          window.MegaMenu.init();
         }
 
-        const sortedItems = [];
-        parents.forEach(ord => {
-          const match = items.find(item => {
-            const aText = item.querySelector('a')?.textContent.trim().replace(/\s+/g, '').toUpperCase() || '';
-            const ordName = ord.name.trim().replace(/\s+/g, '').toUpperCase() || '';
-            return aText === ordName || aText.includes(ordName) || ordName.includes(aText);
-          });
-          if (match) sortedItems.push(match);
-        });
-
-        console.log('[HeaderSync] Sorted items count:', sortedItems.length);
-
-        items.forEach(item => {
-          if (!sortedItems.includes(item)) sortedItems.push(item);
-        });
-
-        navList.innerHTML = '';
-        sortedItems.forEach(item => navList.appendChild(item));
+        console.log('[HeaderSync] Header categories re-rendered with MegaMenu sync');
       } catch (e) {
-        console.error('[ComponentLoader] Failed to reorder header:', e);
+        console.error('[ComponentLoader] Failed to update header:', e);
       }
     };
 

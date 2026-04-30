@@ -1973,3 +1973,5 @@
 .btn--restock:hover {
   background: var(--color-black);
   color: var(--color-white);
+
+.cart-qty-btn svg { width: 12px; height: 12px; stroke-width: 1.5; }

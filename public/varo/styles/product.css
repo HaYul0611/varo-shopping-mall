@@ -417,6 +417,12 @@
   font-family: inherit;
 }
 
+.qty-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.5;
+}
+
 .qty-btn:hover:not(:disabled) {
   background: var(--color-light);
 }
