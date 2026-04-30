@@ -756,7 +756,7 @@ const initMyPage = () => {
         if (!badge || !desc || !amountEl) return;
 
         const gradeMap = {
-            'BRONZE': 'BRONZE',
+            'BASIC': 'BRONZE', 'BRONZE': 'BRONZE',
             'SILVER': 'SILVER', 'GOLD': 'GOLD',
             'DIA': 'DIA',
             'MANAGER': 'MANAGER', 'ADMIN': '관리자설정'
