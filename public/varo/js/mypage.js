@@ -437,6 +437,17 @@ const initMyPage = () => {
                     }
                     cell.querySelectorAll('button').forEach(b => b.style.display = 'none');
 
+                    // 포인트 업데이트
+                    const user = JSON.parse(localStorage.getItem('varo_user') || '{}');
+                    user.points = (parseInt(user.points || '0') + earnedPoints).toString();
+                    localStorage.setItem('varo_user', JSON.stringify(user));
+
+                    // UI 갱신
+                    const pointsEl = document.getElementById('myPageAvailablePoints');
+                    if (pointsEl) {
+                        pointsEl.textContent = `${parseInt(user.points).toLocaleString()}원`;
+                    }
+
                     if (window.Utils && typeof window.Utils.showToast === 'function') {
                         window.Utils.showToast(`구매확정 완료! 리뷰 작성으로 ${earnedPoints.toLocaleString()}포인트가 적립되었습니다.`, 'success');
                     } else {
@@ -735,6 +746,12 @@ const initMyPage = () => {
         const desc = document.getElementById('myPageGradeDesc');
         const amountEl = document.getElementById('myPageTotalOrderAmount');
         const nextGradeEl = document.getElementById('nextGradeGuide');
+        const pointsEl = document.getElementById('myPageAvailablePoints');
+
+        if (pointsEl) {
+            const points = parseInt(user.points || '0');
+            pointsEl.textContent = `${points.toLocaleString()}원`;
+        }
 
         if (!badge || !desc || !amountEl) return;
 
