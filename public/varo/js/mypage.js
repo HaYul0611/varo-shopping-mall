@@ -9,8 +9,13 @@
 // 전역 함수 정의 (타이밍 이슈 방지)
 // ════════════════════════════════════════════════════════
 
+
+
+let currentReturnBtn = null;
+
 // 1. 교환/반품 신청
-window.openReturnModal = (productName, price) => {
+window.openReturnModal = (btn, productName, price) => {
+    currentReturnBtn = btn;
     const modal = document.getElementById('returnModal');
     if (!modal) return;
     const nameInput = document.getElementById('returnProductName');
@@ -117,6 +122,8 @@ window.cancelOrder = (btn) => {
     }
 };
 
+
+
 // 5. 가상 배송 추적 모달 제어 (하이브리드 API)
 window.openDeliveryModal = () => {
     const modal = document.getElementById('deliveryTrackingModal');
@@ -193,7 +200,7 @@ window.closePointModal = () => {
     if (modal) modal.classList.remove('is-active');
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+const initMyPage = () => {
     // ════════════════════════════════════════════════════════
     // 순수 JS 이벤트 바인딩 (인라인 onclick 제거 대응)
     // ════════════════════════════════════════════════════════
@@ -207,23 +214,241 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 1. 주문취소
-    document.querySelectorAll('.btn-cancel-order').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+    // ════════════════════════════════════════════════════════
+    // 커스텀 모달 및 리뷰 관련 순수 JS 로직
+    // ════════════════════════════════════════════════════════
+    let targetCancelBtn = null;
+    let targetConfirmBtn = null;
+    let selectedStarRating = 0;
+    let attachedReviewFiles = [];
+
+    // 이벤트 위임을 통한 버튼 클릭 감지
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-cancel-order, .btn-confirm-purchase, button');
+        if (!btn) return;
+
+        if (btn.classList.contains('btn-cancel-order')) {
             e.preventDefault();
-            if (window.cancelOrder) window.cancelOrder(btn);
-        });
+            targetCancelBtn = btn;
+            const modal = document.getElementById('customCancelModal');
+            if (modal) modal.style.display = 'flex';
+        } else if (btn.classList.contains('btn-confirm-purchase')) {
+            e.preventDefault();
+            targetConfirmBtn = btn;
+            const modal = document.getElementById('customConfirmModal');
+            if (modal) modal.style.display = 'flex';
+        } else if (btn.textContent.trim() === '취소' || btn.textContent.trim() === '닫기') {
+            const modal = btn.closest('[id^="custom"]') || btn.closest('.varo-modal');
+            if (modal) {
+                e.preventDefault();
+                modal.style.display = 'none';
+            }
+        }
     });
 
-    // 2. 구매확정
-    document.querySelectorAll('.btn-confirm-purchase').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+    // 주문취소 확인 버튼
+    const btnCancelConfirm = document.getElementById('btnCancelConfirm');
+    if (btnCancelConfirm) {
+        btnCancelConfirm.addEventListener('click', (e) => {
             e.preventDefault();
-            const row = btn.closest('tr');
-            const productName = row ? row.cells[1].textContent.trim() : '상품';
-            if (window.confirmPurchase) window.confirmPurchase(btn, productName);
+            if (targetCancelBtn) {
+                const cell = targetCancelBtn.closest('.order-status-cell') || targetCancelBtn.parentElement;
+                if (cell) {
+                    const statusSpan = cell.querySelector('span');
+                    if (statusSpan) {
+                        statusSpan.textContent = '취소완료';
+                        statusSpan.style.color = '#ff4d4f';
+                    }
+                    cell.querySelectorAll('button').forEach(b => b.style.display = 'none');
+                    if (window.Utils && typeof window.Utils.showToast === 'function') {
+                        window.Utils.showToast('주문이 정상적으로 취소되었습니다.', 'success');
+                    }
+                }
+            }
+            const modal = document.getElementById('customCancelModal');
+            if (modal) modal.style.display = 'none';
         });
-    });
+    }
+
+    // 구매확정 확인 버튼 (리뷰 모달로 이동)
+    const btnPurchaseConfirm = document.getElementById('btnPurchaseConfirm');
+    if (btnPurchaseConfirm) {
+        btnPurchaseConfirm.addEventListener('click', (e) => {
+            e.preventDefault();
+            const confirmModal = document.getElementById('customConfirmModal');
+            if (confirmModal) confirmModal.style.display = 'none';
+
+            const reviewModal = document.getElementById('customReviewModal');
+            if (reviewModal) reviewModal.style.display = 'flex';
+
+            // 초기화
+            selectedStarRating = 0;
+            updateStarUI(0);
+            const reviewText = document.getElementById('reviewText');
+            if (reviewText) reviewText.value = '';
+            attachedReviewFiles = [];
+            renderReviewImages();
+        });
+    }
+
+    // 별점 관련 로직
+    const updateStarUI = (val) => {
+        const container = document.querySelector('#customReviewModal #reviewStars') || document.querySelector('#reviewStars');
+        if (!container) return;
+        const stars = container.querySelectorAll('span');
+        stars.forEach((s, idx) => {
+            if (idx < val) {
+                s.style.setProperty('color', '#D96B3C', 'important');
+                s.style.color = '#D96B3C';
+            } else {
+                s.style.setProperty('color', '#ddd', 'important');
+                s.style.color = '#ddd';
+            }
+        });
+    };
+
+    // 별점 이벤트 (모달 자체에 위임하여 이벤트 전파 차단 방지)
+    const reviewModalEl = document.getElementById('customReviewModal');
+    if (reviewModalEl) {
+        reviewModalEl.addEventListener('click', (e) => {
+            const star = e.target.closest('#reviewStars span');
+            if (star) {
+                e.preventDefault();
+                e.stopPropagation();
+                const val = parseInt(star.getAttribute('data-value'));
+                selectedStarRating = val;
+                updateStarUI(val);
+            }
+        });
+    }
+
+    // 사진 첨부 로직
+    const fileInput = document.getElementById('reviewImages');
+    if (fileInput) {
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                Array.from(e.target.files).forEach(file => {
+                    attachedReviewFiles.push(file);
+                });
+            }
+            renderReviewImages();
+            e.target.value = '';
+        });
+    }
+
+    const renderReviewImages = () => {
+        const container = document.getElementById('imagePreviewContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
+        attachedReviewFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const wrapper = document.createElement('div');
+                wrapper.style.position = 'relative';
+                wrapper.style.width = '60px';
+                wrapper.style.height = '60px';
+                wrapper.style.display = 'inline-block';
+
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '4px';
+                img.style.border = '1px solid #ddd';
+
+                const delBtn = document.createElement('button');
+                delBtn.innerHTML = '×';
+                delBtn.style.position = 'absolute';
+                delBtn.style.top = '2px';
+                delBtn.style.right = '2px';
+                delBtn.style.background = '#ffffff';
+                delBtn.style.color = '#000000';
+                delBtn.style.border = '1px solid #000000';
+                delBtn.style.outline = 'none';
+                delBtn.style.borderRadius = '50%';
+                delBtn.style.width = '20px';
+                delBtn.style.height = '20px';
+                delBtn.style.fontSize = '14px';
+                delBtn.style.fontWeight = 'bold';
+                delBtn.style.cursor = 'pointer';
+                delBtn.style.display = 'none';
+                delBtn.style.justifyContent = 'center';
+                delBtn.style.alignItems = 'center';
+                delBtn.style.padding = '0';
+                delBtn.style.zIndex = '10';
+                delBtn.style.boxShadow = 'none';
+
+                wrapper.addEventListener('mouseenter', () => { delBtn.style.display = 'flex'; });
+                wrapper.addEventListener('mouseleave', () => { delBtn.style.display = 'none'; });
+
+                delBtn.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    attachedReviewFiles.splice(index, 1);
+                    renderReviewImages();
+                });
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(delBtn);
+                container.appendChild(wrapper);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        const notice = document.getElementById('photoPointNotice');
+        if (notice) {
+            if (attachedReviewFiles.length > 0) {
+                notice.textContent = `* 사진 ${attachedReviewFiles.length}장 첨부됨 (200P 적립 예정)`;
+            } else {
+                notice.textContent = '* 사진 첨부 시 200P (미첨부 100P)';
+            }
+        }
+    };
+
+    // 리뷰 등록 버튼
+    const btnReviewSubmit = document.getElementById('btnReviewSubmit');
+    if (btnReviewSubmit) {
+        btnReviewSubmit.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (selectedStarRating === 0) {
+                alert('별점을 선택해 주세요.');
+                return;
+            }
+
+            const reviewText = document.getElementById('reviewText');
+            const text = reviewText ? reviewText.value.trim() : '';
+            if (text.length < 10) {
+                alert('리뷰를 10자 이상 작성해 주세요.');
+                return;
+            }
+
+            const hasPhotos = attachedReviewFiles.length > 0;
+            const earnedPoints = hasPhotos ? 200 : 100;
+
+            if (targetConfirmBtn) {
+                const cell = targetConfirmBtn.closest('.order-status-cell') || targetConfirmBtn.parentElement;
+                if (cell) {
+                    const statusSpan = cell.querySelector('span');
+                    if (statusSpan) {
+                        statusSpan.textContent = '구매확정';
+                        statusSpan.style.color = '#555';
+                    }
+                    cell.querySelectorAll('button').forEach(b => b.style.display = 'none');
+
+                    if (window.Utils && typeof window.Utils.showToast === 'function') {
+                        window.Utils.showToast(`구매확정 완료! 리뷰 작성으로 ${earnedPoints.toLocaleString()}포인트가 적립되었습니다.`, 'success');
+                    } else {
+                        alert(`구매확정 완료! ${earnedPoints.toLocaleString()}포인트가 적립되었습니다.`);
+                    }
+                }
+            }
+            const modal = document.getElementById('customReviewModal');
+            if (modal) modal.style.display = 'none';
+            attachedReviewFiles = [];
+        });
+    }
 
     // 3. 배송조회 (일반)
     document.querySelectorAll('.btn-track-delivery').forEach(btn => {
@@ -247,9 +472,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.btn-return-order').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation();
             const row = btn.closest('tr');
             const productName = row ? row.cells[1].textContent.trim() : '상품';
-            if (window.openReturnModal) window.openReturnModal(productName, 0);
+            if (window.openReturnModal) window.openReturnModal(btn, productName, 0);
         });
     });
 
@@ -1063,6 +1289,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const type = document.getElementById('returnType').value === 'exchange' ? '교환' : '반품';
             const productName = document.getElementById('returnProductName').value;
 
+            if (currentReturnBtn) {
+                const cell = currentReturnBtn.closest('.order-status-cell') || currentReturnBtn.parentElement;
+                if (cell) {
+                    const statusSpan = cell.querySelector('span');
+                    if (statusSpan) {
+                        statusSpan.textContent = `${type}신청`;
+                        statusSpan.style.color = '#D96B3C';
+                    }
+                    cell.querySelectorAll('button').forEach(b => b.style.display = 'none');
+                }
+            }
+
             if (window.Utils?.showToast) window.Utils.showToast(`${productName} 상품의 ${type} 신청이 접수되었습니다.`, 'success');
             document.getElementById('returnModal').classList.remove('is-active');
         });
@@ -1106,9 +1344,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 모달 닫기 버튼 공통 처리 (Address Modal 및 기타 모든 varo-modal 대응)
     document.querySelectorAll('.varo-modal__close, .varo-modal__overlay').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            const modal = e.target.closest('.varo-modal');
-            if (modal) {
-                modal.classList.remove('is-active');
+            if (e.target.classList.contains('varo-modal__close') || e.target.classList.contains('varo-modal__overlay') || e.target.closest('.varo-modal__close')) {
+                const modal = e.target.closest('.varo-modal');
+                if (modal) {
+                    modal.classList.remove('is-active');
+                }
             }
         });
     });
@@ -1142,5 +1382,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 최종 초기화 (모든 함수 정의 후)
     applyAdminLayout();
     initAdminMemo();
-});
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMyPage);
+} else {
+    initMyPage();
+}
 

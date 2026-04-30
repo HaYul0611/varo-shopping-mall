@@ -827,6 +827,12 @@ async function syncAllData() {
     if (cRes.success) {
       API_CATEGORIES = cRes.data || [];
       renderCategories();
+      if (typeof window.updateHeaderOrder === 'function') {
+        window.updateHeaderOrder();
+      }
+      if (typeof adminSyncChannel !== 'undefined') {
+        adminSyncChannel.postMessage({ type: 'categories', action: 'update', reordered: true });
+      }
     }
     if (bRes.success) {
       API_BANNERS = bRes.data || [];
@@ -1386,16 +1392,49 @@ function deleteProduct(id) {
 let orderStatusFilter = 'all';
 function renderOrders(statusFilter) {
   statusFilter = statusFilter || orderStatusFilter;
-  const list = statusFilter === 'all' ? DATA.orders : DATA.orders.filter(o => o.status === statusFilter);
-  document.getElementById('orderCount').textContent = fmt(DATA.orders.length);
+  let list = statusFilter === 'all' ? DATA.orders : DATA.orders.filter(o => o.status === statusFilter);
+
+  // 1. 검색어 필터링
+  const searchEl = document.getElementById('orderSearchInput');
+  if (searchEl && searchEl.value) {
+    const keyword = searchEl.value.trim().toLowerCase();
+    list = list.filter(o =>
+      (o.id && o.id.toLowerCase().includes(keyword)) ||
+      (o.customer && o.customer.toLowerCase().includes(keyword)) ||
+      (o.phone && o.phone.toLowerCase().includes(keyword)) ||
+      (o.product && o.product.toLowerCase().includes(keyword))
+    );
+  }
+
+  // 2. 기간 필터링
+  const startEl = document.getElementById('orderStartDate');
+  const endEl = document.getElementById('orderEndDate');
+  if (startEl && startEl.value && endEl && endEl.value) {
+    const sDate = startEl.value; // 'YYYY-MM-DD'
+    const eDate = endEl.value;   // 'YYYY-MM-DD'
+
+    list = list.filter(o => {
+      const oDate = o.date.substring(0, 10); // 'YYYY-MM-DD'
+      return oDate >= sDate && oDate <= eDate;
+    });
+  }
+
+  document.getElementById('orderCount').textContent = fmt(list.length);
+
   // update counts
   ['결제완료', '배송준비', '배송중', '배송완료', '취소/반품'].forEach(s => {
     const el = document.getElementById('cnt-' + s);
-    if (el) el.textContent = DATA.orders.filter(o => o.status === s).length;
+    if (el) {
+      // 카운트는 현재 검색/기간 필터가 적용된 상태가 아닌 탭 기준의 전체 개수를 보여주거나, 필터링된 결과를 보여줄 수 있는데
+      // 여기서는 직관적으로 전체 상태별 개수(검색/기간 필터와 무관하게)를 유지하는 것이 더 자연스럽습니다.
+      el.textContent = DATA.orders.filter(o => o.status === s).length;
+    }
   });
   document.getElementById('cnt-all').textContent = DATA.orders.length;
 
   const tbody = document.getElementById('orderTable');
+  if (!tbody) return;
+
   tbody.innerHTML = list.map(o => `
     <tr>
       <td><input type="checkbox" class="order-check"></td>
@@ -1413,10 +1452,99 @@ function renderOrders(statusFilter) {
           ${o.status === '배송준비' ? `<button class="btn btn-primary btn-sm" onclick="updateOrderStatus('${o.id}','배송중')">발송</button>` : ''}
         </div>
       </td>
-    </tr>`).join('') || `<tr><td colspan="9" class="tbl-empty">해당 상태의 주문이 없습니다.</td></tr>`;
+    </tr>`).join('') || `<tr><td colspan="9" class="tbl-empty">해당 조건의 주문이 없습니다.</td></tr>`;
 
   const total = list.reduce((s, o) => s + o.amount, 0);
-  document.getElementById('orderSummary').innerHTML = `조회된 주문: <b>${list.length}건</b>&nbsp;&nbsp;합계 금액: <b>${fmtW(total)}</b>`;
+  const summaryEl = document.getElementById('orderSummary');
+  if (summaryEl) {
+    summaryEl.innerHTML = `조회된 주문: <b>${list.length}건</b>&nbsp;&nbsp;합계 금액: <b>${fmtW(total)}</b>`;
+  }
+}
+
+// 주문 데이터 엑셀 내보내기
+function exportOrders() {
+  try {
+    if (!DATA.orders || DATA.orders.length === 0) {
+      showToast('내보낼 주문 데이터가 없습니다.', 'error');
+      return;
+    }
+
+    if (typeof XLSX === 'undefined') {
+      showToast('XLSX 라이브러리가 로드되지 않았습니다. 잠시 후 다시 시도해주세요.', 'error');
+      return;
+    }
+
+    const exportData = DATA.orders.map(o => ({
+      '주문번호': o.id,
+      '주문자': o.customer,
+      '연락처': o.phone,
+      '상품명': o.product,
+      '금액': o.amount || 0,
+      '결제방법': o.payment,
+      '주문상태': o.status,
+      '주문일시': o.date
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Orders");
+
+    const filename = `varo_orders_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(workbook, filename);
+
+    showToast('주문 데이터가 엑셀로 다운로드되었습니다.', 'success');
+  } catch (e) {
+    console.error(e);
+    showToast('엑셀 다운로드 중 오류가 발생했습니다.', 'error');
+  }
+}
+
+// 상품 데이터 엑셀 내보내기
+function exportProducts() {
+  try {
+    const allList = [...(API_PRODUCTS.map(p => {
+      const catObj = (typeof API_CATEGORIES !== 'undefined' ? API_CATEGORIES : []).find(c => c.id == p.categoryId || c.id === p.category_id);
+      return {
+        '상품명': p.name,
+        'SKU': p.product_code || 'API-PROD',
+        '카테고리': catObj ? (catObj.name || catObj.label) : (p.categoryId || '기타'),
+        '판매가': p.price,
+        '재고': p.stock || 0,
+        '판매수': p.rating || 0,
+        '상태': p.isActive ? '판매중' : '숨김'
+      };
+    })), ...DATA.products.map(p => ({
+      '상품명': p.name,
+      'SKU': p.sku,
+      '카테고리': p.category,
+      '판매가': p.price,
+      '재고': p.stock || 0,
+      '판매수': p.sold || 0,
+      '상태': p.status
+    }))];
+
+    if (allList.length === 0) {
+      showToast('내보낼 상품 데이터가 없습니다.', 'error');
+      return;
+    }
+
+    if (typeof XLSX === 'undefined') {
+      showToast('XLSX 라이브러리가 로드되지 않았습니다. 잠시 후 다시 시도해주세요.', 'error');
+      return;
+    }
+
+    const worksheet = XLSX.utils.json_to_sheet(allList);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
+
+    const filename = `varo_products_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(workbook, filename);
+
+    showToast('상품 데이터가 엑셀로 다운로드되었습니다.', 'success');
+  } catch (e) {
+    console.error(e);
+    showToast('엑셀 다운로드 중 오류가 발생했습니다.', 'error');
+  }
 }
 
 function filterOrders(status, tabEl) {
@@ -1518,8 +1646,57 @@ function renderMembers() {
     });
   }
 
-  document.getElementById('memberCount').textContent = fmt(DATA.members.length);
-  document.getElementById('memberTable').innerHTML = DATA.members.map(m => `
+  // 필터 요소 가져오기
+  const searchInput = document.getElementById('memberSearchInput');
+  const gradeFilter = document.getElementById('memberGradeFilter');
+  const sortFilter = document.getElementById('memberSortFilter');
+
+  const keyword = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  const grade = gradeFilter ? gradeFilter.value : 'all';
+  const sort = sortFilter ? sortFilter.value : 'joinDate';
+
+  // 1. 필터링
+  let filtered = [...DATA.members];
+
+  if (keyword) {
+    filtered = filtered.filter(m =>
+      (m.name && m.name.toLowerCase().includes(keyword)) ||
+      (m.email && m.email.toLowerCase().includes(keyword)) ||
+      (m.phone && m.phone.toLowerCase().includes(keyword))
+    );
+  }
+
+  if (grade !== 'all') {
+    if (grade === '정지') {
+      filtered = filtered.filter(m => m.status === '정지');
+    } else {
+      filtered = filtered.filter(m => m.role === grade && m.status !== '정지');
+    }
+  }
+
+  // 2. 정렬
+  filtered.sort((a, b) => {
+    if (sort === 'purchase') {
+      return (b.purchase || 0) - (a.purchase || 0);
+    } else if (sort === 'name') {
+      return a.name.localeCompare(b.name, 'ko');
+    } else {
+      // 가입일순
+      return new Date(b.joinDate) - new Date(a.joinDate);
+    }
+  });
+
+  document.getElementById('memberCount').textContent = fmt(filtered.length);
+
+  const tbody = document.getElementById('memberTable');
+  if (!tbody) return;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="11" class="tbl-empty">검색 결과가 없습니다.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(m => `
     <tr>
       <td><input type="checkbox" class="mem-check"></td>
       <td><div style="display:flex;align-items:center;gap:8px;">${avatarHTML(m)}<div style="font-weight:500">${m.name}</div></div></td>
@@ -1527,7 +1704,7 @@ function renderMembers() {
       <td style="font-size:13px;color:var(--gray-500)">${m.phone}</td>
       <td>${statusBadge(m.role)}</td>
       <td style="font-weight:600;font-family:'Inter'">${fmtW(m.purchase)}</td>
-      <td style="font-weight:600;font-family:'Inter';color:var(--accent)">${fmt(m.point)} P</td>
+      <td style="font-weight:600;font-family:'Inter';color:var(--accent)">${fmt(m.point || 0)} P</td>
       <td style="font-size:12px;color:var(--gray-400)">${m.joinDate}</td>
       <td style="font-size:12px;color:var(--gray-400)">${m.lastLogin}</td>
       <td>${m.status === '정지' ? statusBadge('정지') : statusBadge('정상')}</td>
@@ -1538,6 +1715,101 @@ function renderMembers() {
         </div>
       </td>
     </tr>`).join('');
+}
+
+// 회원 데이터 CSV 내보내기 기능
+// 회원 데이터 내보내기 모달 열기
+function exportMembers() {
+  if (!DATA.members || DATA.members.length === 0) {
+    showToast('내보낼 회원 데이터가 없습니다.', 'error');
+    return;
+  }
+  openModal('modal-export-members');
+}
+
+// Excel (.xlsx) 파일로 내보내기
+function exportMembersToXLSX() {
+  try {
+    if (typeof XLSX === 'undefined') {
+      showToast('XLSX 라이브러리가 로드되지 않았습니다. 잠시 후 다시 시도해주세요.', 'error');
+      return;
+    }
+
+    const exportData = DATA.members.map(m => ({
+      '아이디': m.id,
+      '이름': m.name,
+      '이메일': m.email,
+      '연락처': m.phone,
+      '등급': m.role,
+      '누적구매액': m.purchase || 0,
+      '포인트': m.point || 0,
+      '가입일': m.joinDate,
+      '최근접속': m.lastLogin,
+      '상태': m.status
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Members");
+
+    const filename = `varo_members_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(workbook, filename);
+
+    closeModal('modal-export-members');
+    showToast('Excel(.xlsx) 파일이 다운로드되었습니다.', 'success');
+  } catch (e) {
+    console.error(e);
+    showToast('Excel 다운로드 중 오류가 발생했습니다.', 'error');
+  }
+}
+
+// PDF (.pdf) 파일로 내보내기
+function exportMembersToPDF() {
+  try {
+    if (typeof jspdf === 'undefined') {
+      showToast('PDF 라이브러리가 로드되지 않았습니다. 잠시 후 다시 시도해주세요.', 'error');
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape' });
+
+    // NotoSans 등 한글 폰트가 내장되어 있지 않은 jsPDF 기본 상태에서는 한글이 깨질 수 있으므로,
+    // 여기서는 jspdf-autotable을 통해 테이블 형태로 변환하여 출력하되,
+    // 안전한 렌더링을 위해 autotable의 body와 head를 매핑합니다.
+
+    const head = [['ID', '이름', '이메일', '연락처', '등급', '누적구매', '포인트', '가입일', '상태']];
+    const body = DATA.members.map(m => [
+      m.id,
+      m.name,
+      m.email,
+      m.phone,
+      m.role,
+      (m.purchase || 0).toLocaleString() + '원',
+      (m.point || 0).toLocaleString() + 'P',
+      m.joinDate,
+      m.status
+    ]);
+
+    doc.text("VARO Shopping Mall - Member List", 14, 15);
+
+    doc.autoTable({
+      head: head,
+      body: body,
+      startY: 20,
+      styles: { font: 'helvetica', fontSize: 10 },
+      headStyles: { fillColor: [100, 100, 100] }
+    });
+
+    const filename = `varo_members_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(filename);
+
+    closeModal('modal-export-members');
+    showToast('PDF(.pdf) 파일이 다운로드되었습니다.', 'success');
+  } catch (e) {
+    console.error(e);
+    showToast('PDF 다운로드 중 오류가 발생했습니다.', 'error');
+  }
 }
 
 function toggleMemberStatus(id) {
@@ -1688,46 +1960,57 @@ function renderCategories() {
   const container = document.getElementById('categoryContainer');
   if (!container) return;
 
-  const categoryData = [
-    { id: 1, parent_id: null, name: 'BEST', slug: 'best', sort_order: 1 },
-    { id: 2, parent_id: null, name: 'NEW 5%', slug: 'new', sort_order: 2 },
-    { id: 3, parent_id: null, name: 'COLLECTION', slug: 'collection', sort_order: 3 },
-    { id: 4, parent_id: null, name: 'OUTER', slug: 'outer', sort_order: 4 },
-    { id: 5, parent_id: 4, name: '자켓', slug: 'jacket', sort_order: 1 },
-    { id: 6, parent_id: 4, name: '코트', slug: 'coat', sort_order: 2 },
-    { id: 7, parent_id: 4, name: '패딩', slug: 'padding', sort_order: 3 },
-    { id: 8, parent_id: 4, name: '점퍼', slug: 'jumper', sort_order: 4 },
-    { id: 9, parent_id: 4, name: '레더/무스탕', slug: 'leather', sort_order: 5 },
-    { id: 10, parent_id: null, name: 'SHIRT', slug: 'shirt', sort_order: 5 },
-    { id: 17, parent_id: 10, name: '반팔셔츠', slug: 'shortshirt', sort_order: 1 },
-    { id: 18, parent_id: 10, name: '긴팔셔츠', slug: 'longshirt', sort_order: 2 },
-    { id: 19, parent_id: 10, name: '오버셔츠', slug: 'overshirt', sort_order: 3 },
-    { id: 20, parent_id: 10, name: '데님셔츠', slug: 'denimshirt', sort_order: 4 },
-    { id: 11, parent_id: null, name: 'TOP', slug: 'top', sort_order: 6 },
-    { id: 21, parent_id: 11, name: '반팔티', slug: 'shorttee', sort_order: 1 },
-    { id: 22, parent_id: 11, name: '긴팔티', slug: 'longtee', sort_order: 2 },
-    { id: 23, parent_id: 11, name: '맨투맨', slug: 'sweatshirt', sort_order: 3 },
-    { id: 24, parent_id: 11, name: '후드티', slug: 'hoodie', sort_order: 4 },
-    { id: 25, parent_id: 11, name: '민소매', slug: 'sleeveless', sort_order: 5 },
-    { id: 12, parent_id: null, name: 'BOTTOM', slug: 'bottom', sort_order: 7 },
-    { id: 26, parent_id: 12, name: '데님팬츠', slug: 'denim', sort_order: 1 },
-    { id: 27, parent_id: 12, name: '슬랙스', slug: 'slacks', sort_order: 2 },
-    { id: 28, parent_id: 12, name: '카고팬츠', slug: 'cargo', sort_order: 3 },
-    { id: 29, parent_id: 12, name: '조거팬츠', slug: 'jogger', sort_order: 4 },
-    { id: 30, parent_id: 12, name: '반바지', slug: 'shorts', sort_order: 5 },
-    { id: 13, parent_id: null, name: 'KNIT', slug: 'knit', sort_order: 8 },
-    { id: 31, parent_id: 13, name: '풀오버', slug: 'pullover', sort_order: 1 },
-    { id: 32, parent_id: 13, name: '집업니트', slug: 'zipup', sort_order: 2 },
-    { id: 33, parent_id: 13, name: '가디건', slug: 'cardigan', sort_order: 3 },
-    { id: 34, parent_id: 13, name: '니트베스트', slug: 'vest', sort_order: 4 },
-    { id: 14, parent_id: null, name: 'SHOES', slug: 'shoes', sort_order: 9 },
-    { id: 35, parent_id: 14, name: '스니커즈', slug: 'sneakers', sort_order: 1 },
-    { id: 36, parent_id: 14, name: '로퍼', slug: 'loafer', sort_order: 2 },
-    { id: 37, parent_id: 14, name: '샌들', slug: 'sandal', sort_order: 3 },
-    { id: 38, parent_id: 14, name: '부츠', slug: 'boots', sort_order: 4 },
-    { id: 15, parent_id: null, name: '1+1 EVENT', slug: 'event', sort_order: 10 },
-    { id: 16, parent_id: null, name: 'COMMUNITY', slug: 'community', sort_order: 11 }
-  ];
+  let categoryData = (typeof API_CATEGORIES !== 'undefined' && API_CATEGORIES && API_CATEGORIES.length > 0)
+    ? API_CATEGORIES
+    : [
+      { id: 1, parent_id: null, name: 'BEST', slug: 'best', sort_order: 1 },
+      { id: 2, parent_id: null, name: 'NEW 5%', slug: 'new', sort_order: 2 },
+      { id: 3, parent_id: null, name: 'COLLECTION', slug: 'collection', sort_order: 3 },
+      { id: 4, parent_id: null, name: 'OUTER', slug: 'outer', sort_order: 4 },
+      { id: 5, parent_id: 4, name: '자켓', slug: 'jacket', sort_order: 1 },
+      { id: 6, parent_id: 4, name: '코트', slug: 'coat', sort_order: 2 },
+      { id: 7, parent_id: 4, name: '패딩', slug: 'padding', sort_order: 3 },
+      { id: 8, parent_id: 4, name: '점퍼', slug: 'jumper', sort_order: 4 },
+      { id: 9, parent_id: 4, name: '레더/무스탕', slug: 'leather', sort_order: 5 },
+      { id: 10, parent_id: null, name: 'SHIRT', slug: 'shirt', sort_order: 5 },
+      { id: 17, parent_id: 10, name: '반팔셔츠', slug: 'shortshirt', sort_order: 1 },
+      { id: 18, parent_id: 10, name: '긴팔셔츠', slug: 'longshirt', sort_order: 2 },
+      { id: 19, parent_id: 10, name: '오버셔츠', slug: 'overshirt', sort_order: 3 },
+      { id: 20, parent_id: 10, name: '데님셔츠', slug: 'denimshirt', sort_order: 4 },
+      { id: 11, parent_id: null, name: 'TOP', slug: 'top', sort_order: 6 },
+      { id: 21, parent_id: 11, name: '반팔티', slug: 'shorttee', sort_order: 1 },
+      { id: 22, parent_id: 11, name: '긴팔티', slug: 'longtee', sort_order: 2 },
+      { id: 23, parent_id: 11, name: '맨투맨', slug: 'sweatshirt', sort_order: 3 },
+      { id: 24, parent_id: 11, name: '후드티', slug: 'hoodie', sort_order: 4 },
+      { id: 25, parent_id: 11, name: '민소매', slug: 'sleeveless', sort_order: 5 },
+      { id: 12, parent_id: null, name: 'BOTTOM', slug: 'bottom', sort_order: 7 },
+      { id: 26, parent_id: 12, name: '데님팬츠', slug: 'denim', sort_order: 1 },
+      { id: 27, parent_id: 12, name: '슬랙스', slug: 'slacks', sort_order: 2 },
+      { id: 28, parent_id: 12, name: '카고팬츠', slug: 'cargo', sort_order: 3 },
+      { id: 29, parent_id: 12, name: '조거팬츠', slug: 'jogger', sort_order: 4 },
+      { id: 30, parent_id: 12, name: '반바지', slug: 'shorts', sort_order: 5 },
+      { id: 13, parent_id: null, name: 'KNIT', slug: 'knit', sort_order: 8 },
+      { id: 31, parent_id: 13, name: '풀오버', slug: 'pullover', sort_order: 1 },
+      { id: 32, parent_id: 13, name: '집업니트', slug: 'zipup', sort_order: 2 },
+      { id: 33, parent_id: 13, name: '가디건', slug: 'cardigan', sort_order: 3 },
+      { id: 34, parent_id: 13, name: '니트베스트', slug: 'vest', sort_order: 4 },
+      { id: 14, parent_id: null, name: 'SHOES', slug: 'shoes', sort_order: 9 },
+      { id: 35, parent_id: 14, name: '스니커즈', slug: 'sneakers', sort_order: 1 },
+      { id: 36, parent_id: 14, name: '로퍼', slug: 'loafer', sort_order: 2 },
+      { id: 37, parent_id: 14, name: '샌들', slug: 'sandal', sort_order: 3 },
+      { id: 38, parent_id: 14, name: '부츠', slug: 'boots', sort_order: 4 },
+      { id: 15, parent_id: null, name: '1+1 EVENT', slug: 'event', sort_order: 10 },
+      { id: 16, parent_id: null, name: 'COMMUNITY', slug: 'community', sort_order: 11 }
+    ];
+
+  const outerCat = categoryData.find(c => c.name.toUpperCase() === 'OUTER');
+  const outerId = outerCat ? outerCat.id : 4;
+  categoryData = categoryData.map(c => {
+    if (c.name === '패딩' || c.name === '점퍼' || c.name === '레더/무스탕') {
+      if (!c.parent_id || c.parent_id === 'null') c.parent_id = outerId;
+    }
+    return c;
+  });
 
   const parents = categoryData.filter(c => !c.parent_id).sort((a, b) => a.sort_order - b.sort_order);
   const children = categoryData.filter(c => c.parent_id).sort((a, b) => a.sort_order - b.sort_order);
@@ -1746,14 +2029,23 @@ function renderCategories() {
     let modalOptions = '<option value="">선택</option>';
     let filterOptions = '<option value="">전체 카테고리</option>';
 
+    // 1. 상품 등록 모달의 카테고리 목록 (기존 유지)
     parents.forEach(p => {
       modalOptions += `<option value="${p.id}" style="font-weight:700;">${p.name}</option>`;
-      filterOptions += `<option value="${p.name}" style="font-weight:700;">${p.name}</option>`;
-
       children.filter(c => c.parent_id == p.id).forEach(c => {
         modalOptions += `<option value="${c.id}">&nbsp;&nbsp;↳ ${c.name}</option>`;
-        filterOptions += `<option value="${c.name}">&nbsp;&nbsp;↳ ${c.name}</option>`;
       });
+    });
+
+    // 2. 상품 목록 필터의 카테고리 목록 (실제 존재하는 상품 카테고리만 추출)
+    const allProducts = [...(DATA.products || []), ...(API_PRODUCTS || []).map(p => {
+      const catObj = (typeof API_CATEGORIES !== 'undefined' ? API_CATEGORIES : []).find(c => c.id == p.categoryId || c.id === p.category_id);
+      return { category: catObj ? (catObj.name || catObj.label) : (p.categoryId || '기타') };
+    })];
+    const uniqueCategories = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
+
+    uniqueCategories.forEach(cat => {
+      filterOptions += `<option value="${cat}">${cat}</option>`;
     });
 
     if (pCatSelect) pCatSelect.innerHTML = modalOptions;
@@ -1825,12 +2117,17 @@ function initCategorySortable() {
       handle: '.parent-handle',
       animation: 150,
       onEnd: async function () {
-        const items = Array.from(container.querySelectorAll('.category-item'));
-        const orders = items.map((item, index) => ({
-          id: item.dataset.id,
-          sort_order: index + 1,
-          parent_id: null
-        }));
+        const items = Array.from(container.children).filter(el => el.classList.contains('category-item'));
+        const orders = items.map((item, index) => {
+          const nameEl = item.querySelector('.name');
+          const fullName = nameEl ? nameEl.childNodes[0].textContent.trim() : '';
+          return {
+            id: item.dataset.id,
+            sort_order: index + 1,
+            parent_id: null,
+            name: fullName
+          };
+        });
         await saveReorder(orders);
       }
     });
@@ -1862,7 +2159,41 @@ async function saveReorder(orders) {
     const res = await API.req('PUT', '/categories/reorder', { orders }, true);
     if (res.success) {
       showToast('순서가 변경되었습니다.', 'success');
+      localStorage.setItem('VARO_CATEGORIES_ORDER', JSON.stringify(orders));
+
+      const currentCats = JSON.parse(localStorage.getItem('varo_categories') || '[]');
+      if (currentCats.length > 0) {
+        const outerCat = currentCats.find(c => c.name.toUpperCase() === 'OUTER');
+        const outerId = outerCat ? outerCat.id : 4;
+
+        orders.forEach(o => {
+          const idx = currentCats.findIndex(c => c.id == o.id);
+          if (idx > -1) {
+            currentCats[idx].sort_order = o.sort_order;
+            if (currentCats[idx].name === '패딩' || currentCats[idx].name === '점퍼' || currentCats[idx].name === '레더/무스탕') {
+              currentCats[idx].parent_id = outerId;
+            } else if (o.parent_id !== undefined) {
+              currentCats[idx].parent_id = o.parent_id;
+            }
+          }
+        });
+        localStorage.setItem('varo_categories', JSON.stringify(currentCats));
+      }
+
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'varo_categories',
+        newValue: localStorage.getItem('varo_categories')
+      }));
+
       syncAllData(); // [ADD] 즉시 데이터 동기화 및 렌더링
+      if (typeof window.updateHeaderOrder === 'function') {
+        window.updateHeaderOrder();
+      }
+
+      // [ADD] 실시간 동기화 브로드캐스트 전송
+      if (typeof adminSyncChannel !== 'undefined') {
+        adminSyncChannel.postMessage({ type: 'categories', action: 'reorder', reordered: true });
+      }
     } else {
       showToast(res.message || '순서 저장 실패', 'error');
     }

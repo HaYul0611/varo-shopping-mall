@@ -43,6 +43,94 @@ const ComponentLoader = (() => {
 
     await Promise.all(tasks);
 
+    // [ADD] 헤더 로드 후 카테고리 순서 재배치 로직
+    const updateHeaderOrder = async () => {
+      try {
+        let catsStr = localStorage.getItem('varo_categories');
+        let cats = [];
+
+        if (!catsStr || catsStr === '[]') {
+          if (window.API && typeof window.API.req === 'function') {
+            const res = await window.API.req('GET', '/categories');
+            if (res.success && (res.data || res.categories)) {
+              cats = res.data || res.categories;
+              localStorage.setItem('varo_categories', JSON.stringify(cats));
+            }
+          }
+        } else {
+          try {
+            cats = JSON.parse(catsStr);
+          } catch (e) {
+            console.error('[HeaderSync] JSON parse error:', e);
+          }
+        }
+
+        if (!Array.isArray(cats) || !cats.length) return;
+
+        console.log('[HeaderSync] Cats raw data:', JSON.stringify(cats));
+
+        const parents = cats.filter(c => !c.parent_id || c.parent_id === 'null' || c.parent_id === '').sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+        console.log('[HeaderSync] Parents ordered:', parents.map(p => `${p.name}(${p.sort_order})`));
+
+        const navList = document.querySelector('.category-nav__list');
+        if (!navList) {
+          console.warn('[HeaderSync] navList not found');
+          return;
+        }
+
+        const items = Array.from(navList.querySelectorAll('.category-nav__item'));
+        if (!items.length) {
+          console.warn('[HeaderSync] items not found');
+          return;
+        }
+
+        const sortedItems = [];
+        parents.forEach(ord => {
+          const match = items.find(item => {
+            const aText = item.querySelector('a')?.textContent.trim().replace(/\s+/g, '').toUpperCase() || '';
+            const ordName = ord.name.trim().replace(/\s+/g, '').toUpperCase() || '';
+            return aText === ordName || aText.includes(ordName) || ordName.includes(aText);
+          });
+          if (match) sortedItems.push(match);
+        });
+
+        console.log('[HeaderSync] Sorted items count:', sortedItems.length);
+
+        items.forEach(item => {
+          if (!sortedItems.includes(item)) sortedItems.push(item);
+        });
+
+        navList.innerHTML = '';
+        sortedItems.forEach(item => navList.appendChild(item));
+      } catch (e) {
+        console.error('[ComponentLoader] Failed to reorder header:', e);
+      }
+    };
+
+    window.updateHeaderOrder = updateHeaderOrder;
+    updateHeaderOrder();
+
+    // 1. Storage 이벤트 감지 (다른 탭/창)
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'varo_categories' || e.key === 'VARO_CATEGORIES_ORDER') {
+        console.log('[HeaderSync] Storage event detected:', e.key);
+        updateHeaderOrder();
+      }
+    });
+
+    // 2. BroadcastChannel 감지 (동일 브라우저 내 모든 컨텍스트)
+    try {
+      const syncChannel = new BroadcastChannel('varo_admin_sync');
+      syncChannel.onmessage = (e) => {
+        console.log('[HeaderSync] Broadcast message received:', e.data);
+        if (e.data && (e.data.type === 'categories' || e.data.reordered)) {
+          updateHeaderOrder();
+        }
+      };
+    } catch (err) {
+      console.warn('[HeaderSync] BroadcastChannel not supported:', err);
+    }
+
     window.varoComponentsLoaded = true;
     document.dispatchEvent(new CustomEvent('varo:componentsLoaded'));
   };

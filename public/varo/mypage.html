@@ -28,9 +28,12 @@
   <link rel="stylesheet" href="./styles/header.css">
   <link rel="stylesheet" href="./styles/mega-menu.css">
   <link rel="stylesheet" href="./styles/mypage.css">
+  <!-- mypage.js에서 이벤트 바인딩 처리 -->
 </head>
 
 <body class="mypage-page">
+
+
 
   <div id="header-placeholder"></div>
 
@@ -95,7 +98,7 @@
                     <td class="order-status-cell">
                       <span style="font-weight:600; color:#D96B3C;">주문완료</span>
                       <button type="button"
-                        class="btn btn--outline btn-order-action btn-track-delivery-custom">배송조회</button>
+                        class="btn btn--outline btn-order-action btn-track-delivery">배송조회</button>
                       <button type="button" class="btn btn--outline btn-order-action btn-cancel-order">주문취소</button>
                     </td>
                   </tr>
@@ -105,7 +108,7 @@
                     <td>89,000원</td>
                     <td class="order-status-cell">
                       <span style="font-weight:600; color:#1B2B4B;">배송중</span>
-                      <button type="button" class="btn btn--outline btn-order-action btn-track-delivery">배송조회</button>
+                      <button type="button" class="btn btn--outline btn-order-action btn-track-delivery-custom">배송조회</button>
                     </td>
                   </tr>
                   <tr>
@@ -627,7 +630,7 @@
   <script src="./js/utils.js"></script>
   <script src="./js/main.js"></script>
   <script src="./js/mega-menu.js"></script>
-  <script src="./js/mypage.js"></script>
+  <script src="./js/mypage.js?v=1.0.1"></script>
 
   <!-- Virtual Delivery Tracking Modal -->
   <div id="deliveryTrackingModal" class="delivery-modal-overlay" role="dialog" aria-modal="true">
@@ -672,8 +675,81 @@
         </div>
 
         <button type="button" class="btn btn--primary btn--full"
-          style="margin-top: 30px; background: #D96B3C; border-color: #D96B3C;"
-          onclick="closeDeliveryModal()">닫기</button>
+          style="margin-top: 30px; background: #D96B3C; border-color: #D96B3C;">닫기</button>
+      </div>
+    </div>
+  </div>
+  <!-- 주문 취소 커스텀 모달 -->
+  <div id="customCancelModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div
+      style="background: #fff; padding: 30px; border-radius: 8px; width: 400px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #1C1A16;">주문 취소</h3>
+      <p style="font-size: 14px; color: #666; margin-bottom: 25px; line-height: 1.5;">정말로 이 주문을 취소하시겠습니까?<br>취소 후에는 되돌릴
+        수 없습니다.</p>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button id="btnCancelConfirm"
+          style="background: #D96B3C; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;">취소하기</button>
+        <button
+          style="background: #eee; color: #333; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 구매 확정 커스텀 모달 -->
+  <div id="customConfirmModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div
+      style="background: #fff; padding: 30px; border-radius: 8px; width: 400px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #1C1A16;">구매 확정</h3>
+      <p style="font-size: 14px; color: #666; margin-bottom: 25px; line-height: 1.5;">구매 확정을 진행하시겠습니까?<br><span
+          style="color: #D96B3C; font-weight: 600;">포토 리뷰 200P / 일반 리뷰 100P 적립</span>됩니다.</p>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button id="btnPurchaseConfirm"
+          style="background: #1B2B4B; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;">구매확정</button>
+        <button
+          style="background: #eee; color: #333; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 리뷰 작성 커스텀 모달 -->
+  <div id="customReviewModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div
+      style="background: #fff; padding: 30px; border-radius: 8px; width: 450px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #1C1A16;">리뷰 작성</h3>
+      <p style="font-size: 13px; color: #888; margin-bottom: 20px;">상품은 어떠셨나요? 솔직한 후기를 남겨주세요.</p>
+
+      <div
+        style="display: flex; justify-content: center; gap: 5px; margin-bottom: 20px; font-size: 24px; color: #ddd; cursor: pointer;"
+        id="reviewStars">
+        <span data-value="1">★</span>
+        <span data-value="2">★</span>
+        <span data-value="3">★</span>
+        <span data-value="4">★</span>
+        <span data-value="5">★</span>
+      </div>
+
+      <textarea id="reviewText" placeholder="최소 10자 이상 작성해주세요. (포토 200P / 일반 100P 적립)"
+        style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: none; font-size: 13px; margin-bottom: 20px; box-sizing: border-box;"></textarea>
+
+      <div style="margin-bottom: 20px; text-align: left;">
+        <label for="reviewImages"
+          style="display: inline-block; padding: 8px 15px; background: #f4f4f4; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; cursor: pointer; font-weight: 600;">📷
+          사진 첨부 (다중 선택 가능)</label>
+        <input type="file" id="reviewImages" multiple accept="image/*" style="display: none;">
+        <span id="photoPointNotice" style="font-size: 12px; color: #D96B3C; margin-left: 10px; font-weight: 600;">* 사진
+          첨부 시 200P (미첨부 100P)</span>
+        <div id="imagePreviewContainer" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button id="btnReviewSubmit"
+          style="background: #1B2B4B; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;">리뷰
+          등록 및 구매확정</button>
+        <button
+          style="background: #eee; color: #333; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;">취소</button>
       </div>
     </div>
   </div>

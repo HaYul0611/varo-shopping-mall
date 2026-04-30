@@ -13,6 +13,9 @@
   <script src="./js/admin-auth.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 
 <body>
@@ -469,7 +472,7 @@
             <div class="section-sub">총 <span id="memberCount">0</span>명 회원</div>
           </div>
           <div class="header-actions">
-            <button class="btn btn-outline" onclick="showToast('회원 데이터 내보내기 완료')">내보내기</button>
+            <button class="btn btn-outline" onclick="exportMembers()">내보내기</button>
             <button class="btn btn-primary" onclick="openModal('modal-add-member')">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -494,7 +497,6 @@
             <option>GOLD</option>
             <option>DIA</option>
             <option>MANAGER</option>
-            <option>정지</option>
           </select>
           <select class="form-control" style="width:130px;">
             <option>가입일순</option>
@@ -1079,7 +1081,8 @@
       <div class="modal-body">
         <div class="form-row">
           <div class="form-group"><label class="form-label">쿠폰명 *</label><input class="form-control" id="cName"></div>
-          <div class="form-group"><label class="form-label">프로모션 코드 (선택)</label><input class="form-control" id="cCode" placeholder="예: WELCOME2026"></div>
+          <div class="form-group"><label class="form-label">프로모션 코드 (선택)</label><input class="form-control" id="cCode"
+              placeholder="예: WELCOME2026"></div>
         </div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">할인 유형</label><select class="form-control" id="cType">
@@ -1132,6 +1135,46 @@
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeModal('modal-review-reply')">취소</button>
         <button class="btn btn-primary" onclick="saveReply()">답변 등록</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPORT MEMBERS MODAL -->
+  <div class="modal-overlay" id="modal-export-members">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">회원 데이터 내보내기</span>
+        <button class="modal-close" onclick="closeModal('modal-export-members')">✕</button>
+      </div>
+      <div class="modal-body" style="text-align:center; padding:30px 20px;">
+        <div style="margin-bottom:20px; color:var(--gray-600);">다운로드할 파일 형식을 선택해주세요.</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <button class="btn btn-outline"
+            style="display:flex; flex-direction:column; align-items:center; gap:10px; padding:20px; height:auto;"
+            onclick="exportMembersToXLSX()">
+            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="var(--success)" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <path d="M8 13h8M8 17h8" />
+            </svg>
+            <span style="font-weight:600; font-size:15px;">Excel (.xlsx)</span>
+          </button>
+
+          <button class="btn btn-outline"
+            style="display:flex; flex-direction:column; align-items:center; gap:10px; padding:20px; height:auto;"
+            onclick="exportMembersToPDF()">
+            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="var(--danger)" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <circle cx="10" cy="13" r="2" />
+              <path d="M12 15l4 4" />
+            </svg>
+            <span style="font-weight:600; font-size:15px;">PDF (.pdf)</span>
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" style="width:100%" onclick="closeModal('modal-export-members')">닫기</button>
       </div>
     </div>
   </div>
